@@ -10,7 +10,8 @@ import http from 'http';
 import cors from 'cors';
 import { resolvers } from './resolver';
 import { readFileSync } from "fs";
-import * as admin from 'firebase-admin';
+import { getLoginUserFromToken } from './platform';
+import { log } from 'console';
 
 const typeDefs = readFileSync("./schema.graphql", { encoding: "utf-8" });
 
@@ -64,15 +65,8 @@ async function startApolloServer() {
             console.log('Token:', token);      
             let loginUser = null;
             if (token) {
-              try {
-                // Replace with admin.auth().verifyIdToken(token) for production
-                // user = { uid: 'sample-uid', email: 'user@example.com' };
-                let decodedId = await admin.auth().verifyIdToken(token);
-                loginUser = { uid: decodedId.uid, email: decodedId.email };        
-                console.log('Decoded ID:', decodedId);
-              } catch (error) {
-                console.error('Auth error:', error);
-              }
+              loginUser = await getLoginUserFromToken(token);
+              console.log('Login user:', loginUser);
             }
             console.log('user', loginUser);
             return { loginUser };

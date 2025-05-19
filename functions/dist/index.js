@@ -48,7 +48,7 @@ const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const resolver_1 = require("./resolver");
 const fs_1 = require("fs");
-const admin = __importStar(require("firebase-admin"));
+const platform_1 = require("./platform");
 const typeDefs = (0, fs_1.readFileSync)("./schema.graphql", { encoding: "utf-8" });
 const PORT = 4000;
 const app = (0, express_1.default)();
@@ -93,16 +93,8 @@ async function startApolloServer() {
             console.log('Token:', token);
             let loginUser = null;
             if (token) {
-                try {
-                    // Replace with admin.auth().verifyIdToken(token) for production
-                    // user = { uid: 'sample-uid', email: 'user@example.com' };
-                    let decodedId = await admin.auth().verifyIdToken(token);
-                    loginUser = { uid: decodedId.uid, email: decodedId.email };
-                    console.log('Decoded ID:', decodedId);
-                }
-                catch (error) {
-                    console.error('Auth error:', error);
-                }
+                loginUser = await (0, platform_1.getLoginUserFromToken)(token);
+                console.log('Login user:', loginUser);
             }
             console.log('user', loginUser);
             return { loginUser };
