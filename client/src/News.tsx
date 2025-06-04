@@ -1,32 +1,64 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { Box, Typography, List, ListItem, Button, IconButton } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { 
+  Box, 
+  Typography, 
+  List, 
+  ListItem, 
+  Button, 
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+  Alert
+} from "@mui/material";
+import { ArrowBack, Close } from "@mui/icons-material";
 import {
   User,
   NewsPost,
   useNewsRecentPostsQuery,
+  useNewsPostQuery,
   NewsRecentPostsQuery,
   NewsRecentPostsQueryVariables,
+  NewsPostQuery,
+  NewsPostQueryVariables,
   Role,
 } from "./generated/graphql";
 import NewsForm from "./components/NewsForm"; // Adjust path as needed
 import { CreateNewsPostMutation } from "./generated/graphql";
 
 const NEWS_RECENT_QUERY = gql`
-  query NewsRecentPosts($tags: [String!], $limit: Int, $offset: Int) {
-    newsRecentPosts(tags: $tags, limit: $limit, offset: $offset) {
+  query NewsRecentPosts($limit: Int, $offset: Int) {
+    newsRecentPosts(limit: $limit, offset: $offset) {
+      id
+      title
+      images
+      createdAt
+      tags
+    }
+  }
+`;
+
+const DETAIL_NEWS_QUERY = gql`
+  query NewsPost($newsPostId: ID!) {
+    newsPost(id: $newsPostId) {
       id
       title
       content
       images
       relatedItems {
+        id
         name
+        category
+        status
       }
       createdAt
+      updatedAt
       tags
       user {
-        isVerified
+        id
         nickname
       }
     }
@@ -39,6 +71,7 @@ interface NewsProps {
 
 const News: React.FC<NewsProps> = ({user}) => {
   const [showAllNews, setShowAllNews] = useState(false);
+  const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
   
   // Query for single recent news (limit: 1)
   const singleNewsOutput = useNewsRecentPostsQuery({
@@ -50,6 +83,12 @@ const News: React.FC<NewsProps> = ({user}) => {
   const allNewsOutput = useNewsRecentPostsQuery({
     variables: { tags: ["Testing"], limit: 20, offset: 0 } as NewsRecentPostsQueryVariables,
     skip: !showAllNews, // Skip this query when showing single news
+  });
+
+  // Query for detailed news when dialog is open
+  const detailNewsOutput = useNewsPostQuery({
+    variables: { newsPostId: selectedNewsId! } as NewsPostQueryVariables,
+    skip: !selectedNewsId, // Skip this query when no news is selected
   });
 
   const handleNewsCreated = (data: CreateNewsPostMutation) => {
@@ -69,6 +108,14 @@ const News: React.FC<NewsProps> = ({user}) => {
   const handleBackToSingle = () => {
     setShowAllNews(false);
   };
+
+  const handleNewsItemClick = (newsId: string) => {
+    setSelectedNewsId(newsId);
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedNewsId(null);
+  };  
 
   // Show single news view
   if (!showAllNews) {
@@ -124,16 +171,20 @@ const News: React.FC<NewsProps> = ({user}) => {
       {allNewsOutput.data && (
         <List>
           {allNewsOutput.data.newsRecentPosts.map((news) => (
-            <ListItem key={news.id} sx={{ borderBottom: "1px solid #eee" }}>
-              <Box sx={{ width: "100%" }}>
+           <ListItem 
+              key={news.id} 
+              sx={{ 
+                borderBottom: "1px solid #eee",
+                cursor: "pointer",
+                "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" }
+              }}
+              onClick={() => handleNewsItemClick(news.id)}
+            >              <Box sx={{ width: "100%" }}>
                 <Typography variant="h6" gutterBottom>
                   {news.title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  By {news.user.nickname} • {new Date(news.createdAt).toLocaleDateString()}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  {news.content}
+                  {new Date(news.createdAt).toLocaleDateString()}
                 </Typography>
                 {news.images && news.images.length > 0 && (
                   <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1 }}>
@@ -183,6 +234,124 @@ const News: React.FC<NewsProps> = ({user}) => {
           <Typography color="error">Error: {allNewsOutput.error.message}</Typography>
         </Box>
       )}
+
+      {/* News Detail Dialog */}
+      <Dialog 
+        open={!!selectedNewsId} 
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { maxHeight: '80vh' }
+        }}
+      >
+        <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Typography variant="h5">News Details</Typography>
+          <IconButton onClick={handleCloseDialog}>
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent>
+          {detailNewsOutput.loading && (
+            <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+              <CircularProgress />
+            </Box>
+          )}
+          
+          {detailNewsOutput.error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              Error loading news details: {detailNewsOutput.error.message}
+            </Alert>
+          )}
+          
+          {detailNewsOutput.data?.newsPost && (
+            <Box>
+              <Typography variant="h4" gutterBottom>
+                {detailNewsOutput.data.newsPost.title}
+              </Typography>
+              
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  By {detailNewsOutput.data.newsPost.user?.nickname || 'Unknown'} • 
+                  Created: {new Date(detailNewsOutput.data.newsPost.createdAt).toLocaleDateString()} • 
+                  Updated: {new Date(detailNewsOutput.data.newsPost.updatedAt).toLocaleDateString()}
+                </Typography>
+              </Box>
+
+              <Typography variant="body1" sx={{ mb: 3, whiteSpace: "pre-wrap" }}>
+                {detailNewsOutput.data.newsPost.content}
+              </Typography>
+
+              {detailNewsOutput.data.newsPost.images && detailNewsOutput.data.newsPost.images.length > 0 && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" gutterBottom>Images</Typography>
+                  <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                    {detailNewsOutput.data.newsPost.images.map((image, index) => (
+                      <img 
+                        key={index}
+                        src={image} 
+                        alt={`News image ${index + 1}`}
+                        style={{ 
+                          maxWidth: "200px", 
+                          maxHeight: "200px", 
+                          objectFit: "cover",
+                          borderRadius: "8px"
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )}
+
+              {detailNewsOutput.data.newsPost.relatedItems && detailNewsOutput.data.newsPost.relatedItems.length > 0 && (
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" gutterBottom>Related Items</Typography>
+                  {detailNewsOutput.data.newsPost.relatedItems.map((item) => (
+                    <Box key={item.id} sx={{ p: 2, border: "1px solid #ddd", borderRadius: 1, mb: 1 }}>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        {item.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Status: {item.status} • Categories: {item.category.join(", ")}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+
+              {detailNewsOutput.data.newsPost.tags && detailNewsOutput.data.newsPost.tags.length > 0 && (
+                <Box>
+                  <Typography variant="h6" gutterBottom>Tags</Typography>
+                  <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                    {detailNewsOutput.data.newsPost.tags.map((tag, index) => (
+                      <Typography 
+                        key={index}
+                        variant="body2" 
+                        sx={{ 
+                          bgcolor: "primary.main", 
+                          color: "white", 
+                          px: 2, 
+                          py: 1, 
+                          borderRadius: 2 
+                        }}
+                      >
+                        {tag}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseDialog} variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>      
     </Box>
   );
 };
