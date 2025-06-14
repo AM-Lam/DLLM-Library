@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { auth } from "../firebase";
 import { Button, Box, Typography, List, ListItem } from "@mui/material";
-import { User as fireUser } from "firebase/auth";
 import { User, Item } from "../generated/graphql";
+import RecentNewsBanner from "../components/RecentNewsBanner";
 import Map from "../components/Map";
 import { Link } from "react-router";
 import { useOutletContext } from 'react-router-dom';
@@ -117,9 +117,9 @@ const HomePage: React.FC= () => {
           </ListItem>
         )}
         <ListItem>
-          <Button component={Link} to="/news" variant="outlined">
-            View News
-          </Button>
+          <RecentNewsBanner 
+            user={user}
+          />
         </ListItem>
         <ListItem>
           <Button variant="contained" onClick={getLocation}>
