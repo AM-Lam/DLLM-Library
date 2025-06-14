@@ -6,9 +6,8 @@ import { User, Item } from "../generated/graphql";
 import RecentNewsBanner from "../components/RecentNewsBanner";
 import Map from "../components/Map";
 import { Link } from "react-router";
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext } from "react-router-dom";
 import CreateUser from "../components/UserProfile";
-
 
 const ITEMS_QUERY = gql`
   query ItemsByLocation(
@@ -50,11 +49,13 @@ const ME_QUERY = gql`
 `;
 
 interface OutletContext {
+  email?: string | undefined | null;
   user?: User;
 }
 
 const HomePage: React.FC = () => {
   const { user } = useOutletContext<OutletContext>();
+  const { email } = useOutletContext<OutletContext>();
   const [location, setLocation] = useState<{
     latitude: number;
     longitude: number;
@@ -72,7 +73,6 @@ const HomePage: React.FC = () => {
       skip: !location,
     }
   );
-
 
   const getLocation = () => {
     if (user?.location?.latitude) {
@@ -98,7 +98,6 @@ const HomePage: React.FC = () => {
 
   const [userFormOpen, setUserFormOpen] = useState(false);
 
-
   const signOut = async () => {
     await auth.signOut();
   };
@@ -107,27 +106,24 @@ const HomePage: React.FC = () => {
     <Box p={2}>
       <List>
         {/* {user && ( */}
-          <ListItem>
-            {user ? (
+        <ListItem>
+          {user ? (
+            <>
+              <Typography>Welcome, {user.nickname}</Typography>
+              <Button onClick={signOut}>Sign Out</Button>
+            </>
+          ) : (
+            email && (
               <>
-                <Typography>Welcome, {user.nickname}</Typography>
+                <CreateUser onUserCreated={() => {}} />
                 <Button onClick={signOut}>Sign Out</Button>
               </>
-            ) : (
-              <>
-                <Button onClick={() => setUserFormOpen(!userFormOpen)}>
-                  Create User
-                </Button>
-                {userFormOpen && <CreateUser onUserCreated={() => { }} />}
-                <Button onClick={signOut}>Sign Out</Button>
-              </>
-            )}
-          </ListItem>
+            )
+          )}
+        </ListItem>
         {/* )} */}
         <ListItem>
-          <RecentNewsBanner 
-            user={user}
-          />
+          <RecentNewsBanner user={user} />
         </ListItem>
         <ListItem>
           <Button variant="contained" onClick={getLocation}>
