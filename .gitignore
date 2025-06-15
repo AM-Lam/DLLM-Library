@@ -50,6 +50,10 @@ build/Release
 node_modules/
 dist/
 
+# Package lock files
+client/package-lock.json
+functions/package-lock.json
+
 # Optional npm cache directory
 .npm
 
