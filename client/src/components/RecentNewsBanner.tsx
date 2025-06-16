@@ -11,12 +11,14 @@ import { CreateNewsPostMutation } from "../generated/graphql";
 import NewsForm from "./NewsForm";
 import NewsSummary from "./NewsSummary";
 import NewsDetail from "./NewsDetail";
+import { useTranslation } from "react-i18next";
 
 interface RecentNewsBannerProps {
   user: User | undefined;
 }
 
 const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
+  const { t } = useTranslation();
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
 
   const { data, loading, error, refetch } = useNewsRecentPostsQuery({
@@ -56,7 +58,7 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
                 "&:hover": { textDecoration: "underline" },
               }}
             >
-              News
+              {t("news.title")}
             </Typography>
             {user?.role === Role.Admin && (
               <NewsForm onNewsCreated={handleNewsCreated} />

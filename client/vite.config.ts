@@ -12,11 +12,6 @@ export default defineConfig({
     outDir: "build",
     sourcemap: true,
   },
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: "./src/setupTests.ts",
-  },
   define: {
     global: "globalThis",
   },

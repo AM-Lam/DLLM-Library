@@ -15,6 +15,7 @@ import L from "leaflet";
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
 // Use:
+/*
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -24,6 +25,7 @@ L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
 });
+*/
 
 interface MapProps {
   open: boolean;
