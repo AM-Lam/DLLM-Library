@@ -8,26 +8,44 @@ import {
 } from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import { Link } from "react-router";
+import { gql, useQuery } from "@apollo/client";
 import {
-  useNewsRecentPostsQuery,
-  NewsRecentPostsQueryVariables,
   User,
-  Role,
+  Item,
+  RecentAddedItemsQuery,
+  RecentAddedItemsQueryVariables,
 } from "../generated/graphql";
-import NewsForm from "./NewsForm";
-import NewsDetail from "./NewsDetail";
-import NewsPost from "./NewsPost";
+import ItemPreview from "./ItemPreview";
+import ItemDetail from "./ItemDetail";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
-interface RecentNewsBannerProps {
+const RECENT_ITEM_QUERY = gql`
+  query RecentAddedItems($limit: Int, $offset: Int, $category: [String!]) {
+    recentAddedItems(limit: $limit, offset: $offset, category: $category) {
+      id
+      name
+      description
+      condition
+      category
+      status
+      images
+      publishedYear
+      language
+      createdAt
+    }
+  }
+`;
+
+interface RecentBannerProps {
   user: User | undefined;
+  category: string;
 }
 
-const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
+const RecentItemBanner: React.FC<RecentBannerProps> = ({ user, category }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [cardsPerView, setCardsPerView] = useState(4);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -38,12 +56,15 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
   const isPortrait = useMediaQuery("(orientation: portrait)");
   const isLandscape = useMediaQuery("(orientation: landscape)");
 
-  const { data, loading, error, refetch } = useNewsRecentPostsQuery({
+  const { data, loading, error, refetch } = useQuery<
+    RecentAddedItemsQuery,
+    RecentAddedItemsQueryVariables
+  >(RECENT_ITEM_QUERY, {
     variables: {
-      tags: [],
+      category: category ? [category] : [],
       limit: 10,
       offset: 0,
-    } as NewsRecentPostsQueryVariables,
+    },
   });
 
   // Calculate responsive dimensions and cards per view
@@ -64,7 +85,7 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
         cards = Math.max(3, Math.min(6, cards));
       }
 
-      const maxCards = data?.newsRecentPosts.length || 10;
+      const maxCards = data?.recentAddedItems.length || 10;
       setCardsPerView(Math.max(1, Math.min(cards, maxCards)));
     };
 
@@ -72,7 +93,7 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
     window.addEventListener("resize", calculateLayout);
 
     return () => window.removeEventListener("resize", calculateLayout);
-  }, [data?.newsRecentPosts.length, isMobile, isPortrait, isLandscape]);
+  }, [data?.recentAddedItems.length, isMobile, isPortrait, isLandscape]);
 
   // Calculate container height based on device and orientation
   const getContainerHeight = () => {
@@ -110,16 +131,12 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
 
   const cardDimensions = getCardDimensions();
 
-  const handleNewsCreated = () => {
-    refetch();
-  };
-
-  const handleNewsItemClick = (newsId: string) => {
-    navigate(`/news/${newsId}`);
+  const handleItemClick = (itemId: string) => {
+    navigate(`/item/${itemId}`);
   };
 
   const handleCloseDialog = () => {
-    setSelectedNewsId(null);
+    setSelectedItemId(null);
   };
 
   const scrollLeft = () => {
@@ -130,7 +147,7 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
   const scrollRight = () => {
     const maxIndex = Math.max(
       0,
-      (data?.newsRecentPosts.length || 0) - cardsPerView
+      (data?.recentAddedItems.length || 0) - cardsPerView
     );
     const newIndex = Math.min(maxIndex, currentIndex + cardsPerView);
     setCurrentIndex(newIndex);
@@ -138,11 +155,11 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
 
   // Check if we can scroll left or right
   const canScrollLeft = currentIndex > 0;
-  const canScrollRight = data?.newsRecentPosts.length
-    ? currentIndex + cardsPerView < data.newsRecentPosts.length
+  const canScrollRight = data?.recentAddedItems.length
+    ? currentIndex + cardsPerView < data.recentAddedItems.length
     : false;
 
-  if (loading) return <Typography>Loading...</Typography>;
+  if (loading) return <Typography>Loading item...</Typography>;
   if (error) return <Typography>Error: {error.message}</Typography>;
 
   return (
@@ -161,7 +178,7 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
           <Typography
             variant={isMobile ? "h6" : "h5"}
             component={Link}
-            to="/news/all"
+            to="/item/all"
             sx={{
               textDecoration: "none",
               color: "primary.main",
@@ -171,15 +188,12 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
               },
             }}
           >
-            {t("news.trending", "Trending News")}
+            {t("item.recentlyAdded", { category: category })}
           </Typography>
-          {user?.role === Role.Admin && (
-            <NewsForm onNewsCreated={handleNewsCreated} />
-          )}
         </Box>
 
-        {/* Scrollable News Container */}
-        {data && data.newsRecentPosts.length > 0 && (
+        {/* Scrollable Comics Container */}
+        {data && data.recentAddedItems.length > 0 && (
           <Box
             sx={{
               position: "relative",
@@ -212,7 +226,7 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
               </IconButton>
             )}
 
-            {/* News Cards Container */}
+            {/* Comics Cards Container */}
             <Box
               ref={scrollContainerRef}
               sx={{
@@ -225,12 +239,12 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
                 height: "100%",
               }}
             >
-              {data.newsRecentPosts.map(
-                (news, index) =>
+              {data.recentAddedItems.map(
+                (item, index) =>
                   index >= currentIndex &&
                   index < currentIndex + cardsPerView && (
                     <Box
-                      key={news.id}
+                      key={item.id}
                       sx={{
                         opacity:
                           index >= currentIndex &&
@@ -245,18 +259,22 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
                         transition: "opacity 0.3s ease-in-out",
                       }}
                     >
-                      <NewsPost
-                        news={{
-                          id: news.id,
-                          title: news.title,
-                          images: news.images,
-                          createdAt: news.createdAt,
-                          tags: news.tags,
+                      <ItemPreview
+                        item={{
+                          id: item.id,
+                          name: item.name,
+                          description: item.description,
+                          condition: item.condition,
+                          status: item.status,
+                          images: item.images,
+                          publishedYear: item.publishedYear,
+                          createdAt: item.createdAt,
+                          category: item.category,
                         }}
                         width={cardDimensions.width}
                         height={cardDimensions.height}
                         showImage={true}
-                        onClick={handleNewsItemClick}
+                        onClick={handleItemClick}
                         isPortrait={isMobile && isPortrait}
                       />
                     </Box>
@@ -291,12 +309,12 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
         )}
 
         {/* Pagination Dots */}
-        {data && data.newsRecentPosts.length > cardsPerView && (
+        {data && data.recentAddedItems.length > cardsPerView && (
           <Box
             sx={{ display: "flex", justifyContent: "center", mt: 2, gap: 1 }}
           >
             {Array.from({
-              length: Math.ceil(data.newsRecentPosts.length / cardsPerView),
+              length: Math.ceil(data.recentAddedItems.length / cardsPerView),
             }).map((_, index) => (
               <Box
                 key={index}
@@ -325,7 +343,7 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
           <Typography
             variant="body2"
             component={Link}
-            to="/news/all"
+            to="/item/all"
             sx={{
               color: "primary.main",
               textDecoration: "none",
@@ -335,18 +353,19 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({ user }) => {
               },
             }}
           >
-            {t("news.viewAll", "View All News")} →
+            {t("item.viewAll", "View All Item")} →
           </Typography>
         </Box>
       </Box>
 
-      <NewsDetail
-        newsId={selectedNewsId}
-        open={!!selectedNewsId}
+      <ItemDetail
+        itemId={selectedItemId}
+        open={!!selectedItemId}
         onClose={handleCloseDialog}
+        user={user}
       />
     </>
   );
 };
 
-export default RecentNewsBanner;
+export default RecentItemBanner;
