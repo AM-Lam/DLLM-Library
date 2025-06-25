@@ -151,22 +151,9 @@ const ItemForm: React.FC<ItemFormProps> = ({ onItemCreated }) => {
               helperText="e.g. Book,Magazine"
             />
             <TextField
-              select
-              label="Condition"
-              fullWidth
-              margin="normal"
-              value={condition}
-              onChange={(e) => setCondition(e.target.value as ItemCondition)}
-            >
-              {Object.values(ItemCondition).map((cond) => (
-                <MenuItem key={cond} value={cond}>
-                  {cond}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
               label="Description"
               fullWidth
+              required
               margin="normal"
               multiline
               rows={3}
@@ -176,6 +163,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onItemCreated }) => {
             <TextField
               label="Images (comma-separated URLs)"
               fullWidth
+              required
               margin="normal"
               value={images.join(",")}
               onChange={(e) =>
@@ -192,6 +180,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onItemCreated }) => {
               select
               label="Language"
               fullWidth
+              required
               margin="normal"
               value={language}
               onChange={(e) => setLanguage(e.target.value as Language)}
@@ -206,6 +195,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onItemCreated }) => {
               label="Published Year"
               type="number"
               fullWidth
+              required
               margin="normal"
               value={publishedYear}
               onChange={(e) => {
@@ -217,8 +207,24 @@ const ItemForm: React.FC<ItemFormProps> = ({ onItemCreated }) => {
             />
             <TextField
               select
+              label="Condition"
+              fullWidth
+              required
+              margin="normal"
+              value={condition}
+              onChange={(e) => setCondition(e.target.value as ItemCondition)}
+            >
+              {Object.values(ItemCondition).map((cond) => (
+                <MenuItem key={cond} value={cond}>
+                  {cond}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
               label="Status"
               fullWidth
+              required
               margin="normal"
               value={status}
               onChange={(e) => setStatus(e.target.value as ItemStatus)}
