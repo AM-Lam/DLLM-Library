@@ -173,10 +173,6 @@ const HomePage: React.FC = () => {
         <RecentNewsBanner user={user} />
       </ListItem>
 
-      <ListItem>
-        <RecentItemBanner user={user} category="" />
-      </ListItem>
-
       {/* Recent Categories Section */}
       {recentCategoriesData?.recentUpdateCategories && (
         <>
