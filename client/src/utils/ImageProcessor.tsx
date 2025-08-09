@@ -165,7 +165,6 @@ const compressToTargetSize = (
               2
             )}KB at quality ${currentQuality.toFixed(2)}`
           );
-
           // Check if we've met the size requirement or reached minimum quality
           if (blob.size <= maxSizeBytes || currentQuality <= minQuality) {
             resolve({
