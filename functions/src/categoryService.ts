@@ -22,7 +22,7 @@ type CategoryModel = {
 export class CategoryService {
   constructor() {}
 
-  async upsertCategories(categories: string[]): Promise<void> {
+  async upsertCategories(owner: User, categories: string[]): Promise<void> {
     if (!categories || categories.length === 0) {
       console.warn("No categories provided for upsert");
       return;
@@ -41,6 +41,33 @@ export class CategoryService {
         },
         { merge: true }
       );
+    }
+
+    // Verify that the category is initialized before calling this.
+    // check here as we do not have access to ItemService.
+    var itemCategory = await this.getUserItemCategory( owner.id );
+    if (!itemCategory || itemCategory.length === 0) {
+      throw new Error("User's item categories are not initialized");
+    }
+
+    // Update user's itemCategory subcollection
+    if (owner && owner.id) {
+      const userCategoryCollection = db
+        .collection("users")
+        .doc(owner.id)
+        .collection("itemCategory");
+
+      for (const category of categories) {
+        const userCategoryRef = userCategoryCollection.doc(category);
+        batch.set(
+          userCategoryRef,
+          {
+            count: firebase.firestore.FieldValue.increment(1),
+            updated: now,
+          },
+          { merge: true }
+        );
+      }
     }
 
     await batch.commit();

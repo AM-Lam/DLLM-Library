@@ -29,7 +29,7 @@ export class ItemService {
   private mapService: MapService;
   private categoryService: CategoryService;
 
-  constructor(categoryService: CategoryService) {
+  constructor(categoryService: CategoryService ) {
     this.mapService = createMapService();
     this.categoryService = categoryService;
   }
@@ -145,7 +145,7 @@ export class ItemService {
   async itemCategoriesByUser(  userId: string )
   {
       // Assuming that we do not have anyone with large number of entries
-      const items = await this.itemsByUser(userId, [], "", "", 1 << 31, 0); 
+      const items = await this.itemsByUser(userId, [], "", "", 65535, 0);
 
       // Count categories
       const categoryCount: { [category: string]: number } = {};
@@ -326,7 +326,13 @@ export class ItemService {
 
     // Update category counts
     if (category && category.length > 0) {
-      await this.categoryService.upsertCategories(category);
+      // If user category is empty, then initialize it
+      const itemCategory = await this.categoryService.getUserItemCategory(owner.id);
+      if (!itemCategory || itemCategory.length === 0) {
+          const categoryCount = await this.itemCategoriesByUser(owner.id);
+          await this.categoryService.initializeUserCategories( owner.id, categoryCount );
+      }
+      await this.categoryService.upsertCategories(owner, category);
     }
 
     return rv;
