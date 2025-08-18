@@ -483,6 +483,7 @@ export type UpdateItemMutationVariables = Exact<{
   condition?: InputMaybe<ItemCondition>;
   description?: InputMaybe<Scalars['String']['input']>;
   images?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+  language?: Language;
   publishedYear?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<ItemStatus>;
 }>;
@@ -617,7 +618,7 @@ export const MeDocument = gql`
     }
   }
 }
-    `;
+`;
 
 /**
  * __useMeQuery__
@@ -668,7 +669,7 @@ export const ItemDocument = gql`
     holderId
   }
 }
-    `;
+`;
 
 /**
  * __useItemQuery__
@@ -711,7 +712,7 @@ export const CreateTransactionDocument = gql`
     updatedAt
   }
 }
-    `;
+`;
 export type CreateTransactionMutationFn = Apollo.MutationFunction<CreateTransactionMutation, CreateTransactionMutationVariables>;
 
 /**
@@ -757,7 +758,7 @@ export const GetUserForItemDocument = gql`
     }
   }
 }
-    `;
+`;
 
 /**
  * __useGetUserForItemQuery__
@@ -805,7 +806,7 @@ export const OpenTransactionsByItemDocument = gql`
     updatedAt
   }
 }
-    `;
+`;
 
 /**
  * __useOpenTransactionsByItemQuery__
@@ -847,7 +848,7 @@ export const ApproveTransactionDocument = gql`
     updatedAt
   }
 }
-    `;
+`;
 export type ApproveTransactionMutationFn = Apollo.MutationFunction<ApproveTransactionMutation, ApproveTransactionMutationVariables>;
 
 /**
@@ -878,7 +879,7 @@ export const CancelTransactionDocument = gql`
     mutation CancelTransaction($transactionId: ID!) {
   cancelTransaction(id: $transactionId)
 }
-    `;
+`;
 export type CancelTransactionMutationFn = Apollo.MutationFunction<CancelTransactionMutation, CancelTransactionMutationVariables>;
 
 /**
@@ -913,7 +914,7 @@ export const TransferTransactionDocument = gql`
     updatedAt
   }
 }
-    `;
+`;
 export type TransferTransactionMutationFn = Apollo.MutationFunction<TransferTransactionMutation, TransferTransactionMutationVariables>;
 
 /**
@@ -948,7 +949,7 @@ export const ReceiveTransactionDocument = gql`
     updatedAt
   }
 }
-    `;
+`;
 export type ReceiveTransactionMutationFn = Apollo.MutationFunction<ReceiveTransactionMutation, ReceiveTransactionMutationVariables>;
 
 /**
@@ -1001,7 +1002,7 @@ export const CreateItemDocument = gql`
     updatedAt
   }
 }
-    `;
+`;
 export type CreateItemMutationFn = Apollo.MutationFunction<CreateItemMutation, CreateItemMutationVariables>;
 
 /**
@@ -1035,6 +1036,37 @@ export function useCreateItemMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateItemMutationHookResult = ReturnType<typeof useCreateItemMutation>;
 export type CreateItemMutationResult = Apollo.MutationResult<CreateItemMutation>;
 export type CreateItemMutationOptions = Apollo.BaseMutationOptions<CreateItemMutation, CreateItemMutationVariables>;
+
+export const UpdateItemDocument = gql`
+  mutation UpdateItem($id: ID!, $name: String, $category: [String!], $condition: ItemCondition, $description: String, $images: [String!], $language: Language, $publishedYear: Int, $status: ItemStatus) {
+    updateItem(id: $id, name: $name, category: $category, condition: $condition, description: $description, images: $images, language: $language, publishedYear: $publishedYear, status: $status) {   
+      id
+      name
+      description
+      condition
+      category
+      status
+      images
+      publishedYear
+      language
+      createdAt
+      ownerId
+      updatedAt
+    }  
+  }
+`;
+
+
+export type UpdateItemMutationFn = Apollo.MutationFunction<UpdateItemMutation, UpdateItemMutationVariables>;
+export function useUpdateItemMutation(baseOptions?: Apollo.MutationHookOptions<UpdateItemMutation, UpdateItemMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<UpdateItemMutation, UpdateItemMutationVariables>(UpdateItemDocument, options);
+}
+
+export type UpdateItemMutationHookResult = ReturnType<typeof useUpdateItemMutation>;
+export type UpdateItemMutationResult = Apollo.MutationResult<UpdateItemMutation>;
+export type UpdateItemMutationOptions = Apollo.BaseMutationOptions<UpdateItemMutation, UpdateItemMutationVariables>;
+
 export const NewsPostDocument = gql`
     query NewsPost($newsPostId: ID!) {
   newsPost(id: $newsPostId) {
@@ -1057,7 +1089,7 @@ export const NewsPostDocument = gql`
     }
   }
 }
-    `;
+`;
 
 /**
  * __useNewsPostQuery__
@@ -1115,7 +1147,7 @@ export const CreateNewsPostDocument = gql`
     title
   }
 }
-    `;
+`;
 export type CreateNewsPostMutationFn = Apollo.MutationFunction<CreateNewsPostMutation, CreateNewsPostMutationVariables>;
 
 /**
@@ -1161,7 +1193,7 @@ export const RecentAddedItemsDocument = gql`
     createdAt
   }
 }
-    `;
+`;
 
 /**
  * __useRecentAddedItemsQuery__
@@ -1207,7 +1239,7 @@ export const NewsRecentPostsDocument = gql`
     tags
   }
 }
-    `;
+`;
 
 /**
  * __useNewsRecentPostsQuery__
@@ -1264,7 +1296,7 @@ export const UserDocument = gql`
     }
   }
 }
-    `;
+`;
 
 /**
  * __useUserQuery__
@@ -1314,7 +1346,7 @@ export const ItemsByUserDocument = gql`
     }
   }
 }
-    `;
+`;
 
 /**
  * __useItemsByUserQuery__
@@ -1358,7 +1390,7 @@ export const GeocodeAddressDocument = gql`
     geohash
   }
 }
-    `;
+`;
 
 /**
  * __useGeocodeAddressQuery__
@@ -1408,7 +1440,7 @@ export const UpdateUserDocument = gql`
     isActive
   }
 }
-    `;
+`;
 export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
 
 /**
@@ -1453,7 +1485,7 @@ export const CreateUserDocument = gql`
     isActive
   }
 }
-    `;
+`;
 export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
 
 /**
@@ -1486,7 +1518,7 @@ export const RecentCategoriesDocument = gql`
     query RecentCategories($limit: Int!) {
   recentUpdateCategories(limit: $limit)
 }
-    `;
+`;
 
 /**
  * __useRecentCategoriesQuery__
@@ -1541,7 +1573,7 @@ export const ItemsByLocationDocument = gql`
     category
   }
 }
-    `;
+`;
 
 /**
  * __useItemsByLocationQuery__
@@ -1582,7 +1614,7 @@ export const HotCategoriesDocument = gql`
     query HotCategories($limit: Int!) {
   hotCategories(limit: $limit)
 }
-    `;
+`;
 
 /**
  * __useHotCategoriesQuery__
@@ -1628,7 +1660,7 @@ export const GenerateSignedUrlDocument = gql`
     expires
   }
 }
-    `;
+`;
 export type GenerateSignedUrlMutationFn = Apollo.MutationFunction<GenerateSignedUrlMutation, GenerateSignedUrlMutationVariables>;
 
 /**

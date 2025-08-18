@@ -178,7 +178,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const { data, loading, error } = useQuery<{ item: Item }>(ITEM_DETAIL_QUERY, {
+  const { data, loading, error, refetch } = useQuery<{ item: Item }>(ITEM_DETAIL_QUERY, {
     variables: { itemId: itemId! },
     skip: !itemId,
   });
@@ -440,7 +440,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
   const handleEditSuccess = () => {
     setSuccessSnackbarOpen(true);
     // Refetch the item data to show updated information
-    window.location.reload(); // Simple refresh, or you could refetch the query
+    refetch();
+    // window.location.reload(); // Simple refresh, or you could refetch the query
   };
 
   const handleEditError = (message: string) => {
@@ -1030,7 +1031,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
         open={editDialogOpen}
         item={data?.item || null}
         onClose={() => setEditDialogOpen(false)}
-        onSuccess={handleEditSuccess}
+        onItemUpdated={handleEditSuccess}
         onError={handleEditError}
       />
 

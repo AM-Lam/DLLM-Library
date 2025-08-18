@@ -45,6 +45,7 @@ const EDIT_ITEM_MUTATION = gql`
     $condition: ItemCondition
     $description: String
     $images: [String!]
+    $language: Language!
     $publishedYear: Int
     $status: ItemStatus
   ) {
@@ -55,6 +56,7 @@ const EDIT_ITEM_MUTATION = gql`
       condition: $condition
       description: $description
       images: $images
+      language: $language
       publishedYear: $publishedYear
       status: $status
     ) {
@@ -74,14 +76,10 @@ const EDIT_ITEM_MUTATION = gql`
   }
 `;
 interface EditItemFormProps {
-  onItemEdited?: (data: UpdateItemMutation) => void;
-}
-
-interface EditItemFormProps {
   open: boolean;
   item: Item | null;
   onClose: () => void;
-  onSuccess: () => void;
+  onItemUpdated?: (data: UpdateItemMutation) => void;
   onError: (message: string) => void;
 }
 
@@ -97,9 +95,8 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
   open,
   item,
   onClose,
-  onSuccess,
+  onItemUpdated,
   onError,
-  // onItemEdited
 }) => {
   const apolloClient = useApolloClient();
   const { t } = useTranslation();
@@ -113,6 +110,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
   const [publishedYear, setPublishedYear] = useState<number | "">("");
   const [status, setStatus] = useState<ItemStatus>(ItemStatus.Available);
   const [formError, setFormError] = useState<string | null>(null);
+  const [language, setLanguage] = useState<Language>(Language.En);
 
   // Image processing states
   const [isProcessingImages, setIsProcessingImages] = useState(false);
@@ -130,8 +128,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
     UpdateItemMutationVariables
   >(EDIT_ITEM_MUTATION, {
     onCompleted: (data) => {
-      // if (onItemEdited) onItemEdited(data);
-      onSuccess();
+      if (onItemUpdated) onItemUpdated(data);
       handleClose();
     },
     onError: (error) => {
@@ -149,6 +146,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
       // Ensure publishedYear is either a number or an empty string for the input field
       setPublishedYear(item.publishedYear ?? "");
       setStatus(item.status || ItemStatus.Available);
+      setLanguage(item.language || Language.En);
 
       // Convert existing images to ImagePreview format
       const existingImages: ImagePreview[] = (item.images || []).map((url, index) => ({
@@ -158,6 +156,8 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         width: 0,
         height: 0,
         size: 0,
+        compressionApplied: false,
+        finalQuality: 1,
         isExisting: true,
         gsUrl: url,
       }));
@@ -185,6 +185,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
     setProcessingProgress(0);
     setIsUploading(false);
     setUploadProgress(0);
+    setLanguage(Language.En);
     onClose();
   };
 
@@ -385,12 +386,21 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
           .filter(Boolean),
         condition,
         status,
-        description: description?.trim() || null, // Send null if empty
-        images: allImageUrls,
-        // Explicitly set publishedYear to a number or null
-        publishedYear: publishedYear === "" ? null : Number(publishedYear),
+        language,
       };
 
+      // Only add optional fields if they have actual values
+      if (description?.trim()) {
+        variables.description = description.trim();
+      }
+
+      if (allImageUrls.length > 0) {
+        variables.images = allImageUrls;
+      }
+
+      if (publishedYear !== "") {
+        variables.publishedYear = Number(publishedYear);
+      }
       console.log("Sending variables:", variables);
 
       await updateItem({ variables });
@@ -578,6 +588,22 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
             {Object.values(ItemStatus).map((stat) => (
               <MenuItem key={stat} value={stat}>
                 {stat}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            label={t("common.language")}
+            fullWidth
+            margin="normal"
+            required
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as Language)}
+          >
+            {Object.values(Language).map((lang) => (
+              <MenuItem key={lang} value={lang}>
+                {lang}
               </MenuItem>
             ))}
           </TextField>
