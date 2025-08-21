@@ -198,13 +198,12 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
     setProcessingProgress(0);
 
     try {
-      // Validate files first
       const validFiles: File[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
 
         if (!file.type.startsWith("image/")) {
-          setFormError(t("item.invalidFileType", { fileName: file.name }));
+          setFormError(t("item.fileTooLarge", { fileName: file.name }));
           continue;
         }
 
@@ -225,8 +224,13 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
       // Process images
       const processedImages = await batchProcessImages(
         validFiles,
-        maxImageSize,
-        imageQuality,
+        {
+          maxSize: maxImageSize,
+          maxFileSizeKB: 500,
+          initialQuality: imageQuality,
+          minQuality: 0.3,
+          preferJPEG: true,
+        },
         (processed, total) => {
           setProcessingProgress(Math.round((processed / total) * 100));
         }
@@ -253,6 +257,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
     event.target.value = "";
   };
 
+  // Add handleRemoveImage function back
   const handleRemoveImage = (index: number) => {
     setImageFiles((prev) => {
       const newFiles = [...prev];
@@ -387,20 +392,11 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         condition,
         status,
         language,
+        description: description?.trim() || null,
+        images: allImageUrls,
+        publishedYear: publishedYear === "" ? null : Number(publishedYear),
       };
 
-      // Only add optional fields if they have actual values
-      if (description?.trim()) {
-        variables.description = description.trim();
-      }
-
-      if (allImageUrls.length > 0) {
-        variables.images = allImageUrls;
-      }
-
-      if (publishedYear !== "") {
-        variables.publishedYear = Number(publishedYear);
-      }
       console.log("Sending variables:", variables);
 
       await updateItem({ variables });

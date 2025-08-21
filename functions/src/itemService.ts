@@ -338,6 +338,121 @@ export class ItemService {
     return rv;
   }
 
+  async updateItem(
+    itemId: string,
+    userId: string, // To verify ownership
+    name?: string,
+    description?: string,
+    condition?: ItemCondition,
+    category?: string[],
+    status?: ItemStatus,
+    language?: Language,
+    images?: string[],
+    publishedYear?: number
+  ): Promise<Item | null> {
+    // First, get the existing item to verify ownership
+    const itemDoc = await db.collection("items").doc(itemId).get();
+    if (!itemDoc.exists) {
+      throw new Error(`Item with ID ${itemId} does not exist`);
+    }
+
+    const existingData = itemDoc.data() as ItemModel;
+    
+    // Verify the user owns this item
+    if (existingData.ownerId !== userId) {
+      throw new Error(`User ${userId} does not have permission to update item ${itemId}`);
+    }
+
+    // Process new images if provided
+    let gsImageUrls: string[] | null = null;
+    let publicImageUrls: string[] | null = null;
+
+    if (images && images.length > 0) {
+      for (const image of images) {
+        console.debug(`Processing image: ${image}`);
+        if (image.startsWith("gs://")) {
+          try {
+            const publicUrl = await GetPublicUrlForGSFile(image);
+            console.debug(`Public URL for image ${image}: ${publicUrl}`);
+            if (!gsImageUrls) gsImageUrls = [];
+            if (!publicImageUrls) publicImageUrls = [];
+            publicImageUrls.push(publicUrl);
+            gsImageUrls.push(image);
+          } catch (error) {
+            console.error(
+              `Failed to get public URL for image ${image}:`,
+              error
+            );
+          }
+        } else {
+          if (!publicImageUrls) publicImageUrls = [];
+          publicImageUrls.push(image);
+        }
+      }
+    }
+
+    // Build update data object with only provided fields
+    const updateData: Partial<ItemModel> = {
+      updated: Timestamp.now(),
+    };
+
+    // Only update fields that were provided
+    if (name !== undefined) updateData.name = name;
+    
+
+    if (description !== undefined) updateData.description = description || null; // Allow clearing description
+    
+
+    if (condition !== undefined) updateData.condition = condition;
+    
+
+    if (category !== undefined) updateData.category = category;
+    
+    if (status !== undefined) updateData.status = status;
+    
+    if (language !== undefined) updateData.language = language;
+
+    if (publishedYear !== undefined) updateData.publishedYear = publishedYear || null; // Allow clearing year
+    
+    if (images !== undefined) {
+      if (publicImageUrls && publicImageUrls.length > 0) {
+        updateData.images = publicImageUrls;
+      } else {
+        updateData.images = []; // Allow clearing images
+      }
+
+      if (gsImageUrls && gsImageUrls.length > 0) {
+        updateData.gsImageUrls = gsImageUrls;
+      } else {
+        updateData.gsImageUrls = []; // Allow clearing gs URLs
+      }
+
+      // Clear thumbnails when images change - they'll be regenerated on next read
+      updateData.thumbnails = [];
+      updateData.gsThumbnailUrls = [];
+    }
+
+    // Update the document
+    await db.collection("items").doc(itemId).update(updateData);
+
+    // Handle category updates if category was changed
+    if (category !== undefined) {
+      // Get the owner data for category service
+      const owner = { id: userId } as User; // Minimal user object for category service
+      
+      if (category.length > 0) {
+        // Update category counts for new categories
+        await this.categoryService.upsertCategories(owner, category);
+      }
+      
+      // TODO: counts for categories,
+    }
+
+    // Fetch and return the updated item
+    const updatedItem = await this.itemById(itemId);
+    return updatedItem;
+  }
+
   async updateUserItemsLocation(
     userId: string,
     location: Location | null

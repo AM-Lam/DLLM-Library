@@ -38,8 +38,6 @@ import {
   Transaction,
   User,
   TransactionStatus,
-  UpdateItemMutation,
-  UpdateItemMutationVariables,
 } from "../generated/graphql";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -156,10 +154,6 @@ interface ItemDetailProps {
   itemId: string | null;
   user?: User | null;
   onBack?: () => void;
-}
-
-interface ItemFormProps {
-  onItemUpdated?: (data: UpdateItemMutation) => void;
 }
 
 const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {

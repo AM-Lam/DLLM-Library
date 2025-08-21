@@ -187,6 +187,7 @@ export type MutationUpdateItemArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
   publishedYear?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<ItemStatus>;
+  language?: InputMaybe<Language>;
 };
 
 
