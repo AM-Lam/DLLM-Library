@@ -136,6 +136,13 @@ export const resolvers: Resolvers = {
     ): Promise<User | null> => {
       return userService.userById(id);
     },
+    exchangePoints: async (
+      _: any,
+      { limit = 20, offset = 0 }: any,
+      __: any
+    ): Promise<User[]> => {
+      return userService.exchangePoints(limit, offset);
+    },
     newsPost: async (
       _: any,
       { id }: any,
@@ -216,14 +223,15 @@ export const resolvers: Resolvers = {
     },
     updateUser: async (
       _: any,
-      { nickname, contactMethods, address }: any,
+      { nickname, contactMethods, address, exchangePoints }: any,
       { loginUser }: Context
     ): Promise<User> => {
       return userService.updateUser(
         loginUser,
         nickname,
         address,
-        contactMethods
+        contactMethods,
+        exchangePoints
       );
     },
     createItem: async (

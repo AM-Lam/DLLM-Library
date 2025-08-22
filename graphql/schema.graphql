@@ -32,6 +32,7 @@ enum Role {
   USER
   ADMIN
   MODERATOR
+  EXCHANGE_POINT_ADMIN # 交換點管理員
 }
 
 # 用戶個人檔案
@@ -45,6 +46,7 @@ type User {
   isActive: Boolean! # 是否啟用帳號
   isVerified: Boolean! # 是否已驗證電子郵件
   contactMethods: [ContactMethod!] # 其他聯繫方式
+  exchangePoints: [String!] # 可選的交換點
   createdAt: Date!
 }
 
@@ -117,6 +119,7 @@ type Query {
   user(id: ID!): User
   me: User # 當前登錄用戶
   users(address: String, limit: Int, offset: Int): [User!]! # 按地區查找（備用）
+  exchangePoints(limit: Int, offset: Int): [User!]! # 交換點列表
   # 藏品相關
   item(id: ID!): Item
   items(
@@ -179,6 +182,7 @@ type Mutation {
     nickname: String
     address: String
     contactMethods: [ContactMethodInput!]
+    exchangePoints: [String!]
   ): User!
   deleteUser(id: ID!): Boolean!
 

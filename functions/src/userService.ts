@@ -9,6 +9,10 @@ type UserModel = Omit<User, "createdAt"> & {
   created: Timestamp;
 };
 
+type ItemCacheModel = {
+  categories: string[];
+};
+
 export class UserService {
   private mapService: MapService;
   private itemService: ItemService;
@@ -89,11 +93,33 @@ export class UserService {
     return { createdAt: userData.created.seconds * 1000, ...userData } as User;
   }
 
+  async exchangePoints(
+    limit: number = 20,
+    offset: number = 0
+  ): Promise<User[]> {
+    const usersSnapshot = await db
+      .collection("users")
+      .where("role", "==", Role.ExchangePointAdmin)
+      .orderBy("created", "desc")
+      .limit(limit)
+      .offset(offset)
+      .get();
+
+    const users: User[] = [];
+    usersSnapshot.forEach((doc) => {
+      const data = doc.data() as UserModel;
+      users.push({ createdAt: data.created.seconds * 1000, ...data } as User);
+    });
+
+    return users;
+  }
+
   async updateUser(
     loginUser: LoginUser | null,
     nickname?: string | null,
     address?: string | null,
-    contactMethods?: ContactMethod[] | null
+    contactMethods?: ContactMethod[] | null,
+    exchangePoints?: string[] | null
   ): Promise<User> {
     if (!loginUser) throw new Error("Not authenticated");
 
@@ -143,6 +169,50 @@ export class UserService {
       }
     }
 
+    if (exchangePoints != null) {
+      updates.exchangePoints = exchangePoints;
+      const oldExchangePoints: string[] = userDoc.data()?.exchangePoints || [];
+      const newExchangePoints = exchangePoints.filter(
+        (point) => !oldExchangePoints.includes(point)
+      );
+      const removedExchangePoints = oldExchangePoints.filter(
+        (point) => !exchangePoints.includes(point)
+      );
+      if (newExchangePoints.length > 0 || removedExchangePoints.length > 0) {
+        // update item cache in exchange points
+        let offset = 0;
+        while (true) {
+          const itemsPerUser = await this.itemService.itemsByUser(
+            loginUser.uid,
+            newExchangePoints, // category
+            undefined, // status
+            undefined, // keyword
+            100, // limit
+            offset // offset
+          );
+          if (itemsPerUser.length === 0) break;
+          offset += itemsPerUser.length;
+          // map items to categories
+          const itemCacheModelMap: Map<string, ItemCacheModel> = new Map();
+          for (const item of itemsPerUser) {
+            const itemCacheModel: ItemCacheModel = {
+              categories: item.category || [],
+            };
+            itemCacheModelMap.set(item.id, itemCacheModel);
+          }
+          // add item cache to new exchange points
+          for (const point of newExchangePoints) {
+            await this._AddItemCacheToExchangePoint(point, itemCacheModelMap);
+          }
+          // remove item cache from removed exchange points
+          for (const point of removedExchangePoints) {
+            this._RemoveItemCacheFromExchangePoint(point, itemCacheModelMap);
+          }
+        }
+      }
+      updates.exchangePoints = exchangePoints;
+    }
+
     if (Object.keys(updates).length > 0) {
       console.debug("update: ", updates);
       await userRef.update(updates);
@@ -150,7 +220,10 @@ export class UserService {
 
     const updatedDoc = await userRef.get();
     const data = updatedDoc.data() as UserModel;
-    const updatedUser = { createdAt: data.created.seconds * 1000, ...data } as User;
+    const updatedUser = {
+      createdAt: data.created.seconds * 1000,
+      ...data,
+    } as User;
     this.userCache.set(loginUser.uid, updatedUser);
     return updatedUser;
   }

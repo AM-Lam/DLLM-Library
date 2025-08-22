@@ -112,8 +112,8 @@ export class ItemService {
   async itemsByUser(
     userId: string,
     category: string[],
-    status: string,
-    keyword: string,
+    status?: string,
+    keyword?: string,
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
@@ -123,8 +123,9 @@ export class ItemService {
       .orderBy("updated", "desc");
     if (category && category.length > 0)
       query = query.where("category", "array-contains-any", category);
-    if (status) query = query.where("status", "==", status);
-    if (keyword)
+    if (status && status.length > 0)
+      query = query.where("status", "==", status);
+    if (keyword && keyword.length > 0)
       query = query
         .where("name", ">=", keyword)
         .where("name", "<=", keyword + "\uf8ff");
@@ -501,15 +502,22 @@ export class ItemService {
         );
         uploadPath = `${pathDir}/${thumbnailFileName}`;
 
-        const gsUrl = await UploadBufferToGCS(uploadPath, thumbnailBuffer, "image/jpeg");
+        const gsUrl = await UploadBufferToGCS(
+          uploadPath,
+          thumbnailBuffer,
+          "image/jpeg"
+        );
         const publicUrl = await GetPublicUrlForGSFile(gsUrl);
 
         return { gs: gsUrl, url: publicUrl };
-
       } else {
         // Create upload path: thumbnails/{generated_filename}
         uploadPath = `thumbnails/${thumbnailFileName}`;
-        const gsUrl = await UploadBufferToGCS(uploadPath, thumbnailBuffer, "image/jpeg");
+        const gsUrl = await UploadBufferToGCS(
+          uploadPath,
+          thumbnailBuffer,
+          "image/jpeg"
+        );
         const publicUrl = await GetPublicUrlForGSFile(gsUrl);
 
         console.log(`Thumbnail generated successfully: ${gsUrl}`);
