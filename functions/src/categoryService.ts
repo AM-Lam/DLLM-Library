@@ -47,10 +47,10 @@ export class CategoryService {
     // Verify that the category is initialized before calling this.
     // Do a check here as we do not have access to ItemService.
     // Handle case where the user does not have any item categories.
-    var itemCategory = await this.getUserItemCategory( owner.id );
-    if ( !itemCategory ) {
-      console.warn("User's item categories are not initialized: " + owner.id );
-      throw new Error("User's item categories are not initialized:" + owner.id );
+    var itemCategory = await this.getUserItemCategory(owner.id);
+    if (!itemCategory) {
+      console.warn("User's item categories are not initialized: " + owner.id);
+      throw new Error("User's item categories are not initialized:" + owner.id);
     }
 
     // Update user's itemCategory subcollection
@@ -132,22 +132,110 @@ export class CategoryService {
         .join(", ")}`
     );
 
-    const itemCategory = Object.entries(categoriesMap).map(([category, count]) => ({
-      category,
-      count,
-    }));
+    const itemCategory = Object.entries(categoriesMap).map(
+      ([category, count]) => ({
+        category,
+        count,
+      })
+    );
 
     return itemCategory;
   }
 
-  async getUserItemCategory( userId: string )
-  {
-    const categorySnapshot = await db.collection("users").doc(userId).collection("itemCategory").get();
-    var itemCategory = categorySnapshot.docs.map(doc => ({
+  async getUserItemCategory(userId: string) {
+    const categorySnapshot = await db
+      .collection("users")
+      .doc(userId)
+      .collection("itemCategory")
+      .get();
+    var itemCategory = categorySnapshot.docs.map((doc) => ({
       category: doc.id,
-      count: doc.data().count
+      count: doc.data().count,
     }));
     return itemCategory;
+  }
+
+  async upsertExchangePointCategoryCache(
+    exchangePointId: string,
+    categories: { category: string; count: number }[]
+  ): Promise<void> {
+    if (!exchangePointId || !categories) return;
+
+    const batch = db.batch();
+    const now = Timestamp.now();
+
+    const exchangePointCategoryCollection = db
+      .collection("users")
+      .doc(exchangePointId)
+      .collection("itemCategory");
+
+    for (const { category, count } of categories) {
+      if (!category || typeof count !== "number") continue;
+      const categoryRef = exchangePointCategoryCollection.doc(category);
+      batch.set(
+        categoryRef,
+        {
+          count: firebase.firestore.FieldValue.increment(count),
+          updated: now,
+        },
+        { merge: true }
+      );
+    }
+
+    await batch.commit();
+    console.log(
+      `Upserted exchange point categories for ${exchangePointId}: ${categories
+        .map(({ category, count }) => `${category} (+${count})`)
+        .join(", ")}`
+    );
+  }
+
+  async removeExchangePointCategoryCache(
+    exchangePointId: string,
+    categories: { category: string; count: number }[]
+  ): Promise<void> {
+    if (!exchangePointId || !categories) return;
+
+    const batch = db.batch();
+    const now = Timestamp.now();
+
+    const exchangePointCategoryCollection = db
+      .collection("users")
+      .doc(exchangePointId)
+      .collection("itemCategory");
+
+    for (const { category, count } of categories) {
+      if (!category || typeof count !== "number") continue;
+      const categoryRef = exchangePointCategoryCollection.doc(category);
+      // if the category does not exist, skip
+      const categoryDoc = await categoryRef.get();
+      if (!categoryDoc.exists) continue;
+      // Decrement the count and update the timestamp
+      // If count is greater than the current count, delete the category
+      // to avoid negative counts.
+      // This is to ensure that we do not end up with negative counts.
+      // If the count is 0, we can delete the category.
+      const currentCount = categoryDoc.data()?.count || 0;
+      if (currentCount <= count) {
+        batch.delete(categoryRef);
+        continue;
+      }
+      batch.set(
+        categoryRef,
+        {
+          count: firebase.firestore.FieldValue.increment(-count),
+          updated: now,
+        },
+        { merge: true }
+      );
+    }
+
+    await batch.commit();
+    console.log(
+      `Removed exchange point categories for ${exchangePointId}: ${categories
+        .map(({ category, count }) => `${category} (-${count})`)
+        .join(", ")}`
+    );
   }
 
   async getRecentUpdateCategories(limit: number = 10): Promise<string[]> {

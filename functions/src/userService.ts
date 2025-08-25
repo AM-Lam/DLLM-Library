@@ -5,6 +5,8 @@ import { MapService, createMapService } from "./mapService";
 import { Timestamp } from "firebase-admin/firestore";
 import { CategoryService } from "./categoryService";
 
+const userCollection = db.collection("users");
+
 type UserModel = Omit<User, "createdAt"> & {
   geohash?: string;
   created: Timestamp;
@@ -35,10 +37,7 @@ export class UserService {
     if (!user) return null;
     if (!user.isVerified && loginUser.emailVerified) {
       // update user to verified if email is verified
-      await db
-        .collection("users")
-        .doc(loginUser.uid)
-        .update({ isVerified: true });
+      await userCollection.doc(loginUser.uid).update({ isVerified: true });
     }
     // return user data
     return user;
@@ -52,7 +51,7 @@ export class UserService {
 
   async _userById(userId: string): Promise<User | null> {
     // fetch user from database
-    const userDoc = await db.collection("users").doc(userId).get();
+    const userDoc = await userCollection.doc(userId).get();
     if (!userDoc.exists) return null;
     const data = userDoc.data() as UserModel;
 
@@ -71,16 +70,18 @@ export class UserService {
   /**
    * Gets the user item category based on items in the user's collection.
    * If one is not available, then compute the value.
-   * @param userId 
-   * @returns 
+   * @param userId
+   * @returns
    */
-  async getOrComputeUserItemCategory( userId: string )
-  {
+  async getOrComputeUserItemCategory(userId: string) {
     var itemCategory = await this.categoryService.getUserItemCategory(userId);
 
     if (!itemCategory || itemCategory.length === 0) {
       const categoryCount = await this.itemService.itemCategoriesByUser(userId);
-      itemCategory = await this.categoryService.initializeUserCategories( userId, categoryCount );
+      itemCategory = await this.categoryService.initializeUserCategories(
+        userId,
+        categoryCount
+      );
     }
     return itemCategory;
   }
@@ -117,7 +118,7 @@ export class UserService {
       created: Timestamp.now(),
       geohash: resolvedLocation?.geohash || undefined,
     };
-    await db.collection("users").doc(loginUser.uid).set(userData);
+    await userCollection.doc(loginUser.uid).set(userData);
     return { createdAt: userData.created.seconds * 1000, ...userData } as User;
   }
 
@@ -125,8 +126,7 @@ export class UserService {
     limit: number = 20,
     offset: number = 0
   ): Promise<User[]> {
-    const usersSnapshot = await db
-      .collection("users")
+    const usersSnapshot = await userCollection
       .where("role", "==", Role.ExchangePointAdmin)
       .orderBy("created", "desc")
       .limit(limit)
@@ -151,7 +151,7 @@ export class UserService {
   ): Promise<User> {
     if (!loginUser) throw new Error("Not authenticated");
 
-    const userRef = db.collection("users").doc(loginUser.uid);
+    const userRef = userCollection.doc(loginUser.uid);
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
@@ -207,7 +207,7 @@ export class UserService {
         (point) => !exchangePoints.includes(point)
       );
       if (newExchangePoints.length > 0 || removedExchangePoints.length > 0) {
-        // update item cache in exchange points
+        // update item and categories cache in exchange points
         let offset = 0;
         while (true) {
           const itemsPerUser = await this.itemService.itemsByUser(
@@ -237,6 +237,22 @@ export class UserService {
             this._RemoveItemCacheFromExchangePoint(point, itemCacheModelMap);
           }
         }
+        // update CategoryCache for exchange points
+        const userItemCategories = await this.getOrComputeUserItemCategory(
+          loginUser.uid
+        );
+        for (const point of newExchangePoints) {
+          await this.categoryService.upsertExchangePointCategoryCache(
+            point,
+            userItemCategories
+          );
+        }
+        for (const point of removedExchangePoints) {
+          await this.categoryService.removeExchangePointCategoryCache(
+            point,
+            userItemCategories
+          );
+        }
       }
       updates.exchangePoints = exchangePoints;
     }
@@ -254,5 +270,33 @@ export class UserService {
     } as User;
     this.userCache.set(loginUser.uid, updatedUser);
     return updatedUser;
+  }
+
+  private async _AddItemCacheToExchangePoint(
+    userId: string,
+    itemCacheModelMap: Map<string, ItemCacheModel>
+  ) {
+    const itemCacheCollection = userCollection
+      .doc(userId)
+      .collection("itemCache");
+
+    // add item cache to exchange point's itemCacheCollections
+    for (const [itemId, itemCacheModel] of itemCacheModelMap.entries()) {
+      await itemCacheCollection.doc(itemId).set(itemCacheModel);
+    }
+  }
+
+  private async _RemoveItemCacheFromExchangePoint(
+    userId: string,
+    itemCacheModelMap: Map<string, ItemCacheModel>
+  ) {
+    const itemCacheCollection = userCollection
+      .doc(userId)
+      .collection("itemCache");
+
+    // remove item cache from exchange point's itemCacheCollections
+    for (const itemId of itemCacheModelMap.keys()) {
+      await itemCacheCollection.doc(itemId).delete();
+    }
   }
 }
