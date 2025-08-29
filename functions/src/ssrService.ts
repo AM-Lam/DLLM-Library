@@ -3,7 +3,7 @@ import { readFile } from 'fs';
 import path from 'path';
 import { db } from './platform';
 import * as fs from 'fs';
-
+import { isBotRequest, getBotType } from './botDetection';
 // Get Config
 const getConfig = () => {
   const clientConfigPath = path.join(process.cwd(), '..', 'client', 'public', 'dllm-client-config.json');

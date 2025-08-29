@@ -143,16 +143,29 @@ export class ItemService {
     return results;
   }
 
-  async itemCategoriesByUser(userId: string) {
-    // Assuming that we do not have anyone with large number of entries
-    const items = await this.itemsByUser(userId, [], "", "", 65535, 0);
+  async itemCategoriesByUser(  userId: string )
+  {
+      // Assuming that we do not have anyone with large number of entries
+      let items: Item[] = [];
+      // Fetch all items by user by batch
+      let batchSize = 20;
+      let offset = 0;
+      while (true) {
+        const batchItems = await this.itemsByUser(userId, [], "", "", batchSize, offset);
+        if (!batchItems || batchItems.length === 0) break;
+        items.push(...batchItems);
+        offset += batchSize;
+        if (batchItems.length < batchSize) break;
+       // console.log(`Fetched ${items.length} items for user ${userId} so far...`);
+      }
 
-    // Count categories
-    const categoryCount: { [category: string]: number } = {};
-    for (const item of items) {
-      if (item.category && Array.isArray(item.category)) {
-        for (const cat of item.category) {
-          categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+      // Count categories
+      const categoryCount: { [category: string]: number } = {};
+      for (const item of items) {
+        if (item.category && Array.isArray(item.category)) {
+          for (const cat of item.category) {
+            categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+          }
         }
       }
     }
