@@ -14,6 +14,8 @@ import {
   List,
   ListItem,
   ListItemText,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -22,14 +24,17 @@ import {
   Person as PersonIcon,
   Home as HomeIcon,
   Verified as VerifiedIcon,
+  Label as LabelIcon,
+  Storage as StorageIcon,
 } from "@mui/icons-material";
 import { gql, useQuery } from "@apollo/client";
-import { User, Item } from "../generated/graphql";
+import { User, Item, Category } from "../generated/graphql";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { calculateDistance, formatDistance } from "../utils/geoProcessor";
 import ItemSummary from "./ItemSummary";
 import PaginationControls from "./PaginationControls";
+import { TagCloud } from "react-tagcloud";
 
 const USER_DETAIL_QUERY = gql`
   query User($userId: ID!) {
@@ -42,6 +47,11 @@ const USER_DETAIL_QUERY = gql`
       isVerified
       isActive
       role
+      exchangePoints
+      itemCategory {
+        category
+        count
+      }
       contactMethods {
         type
         value
@@ -56,8 +66,20 @@ const USER_DETAIL_QUERY = gql`
 `;
 
 const USER_ITEMS_QUERY = gql`
-  query ItemsByUser($userId: ID!, $limit: Int, $offset: Int) {
-    itemsByUser(userId: $userId, limit: $limit, offset: $offset) {
+  query ItemsByUser(
+    $userId: ID!
+    $limit: Int
+    $offset: Int
+    $category: [String!]
+    $isExchangePointItem: Boolean
+  ) {
+    itemsByUser(
+      userId: $userId
+      limit: $limit
+      offset: $offset
+      category: $category
+      isExchangePointItem: $isExchangePointItem
+    ) {
       id
       name
       condition
@@ -79,6 +101,11 @@ interface UserDetailProps {
   onBack?: () => void;
 }
 
+interface TagCloudData {
+  value: string;
+  count: number;
+}
+
 const ITEMS_PER_PAGE = 10;
 
 const UserDetail: React.FC<UserDetailProps> = ({
@@ -89,6 +116,9 @@ const UserDetail: React.FC<UserDetailProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [itemsPage, setItemsPage] = useState<number>(1);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [includeExchangePointItems, setIncludeExchangePointItems] =
+    useState<boolean>(true);
 
   const {
     data: userData,
@@ -98,6 +128,9 @@ const UserDetail: React.FC<UserDetailProps> = ({
     variables: { userId: userId! },
     skip: !userId,
   });
+
+  // Check if user is exchange point admin
+  const isExchangePointAdmin = userData?.user?.role === "EXCHANGE_POINT_ADMIN";
 
   const {
     data: itemsData,
@@ -110,19 +143,50 @@ const UserDetail: React.FC<UserDetailProps> = ({
       userId: userId!,
       limit: ITEMS_PER_PAGE,
       offset: (itemsPage - 1) * ITEMS_PER_PAGE,
+      category: selectedCategory ? [selectedCategory] : undefined,
+      isExchangePointItem: isExchangePointAdmin && includeExchangePointItems,
     },
-    skip: !userId,
+    skip: !userId || !selectedCategory, // Only query when category is selected
   });
 
-  // Refetch items when page changes
+  // Reset page when category changes or exchange point toggle changes
   useEffect(() => {
-    if (userId) {
+    setItemsPage(1);
+  }, [selectedCategory, includeExchangePointItems]);
+
+  // Refetch items when page changes, category changes, or exchange point setting changes
+  useEffect(() => {
+    console.log("Refetching items... " + selectedCategory);
+    if (userId && selectedCategory) {
       refetchItems();
     }
-  }, [itemsPage, refetchItems, userId]);
+  }, [
+    itemsPage,
+    selectedCategory,
+    includeExchangePointItems,
+    refetchItems,
+    userId,
+  ]);
 
   const handleItemsPageChange = (newPage: number) => {
     setItemsPage(newPage);
+  };
+
+  const handleCategoryClick = (tag: TagCloudData) => {
+    const category = tag.value;
+    console.log("Clicked category:", tag);
+    if (selectedCategory === category) {
+      // If clicking the same category, deselect it
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(category);
+    }
+  };
+
+  const handleExchangePointItemsToggle = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIncludeExchangePointItems(event.target.checked);
   };
 
   const isCurrentUser =
@@ -171,6 +235,50 @@ const UserDetail: React.FC<UserDetailProps> = ({
     });
   };
 
+  // Prepare data for TagCloud component
+  const tagCloudData: TagCloudData[] = userData?.user?.itemCategory
+    ? userData.user.itemCategory.map((categoryItem) => ({
+        value: categoryItem.category,
+        count: categoryItem.count,
+      }))
+    : [];
+
+  // Custom renderer for TagCloud
+  const customRenderer = (tag: TagCloudData, size: number, color: string) => {
+    const isSelected = selectedCategory === tag.value;
+
+    return (
+      <Box
+        key={tag.value}
+        component="span"
+        sx={{
+          fontSize: `${size}px`,
+          color: isSelected ? "#1976d2" : color,
+          fontWeight: isSelected ? "bold" : "normal",
+          cursor: "pointer",
+          margin: "4px",
+          padding: "4px 8px",
+          borderRadius: "4px",
+          backgroundColor: isSelected
+            ? "rgba(25, 118, 210, 0.1)"
+            : "transparent",
+          border: isSelected ? "2px solid #1976d2" : "1px solid transparent",
+          display: "inline-block",
+          transition: "all 0.2s ease-in-out",
+          "&:hover": {
+            transform: "scale(1.05)",
+            backgroundColor: isSelected
+              ? "rgba(25, 118, 210, 0.2)"
+              : "rgba(0, 0, 0, 0.05)",
+          },
+        }}
+        title={`${tag.value} (${tag.count} items)`}
+      >
+        {tag.value} ({tag.count})
+      </Box>
+    );
+  };
+
   // Handle case when userId is null
   if (!userId) {
     return (
@@ -189,6 +297,8 @@ const UserDetail: React.FC<UserDetailProps> = ({
       </Container>
     );
   }
+
+  const sortedCategories = userData?.user?.itemCategory;
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -215,6 +325,14 @@ const UserDetail: React.FC<UserDetailProps> = ({
                   color="primary"
                   sx={{ ml: 1, verticalAlign: "middle" }}
                   titleAccess={t("user.verified", "Verified User")}
+                />
+              )}
+              {isExchangePointAdmin && (
+                <Chip
+                  label={t("user.exchangePointAdmin", "Exchange Point Admin")}
+                  color="secondary"
+                  size="small"
+                  sx={{ ml: 1 }}
                 />
               )}
             </>
@@ -324,6 +442,149 @@ const UserDetail: React.FC<UserDetailProps> = ({
             </Grid>
           </Paper>
 
+          {/* Item Categories Tag Cloud */}
+          {userData.user.itemCategory &&
+            userData.user.itemCategory.length > 0 && (
+              <Paper elevation={1} sx={{ p: 4, mb: 4 }}>
+                <Typography
+                  variant="h6"
+                  sx={{ mb: 2, display: "flex", alignItems: "center" }}
+                >
+                  <LabelIcon sx={{ mr: 1 }} />
+                  {t("user.itemCategories", "Item Categories")}
+                </Typography>
+
+                {/* Exchange Point Items Control - Only show for exchange point admins */}
+                {isExchangePointAdmin && (
+                  <Box
+                    sx={{
+                      mb: 2,
+                      p: 2,
+                      bgcolor: "action.hover",
+                      borderRadius: 1,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={includeExchangePointItems}
+                          onChange={handleExchangePointItemsToggle}
+                          icon={<StorageIcon />}
+                          checkedIcon={<StorageIcon />}
+                        />
+                      }
+                      label={
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <Typography variant="body2">
+                            {t(
+                              "user.includeExchangePointItems",
+                              "Include Exchange Point Cached Items"
+                            )}
+                          </Typography>
+                          <Chip
+                            label={
+                              includeExchangePointItems
+                                ? t("common.enabled", "Enabled")
+                                : t("common.disabled", "Disabled")
+                            }
+                            size="small"
+                            color={
+                              includeExchangePointItems ? "success" : "default"
+                            }
+                          />
+                        </Box>
+                      }
+                    />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block", mt: 1 }}
+                    >
+                      {t(
+                        "user.exchangePointItemsHelper",
+                        "When enabled, includes items cached at your exchange point in addition to your personal items."
+                      )}
+                    </Typography>
+                  </Box>
+                )}
+
+                {selectedCategory && (
+                  <Alert severity="info" sx={{ mb: 2 }}>
+                    {t(
+                      "user.filteringByCategory",
+                      "Filtering by category: {{category}}",
+                      {
+                        category: selectedCategory,
+                      }
+                    )}
+                    <Chip
+                      label={t("common.clearFilter", "Clear Filter")}
+                      size="small"
+                      onClick={() => setSelectedCategory(null)}
+                      onDelete={() => setSelectedCategory(null)}
+                      sx={{ ml: 1 }}
+                    />
+                  </Alert>
+                )}
+
+                {!selectedCategory && (
+                  <Alert severity="info" sx={{ mb: 2 }}>
+                    {t(
+                      "user.selectCategoryToViewItems",
+                      "Select a category below to view items."
+                    )}
+                  </Alert>
+                )}
+
+                {/* React TagCloud */}
+                <Box
+                  sx={{
+                    minHeight: 200,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    p: 2,
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  {tagCloudData.length > 0 ? (
+                    <TagCloud
+                      minSize={14}
+                      maxSize={32}
+                      tags={tagCloudData}
+                      onClick={(tag) => handleCategoryClick(tag)}
+                      renderer={customRenderer}
+                      shuffle={false}
+                      colorOptions={{
+                        luminosity: "dark",
+                        hue: "blue",
+                      }}
+                    />
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      {t("user.noCategories", "No categories available")}
+                    </Typography>
+                  )}
+                </Box>
+
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 2, display: "block" }}
+                >
+                  {t(
+                    "user.tagCloudHelper",
+                    "Click on a category to filter items. Larger tags indicate more items in that category."
+                  )}
+                </Typography>
+              </Paper>
+            )}
+
           {/* Contact Methods */}
           {userData.user.contactMethods &&
             userData.user.contactMethods.length > 0 && (
@@ -357,72 +618,103 @@ const UserDetail: React.FC<UserDetailProps> = ({
               </Paper>
             )}
 
-          {/* User's Items */}
-          <Paper elevation={1} sx={{ p: 4 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              {isCurrentUser
-                ? t("user.yourItems", "Your Items")
-                : t("user.userItems", "{{name}}'s Items", {
-                    name: userData.user.nickname || userData.user.email,
-                  })}
-            </Typography>
-
-            {itemsLoading && (
-              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                <CircularProgress />
-              </Box>
-            )}
-
-            {itemsData?.itemsByUser && itemsData.itemsByUser.length > 0 ? (
-              <>
-                <List>
-                  {itemsData.itemsByUser.map((item) => (
-                    <ItemSummary
-                      key={item.id}
-                      item={{
-                        id: item.id,
-                        name: item.name,
-                        distance:
-                          item.location && currentUser?.location
-                            ? calculateDistance(
-                                item.location.latitude,
-                                item.location.longitude,
-                                currentUser.location.latitude,
-                                currentUser.location.longitude
-                              )
-                            : 0,
-                        status: item.status,
-                        images: item.images,
-                        thumbnails: item.thumbnails,
-                        tags: item.category,
-                      }}
-                      onClick={handleItemClick}
-                    />
-                  ))}
-                </List>
-
-                {/* Pagination Controls for Items */}
-                <PaginationControls
-                  currentPage={itemsPage}
-                  onPageChange={handleItemsPageChange}
-                  hasNextPage={itemsData.itemsByUser.length === ITEMS_PER_PAGE}
-                  hasPrevPage={itemsPage > 1}
-                  isLoading={itemsLoading}
-                  itemsPerPage={ITEMS_PER_PAGE}
-                  showPageInfo={true}
-                />
-              </>
-            ) : (
-              <Alert severity="info">
+          {/* User's Items - Only show when a category is selected */}
+          {selectedCategory && (
+            <Paper elevation={1} sx={{ p: 4 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
                 {isCurrentUser
-                  ? t("user.noItemsYou", "You haven't added any items yet.")
+                  ? t("user.yourItemsInCategory", "Your {{category}} Items", {
+                      category: selectedCategory,
+                    })
                   : t(
-                      "user.noItemsUser",
-                      "This user hasn't added any items yet."
+                      "user.userItemsInCategory",
+                      "{{name}}'s {{category}} Items",
+                      {
+                        name: userData.user.nickname || userData.user.email,
+                        category: selectedCategory,
+                      }
                     )}
-              </Alert>
-            )}
-          </Paper>
+                {isExchangePointAdmin && includeExchangePointItems && (
+                  <Chip
+                    label={t(
+                      "user.includesCachedItems",
+                      "Includes cached items"
+                    )}
+                    size="small"
+                    variant="outlined"
+                    sx={{ ml: 2 }}
+                  />
+                )}
+              </Typography>
+
+              {itemsLoading && (
+                <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              )}
+
+              {itemsData?.itemsByUser && itemsData.itemsByUser.length > 0 ? (
+                <>
+                  <List>
+                    {itemsData.itemsByUser.map((item) => (
+                      <ItemSummary
+                        key={item.id}
+                        item={{
+                          id: item.id,
+                          name: item.name,
+                          distance:
+                            item.location && currentUser?.location
+                              ? calculateDistance(
+                                  item.location.latitude,
+                                  item.location.longitude,
+                                  currentUser.location.latitude,
+                                  currentUser.location.longitude
+                                )
+                              : 0,
+                          status: item.status,
+                          images: item.images,
+                          thumbnails: item.thumbnails,
+                          tags: item.category,
+                        }}
+                        onClick={handleItemClick}
+                      />
+                    ))}
+                  </List>
+
+                  {/* Pagination Controls for Items */}
+                  <PaginationControls
+                    currentPage={itemsPage}
+                    onPageChange={handleItemsPageChange}
+                    hasNextPage={
+                      itemsData.itemsByUser.length === ITEMS_PER_PAGE
+                    }
+                    hasPrevPage={itemsPage > 1}
+                    isLoading={itemsLoading}
+                    itemsPerPage={ITEMS_PER_PAGE}
+                    showPageInfo={true}
+                  />
+                </>
+              ) : (
+                <Alert severity="info">
+                  {isCurrentUser
+                    ? t(
+                        "user.noItemsInCategoryYou",
+                        "You haven't added any {{category}} items yet.",
+                        {
+                          category: selectedCategory,
+                        }
+                      )
+                    : t(
+                        "user.noItemsInCategoryUser",
+                        "This user hasn't added any {{category}} items yet.",
+                        {
+                          category: selectedCategory,
+                        }
+                      )}
+                </Alert>
+              )}
+            </Paper>
+          )}
         </>
       )}
     </Container>

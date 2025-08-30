@@ -30,9 +30,10 @@ enum Role {
   USER
   ADMIN
   MODERATOR
+  EXCHANGE_POINT_ADMIN # 交換點管理員
 }
 
-type Category{
+type Category {
   category: String!
   count: Int!
 }
@@ -47,6 +48,7 @@ type User {
   isActive: Boolean!
   isVerified: Boolean!
   contactMethods: [ContactMethod!]
+  exchangePoints: [String!]
   itemCategory: [Category!]
   createdAt: Date!
 }
@@ -116,6 +118,7 @@ type Query {
   user(id: ID!): User
   me: User
   users(address: String, limit: Int, offset: Int): [User!]!
+  exchangePoints(limit: Int, offset: Int): [User!]!
   item(id: ID!): Item
   items(
     category: [String!]
@@ -142,6 +145,7 @@ type Query {
     keyword: String
     limit: Int
     offset: Int
+    isExchangePointItem: Boolean
   ): [Item!]!
   recentAddedItems(limit: Int, offset: Int, category: [String!]): [Item!]!
   transaction(id: ID!): Transaction
@@ -169,6 +173,7 @@ type Mutation {
     nickname: String
     address: String
     contactMethods: [ContactMethodInput!]
+    exchangePoints: [String!]
   ): User!
   deleteUser(id: ID!): Boolean!
   createItem(

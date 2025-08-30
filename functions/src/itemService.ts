@@ -28,10 +28,15 @@ type ItemModel = Omit<Item, "id" | "createdAt" | "updatedAt"> & {
 export class ItemService {
   private mapService: MapService;
   private categoryService: CategoryService;
+  private userService?: any; // Will be set after initialization
 
   constructor(categoryService: CategoryService) {
     this.mapService = createMapService();
     this.categoryService = categoryService;
+  }
+
+  setUserService(userService: any) {
+    this.userService = userService;
   }
 
   async itemsByLocation(
@@ -101,7 +106,7 @@ export class ItemService {
 
         await Promise.all(
           snapshot.docs.map(async (doc) => {
-            const item = await this._itemModelToItem(doc);
+            const item = await this._itemQueryToItem(doc);
             results.push(item);
           })
         );
@@ -113,61 +118,94 @@ export class ItemService {
   async itemsByUser(
     userId: string,
     category: string[],
-    status: string,
-    keyword: string,
+    status?: string,
+    keyword?: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
+    isExchangePointItem: boolean = false
   ): Promise<Item[]> {
-    let query = db
-      .collection("items")
-      .where("ownerId", "==", userId)
-      .orderBy("updated", "desc");
-    if (category && category.length > 0)
-      query = query.where("category", "array-contains-any", category);
-    if (status) query = query.where("status", "==", status);
-    if (keyword)
-      query = query
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff");
-    const snapshot = await query.limit(limit).offset(offset).get();
-    const results: Item[] = [];
-    await Promise.all(
-      snapshot.docs.map(async (doc) => {
-        const item = await this._itemQueryToItem(doc);
-        results.push(item);
-      })
-    );
-    console.debug(
-      `Found ${results.length} items for user ${userId} with category ${category}, status ${status}, keyword ${keyword}`
-    );
-    return results;
+    if (isExchangePointItem) {
+      if (!this.userService) {
+        throw new Error("UserService not available for exchange point items");
+      }
+
+      const cachedItemIds = await this.userService.getItemCaches(
+        userId,
+        category && category.length > 0 ? category : undefined,
+        limit,
+        offset
+      );
+
+      if (cachedItemIds.length === 0) {
+        return [];
+      }
+
+      const items = await this.itemsByIds(cachedItemIds);
+
+      console.debug(
+        `Found ${items.length} cached items for exchange point user ${userId}`
+      );
+
+      return items;
+    } else {
+      let query = db
+        .collection("items")
+        .where("ownerId", "==", userId)
+        .orderBy("updated", "desc");
+      if (category && category.length > 0)
+        query = query.where("category", "array-contains-any", category);
+      if (status && status.length > 0)
+        query = query.where("status", "==", status);
+      if (keyword && keyword.length > 0)
+        query = query
+          .where("name", ">=", keyword)
+          .where("name", "<=", keyword + "\uf8ff");
+      const snapshot = await query.limit(limit).offset(offset).get();
+      const results: Item[] = [];
+      await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const item = await this._itemQueryToItem(doc);
+          results.push(item);
+        })
+      );
+      console.debug(
+        `Found ${results.length} items for user ${userId} with category ${category}, status ${status}, keyword ${keyword}`
+      );
+      return results;
+    }
   }
 
-  async itemCategoriesByUser(  userId: string )
-  {
-      // Assuming that we do not have anyone with large number of entries
-      let items: Item[] = [];
-      // Fetch all items by user by batch
-      let batchSize = 20;
-      let offset = 0;
-      while (true) {
-        const batchItems = await this.itemsByUser(userId, [], "", "", batchSize, offset);
-        if (!batchItems || batchItems.length === 0) break;
-        items.push(...batchItems);
-        offset += batchSize;
-        if (batchItems.length < batchSize) break;
-       // console.log(`Fetched ${items.length} items for user ${userId} so far...`);
-      }
+  async itemCategoriesByUser(userId: string) {
+    // Assuming that we do not have anyone with large number of entries
+    let items: Item[] = [];
+    // Fetch all items by user by batch
+    let batchSize = 20;
+    let offset = 0;
+    while (true) {
+      const batchItems = await this.itemsByUser(
+        userId,
+        [],
+        "",
+        "",
+        batchSize,
+        offset
+      );
+      if (!batchItems || batchItems.length === 0) break;
+      items.push(...batchItems);
+      offset += batchSize;
+      if (batchItems.length < batchSize) break;
+      // console.log(`Fetched ${items.length} items for user ${userId} so far...`);
+    }
 
-      // Count categories
-      const categoryCount: { [category: string]: number } = {};
-      for (const item of items) {
-        if (item.category && Array.isArray(item.category)) {
-          for (const cat of item.category) {
-            categoryCount[cat] = (categoryCount[cat] || 0) + 1;
-          }
+    // Count categories
+    const categoryCount: { [category: string]: number } = {};
+    for (const item of items) {
+      if (item.category && Array.isArray(item.category)) {
+        for (const cat of item.category) {
+          categoryCount[cat] = (categoryCount[cat] || 0) + 1;
         }
       }
+    }
     return categoryCount;
   }
 
@@ -329,8 +367,9 @@ export class ItemService {
     }
 
     const docRef = await db.collection("items").add(itemData);
+    const itemId = docRef.id;
     const rv = {
-      id: docRef.id,
+      id: itemId,
       createdAt: itemData.created.seconds * 1000,
       updatedAt: itemData.updated.seconds * 1000,
       ...itemData,
@@ -357,7 +396,7 @@ export class ItemService {
 
   async updateItem(
     itemId: string,
-    userId: string,
+    user: User,
     name?: string,
     condition?: ItemCondition,
     category?: string[],
@@ -375,9 +414,9 @@ export class ItemService {
     let existingData = itemDoc.data() as ItemModel;
 
     // Verify the user owns this item
-    if (existingData.ownerId !== userId) {
+    if (existingData.ownerId !== user.id) {
       throw new Error(
-        `User ${userId} does not have permission to update item ${itemId}`
+        `User ${user.id} does not have permission to update item ${itemId}`
       );
     }
 
@@ -388,7 +427,10 @@ export class ItemService {
     if (images && images.length > 0) {
       for (const image of images) {
         console.debug(`Processing image: ${image}`);
-        if (image.startsWith("gs://") && !existingData.gsImageUrls?.includes(image)) {
+        if (
+          image.startsWith("gs://") &&
+          !existingData.gsImageUrls?.includes(image)
+        ) {
           try {
             let publicUrl = await GetPublicUrlForGSFile(image);
             console.debug(`Public URL for image ${image}: ${publicUrl}`);
@@ -411,6 +453,11 @@ export class ItemService {
       updated: Timestamp.now(),
     };
 
+    // Track category changes for later processing
+    let categoryChanged = false;
+    let oldCategories: string[] = [];
+    let newCategories: string[] = [];
+
     // Only update fields that were provided
     if (name && existingData.name !== name) {
       updateData.name = name;
@@ -428,13 +475,31 @@ export class ItemService {
       updateData.description = description;
       existingData.description = description;
     }
-    if (
-      category &&
-      JSON.stringify(existingData.category) !== JSON.stringify(category)
-    ) {
-      updateData.category = category;
-      existingData.category = category;
+
+    // Handle category changes with comparison
+    if (category !== undefined) {
+      const existingCategories = existingData.category || [];
+
+      // Check if categories actually changed
+      const categoriesEqual =
+        existingCategories.length === category.length &&
+        existingCategories.every((cat) => category.includes(cat)) &&
+        category.every((cat) => existingCategories.includes(cat));
+
+      if (!categoriesEqual) {
+        categoryChanged = true;
+        oldCategories = [...existingCategories];
+        newCategories = [...category];
+
+        updateData.category = category;
+        existingData.category = category;
+
+        console.debug(`Category change detected for item ${itemId}:`);
+        console.debug(`  Old categories: [${oldCategories.join(", ")}]`);
+        console.debug(`  New categories: [${newCategories.join(", ")}]`);
+      }
     }
+
     if (publishedYear && existingData.publishedYear !== publishedYear) {
       updateData.publishedYear = publishedYear;
       existingData.publishedYear = publishedYear;
@@ -457,9 +522,9 @@ export class ItemService {
         // Append to existing images
         let existingPublicImages = existingData.images || [];
         let existingGsImages = existingData.gsImageUrls || [];
-        updateData.images = publicImageUrls; 
+        updateData.images = publicImageUrls;
         updateData.gsImageUrls = gsImageUrls;
-        existingData.images  = [...existingPublicImages, ...publicImageUrls];
+        existingData.images = [...existingPublicImages, ...publicImageUrls];
         existingData.gsImageUrls = [...existingGsImages, ...gsImageUrls];
       }
 
@@ -473,14 +538,44 @@ export class ItemService {
     // Update the document
     await db.collection("items").doc(itemId).update(updateData);
 
-    // Handle category updates if category was changed
-    if (category !== undefined) {
-      // Get the owner data for category service
-      const owner = { id: userId } as User; // Minimal user object for category service
+    // Handle category updates if categories were changed
+    if (categoryChanged) {
+      try {
+        // Calculate categories to add and remove
+        const categoriesToAdd = newCategories.filter(
+          (cat) => !oldCategories.includes(cat)
+        );
+        const categoriesToRemove = oldCategories.filter(
+          (cat) => !newCategories.includes(cat)
+        );
 
-      if (category.length > 0) {
-        // Update category counts for new categories
-        await this.categoryService.upsertCategories(owner, category);
+        console.debug(`Categories to add: [${categoriesToAdd.join(", ")}]`);
+        console.debug(
+          `Categories to remove: [${categoriesToRemove.join(", ")}]`
+        );
+
+        // Process removals first to avoid potential conflicts
+        if (categoriesToRemove.length > 0) {
+          await this.categoryService.reduceCategories(user, categoriesToRemove);
+          console.debug(
+            `Removed categories: [${categoriesToRemove.join(", ")}]`
+          );
+        }
+
+        // Then process additions
+        if (categoriesToAdd.length > 0) {
+          await this.categoryService.upsertCategories(user, categoriesToAdd);
+          console.debug(`Added categories: [${categoriesToAdd.join(", ")}]`);
+        }
+
+        console.log(`Successfully updated categories for item ${itemId}`);
+      } catch (error) {
+        console.error(
+          `Failed to update category counts for item ${itemId}:`,
+          error
+        );
+        // Consider whether to throw here or just log the error
+        // For now, we'll log and continue since the item update succeeded
       }
     }
 
