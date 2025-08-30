@@ -1,4 +1,4 @@
-# De-centralised Hong Kong Library (DLLM-Library)
+# De-centralised Library (DLLM-Library)
 
 ## Table of Contents
 - [Project Background and Objectives](#project-background-and-objectives)
@@ -13,15 +13,15 @@
 - [Community Engagement](#community-engagement)
 - [Future Outlook](#future-outlook)
 
-The "De-centralised Hong Kong Library" empowers overseas Hong Kong communities through an open-source model, allowing each region to independently operate its own cultural preservation platform. Through transparent code and a decentralized architecture, we hope that every book and every artifact can find its home, collectively safeguarding the cultural memory of Hong Kong.
+The "De-centralised Library" empowers local communities through an open-source model, allowing each region to independently operate its own cultural preservation platform. Through transparent code and a decentralized architecture, we hope that every book and every artifact can find its home, collectively safeguarding the cultural memory.
 
 ## Project Background and Objectives
-The "De-centralised Hong Kong Library" is an open-source community platform designed for overseas Hong Kongers, aiming to promote the preservation and inheritance of precious books and cultural artifacts. Given that personal collections may face the risk of being discarded due to space limitations or a lack of interest from the next generation after Hong Kongers emigrate, this project aims to empower the global Hong Kong community through a decentralized approach to:
+The "De-centralised Library" is an open-source community platform designed for small local community, aiming to promote the preservation and inheritance of precious books and cultural artifacts. Given that personal collections may face the risk of being discarded due to space limitations or a lack of interest from the next generation with lack of cultural heritage, this project aims to empower the global community through a decentralized approach to:
 - **List and Share** personal collections of books or cultural items and connect with like-minded individuals;
 - **Borrow or Transfer** items to those who truly cherish them, preventing the loss of cultural heritage;
-- **Enable Communities** where different regional Hong Kong communities can set up their own servers to flexibly manage localized platforms.
+- **Enable Communities** where different regional communities can set up their own servers to flexibly manage localized platforms.
 
-As an open-source project, the source code will be publicly available on GitHub, allowing any overseas Hong Kong community to freely download, modify, and deploy it, ensuring the spirit of "decentralization" is upheld without relying on a single central server.
+As an open-source project, the source code will be publicly available on GitHub, allowing any overseas community to freely download, modify, and deploy it, ensuring the spirit of "decentralization" is upheld without relying on a single central server.
 
 ## Phase 1 Core Features
 Phase 1 focuses on providing simple and stable features to support item data uploading, browsing, and virtual ownership transfer, while ensuring the open-source architecture is easy to deploy. The core features are as follows:
@@ -35,7 +35,7 @@ Phase 1 focuses on providing simple and stable features to support item data upl
 
 **2.2 Item Listing & Browsing**
 - Users can upload information about books or other cultural artifacts, including:
-  - **Item Name** (e.g., "Stories of Hong Kong Streets")
+  - **Item Name** (e.g., "Stories of Streets")
   - **Condition** (e.g., "Like New," "Slightly creased")
   - **Category** (e.g., Literature, History, Photography, with support for multilingual tags)
   - **Optional Details** (e.g., year of publication, photos, the story behind the item)
@@ -49,10 +49,10 @@ Phase 1 focuses on providing simple and stable features to support item data upl
 
 **2.4 Language and Interface**
 - The app supports both **Traditional Chinese** and **English** interfaces to meet the needs of overseas users.
-- Users can choose the language for their uploaded information, and the system can automatically generate bilingual tags (e.g., "香港漫畫 / Hong Kong Comics").
+- Users can choose the language for their uploaded information, and the system can automatically generate bilingual tags (e.g., "漫畫 / Comics").
 
 ## Open-Source Operational Model
-- **Decentralized Principle**: This project does not rely on a single server and encourages Hong Kong communities in different regions to set up their own independent instances. For example, the London community can run its own server to manage local user and item data independently.
+- **Decentralized Principle**: This project does not rely on a single server and encourages communities in different regions to set up their own independent instances. For example, the London community can run its own server to manage local user and item data independently.
 - **Open Source Code**: All code (frontend, backend, and database schema) will be uploaded to GitHub under the MIT License, allowing for free use, modification, and distribution.
 - **Deployment Flexibility**: A detailed **Deployment Guide** will be provided, including Docker container setups, making it easy for non-technical users to run the platform on the cloud (e.g., AWS, Heroku) or a local server.
 - **Privacy Protection**: User data (especially addresses) is not made public. Server administrators must adhere to basic data protection guidelines (with reference to GDPR).
@@ -69,8 +69,8 @@ Phase 1 focuses on providing simple and stable features to support item data upl
 - **UI/UX**: Minimalist design featuring three core tabs: "Upload Item," "Browse," and "My Profile," designed for easy localization.
 
 ## Community Engagement
-- **How to Contribute**: We welcome developers and Hong Kong communities worldwide to participate by submitting Pull Requests to improve features, translate the interface, or fix bugs.
-- **Localization Support**: Multilingual templates will be provided to make it easy for communities to translate the app into other languages (e.g., Japanese, German) to integrate with local Hong Kong networks.
+- **How to Contribute**: We welcome developers and communities worldwide to participate by submitting Pull Requests to improve features, translate the interface, or fix bugs.
+- **Localization Support**: Multilingual templates will be provided to make it easy for communities to translate the app into other languages (e.g., Japanese, German) to integrate with local networks.
 - **Discussion Channels**: A Discord or Matrix group will be set up for developers and users to discuss technical issues and suggestions.
 
 ## Future Outlook

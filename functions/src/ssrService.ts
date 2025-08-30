@@ -64,7 +64,7 @@ export const handleHomePageSSR = (req: Request, res: Response) => {
     }
 
     const newTitle = "無大台 Decentralized Local Library Module";
-    const newDescription = "香港・雪梨・無大台圖書館模組";
+    const newDescription = "墨爾本・無大台圖書館模組";
     const newImageUrl = getLogoUrl();
 
     const ogTags = `

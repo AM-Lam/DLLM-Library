@@ -1,5 +1,5 @@
 /**
- * Service Worker for 無大台香港典藏館 PWA
+ * Service Worker for 無大台典藏館 PWA
  * Enables offline support and caching for Firebase-hosted React app
  * Uses Workbox for caching strategies
  */

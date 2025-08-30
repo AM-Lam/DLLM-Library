@@ -68,7 +68,7 @@ type Item {
   name: String! # 書名或物品名稱
   description: String # 可選描述
   condition: ItemCondition!
-  category: [String!]! # 分類標籤，如 ["小說", "香港歷史"]
+  category: [String!]! # 分類標籤，如 ["小說", "歷史"]
   status: ItemStatus!
   images: [String!] # 圖片URL列表
   thumbnails: [String!] # 縮略圖URL列表
