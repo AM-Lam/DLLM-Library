@@ -107,7 +107,15 @@ export const resolvers: Resolvers = {
     },
     itemsByUser: async (
       _: any,
-      { userId, category, status, keyword, limit = 20, offset = 0 }: any,
+      {
+        userId,
+        category,
+        status,
+        keyword,
+        limit = 20,
+        offset = 0,
+        isExchangePointItem = false,
+      }: any,
       __: any
     ): Promise<Item[]> => {
       return itemService.itemsByUser(
@@ -116,7 +124,8 @@ export const resolvers: Resolvers = {
         status,
         keyword,
         limit,
-        offset
+        offset,
+        isExchangePointItem
       );
     },
     item: async (_: any, { id }: any, __: any): Promise<Item | null> => {
@@ -135,6 +144,13 @@ export const resolvers: Resolvers = {
       { loginUser }: Context
     ): Promise<User | null> => {
       return userService.userById(id);
+    },
+    exchangePoints: async (
+      _: any,
+      { limit = 20, offset = 0 }: any,
+      __: any
+    ): Promise<User[]> => {
+      return userService.exchangePoints(limit, offset);
     },
     newsPost: async (
       _: any,
@@ -216,14 +232,15 @@ export const resolvers: Resolvers = {
     },
     updateUser: async (
       _: any,
-      { nickname, contactMethods, address }: any,
+      { nickname, contactMethods, address, exchangePoints }: any,
       { loginUser }: Context
     ): Promise<User> => {
       return userService.updateUser(
         loginUser,
         nickname,
         address,
-        contactMethods
+        contactMethods,
+        exchangePoints
       );
     },
     createItem: async (
@@ -234,7 +251,7 @@ export const resolvers: Resolvers = {
       if (!loginUser) throw new Error("Not authenticated");
       const owner = await userService.me(loginUser);
       if (!owner) throw new Error("Owner not found");
-      return itemService.createItem(
+      const newItem = await itemService.createItem(
         owner,
         args.name,
         args.description,
@@ -245,6 +262,8 @@ export const resolvers: Resolvers = {
         args.publishedYear,
         args.language
       );
+      await userService.addItemToUser(owner, newItem);
+      return newItem;
     },
     updateItem: async (
       _: any,
@@ -256,7 +275,7 @@ export const resolvers: Resolvers = {
       if (!owner) throw new Error("Owner not found");
       return itemService.updateItem(
         args.id,
-        owner.id,
+        owner,
         args.name,
         args.condition,
         args.category,
