@@ -52,7 +52,10 @@
     "updated": "改造",
     "created": "發佈",
     "optional": "可選",
-    "save": "儲存"
+    "save": "儲存",
+    "clearFilter": "清除過濾",
+    "enabled": "已啟用",
+    "disabled": "已停用"
   },
   "location": {
     "latitude": "緯度",
@@ -209,5 +212,19 @@
   "languages": {
     "en": "English",
     "zh-TW": "繁體中文"
+  },
+  "user": {
+    "itemCategories": "物品類別",
+    "includesCachedItems": "包含快取物品",
+    "exchangePointAdmin": "交換點管理員",
+    "filteringByCategory": "按類別過濾：{{category}}",
+    "tagCloudHelper": "點擊類別來過濾物品。較大的標籤表示該類別有更多物品。",
+    "yourItemsInCategory": "您的{{category}}物品",
+    "userItemsInCategory": "{{name}}的{{category}}物品",
+    "noItemsInCategoryYou": "您還沒有添加任何{{category}}物品。",
+    "noItemsInCategoryUser": "此用戶還沒有添加任何{{category}}物品。",
+    "includeExchangePointItems": "包含交換點快取物品",
+    "exchangePointItemsHelper": "啟用時，除了您的個人物品外，還包括在您的交換點快取的物品。",
+    "selectCategoryToViewItems": "選擇下面的類別來查看物品。"
   }
 }
