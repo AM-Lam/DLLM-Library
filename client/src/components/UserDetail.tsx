@@ -44,6 +44,7 @@ import {
   Tooltip as RechartsTooltip,
   CartesianGrid,
   LabelList,
+  Cell,
 } from "recharts";
 
 const USER_DETAIL_QUERY = gql`
@@ -257,16 +258,17 @@ const UserDetail: React.FC<UserDetailProps> = ({
   const bubbleData = tagCloudData.map((tag, i) => {
     const n = tagCloudData.length || 1;
     const angle = (i / n) * Math.PI * 2;
-    // increase radius spacing so bubbles don't cluster
-    const radius = 18 * Math.sqrt(i + 1);
-    // scale up z so bubbles render much larger for clearer labels
-    const baseSize = Math.max(tag.count, 1);
+    // increase radius spacing even more so larger bubbles don't overlap
+    const radius = 25 * Math.sqrt(i + 1);
+    // scale up z significantly for much larger bubbles
+    const baseSize = Math.max(tag.count, 2); // Higher minimum size
     return {
       name: tag.value,
       value: tag.count,
       x: radius * Math.cos(angle),
       y: radius * Math.sin(angle),
-      z: baseSize * 250, // larger scale factor
+      z: baseSize * 400, // much larger scale factor
+      selected: selectedCategory === tag.value,
     };
   });
 
@@ -274,13 +276,31 @@ const UserDetail: React.FC<UserDetailProps> = ({
     if (!active || !payload || payload.length === 0) return null;
     const p = payload[0].payload;
     return (
-      <Box sx={{ bgcolor: "background.paper", p: 1, borderRadius: 1, boxShadow: 3 }}>
-        <Typography variant="subtitle2">{p.name}</Typography>
+      <Box
+        sx={{
+          bgcolor: "background.paper",
+          p: 1.5,
+          borderRadius: 1,
+          boxShadow: 3,
+          border: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+          {p.name}
+        </Typography>
         <Typography variant="caption" color="text.secondary">
-          {p.value} items
+          {p.value} {p.value === 1 ? "item" : "items"}
         </Typography>
       </Box>
     );
+  };
+
+  // Handle bubble click
+  const handleBubbleClick = (data: any) => {
+    if (data && data.name) {
+      handleCategoryClick({ value: data.name, count: data.value });
+    }
   };
 
   // Handle case when userId is null
@@ -545,7 +565,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
                 {/* Bubble Chart (replaces TagCloud) */}
                 <Box
                   sx={{
-                    minHeight: 200,
+                    minHeight: 500, // Increased height for larger bubbles
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -555,28 +575,36 @@ const UserDetail: React.FC<UserDetailProps> = ({
                     p: 2,
                     bgcolor: "background.paper",
                     width: "100%",
+                    position: "relative",
                   }}
                 >
                   {bubbleData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <ScatterChart>
-                        <CartesianGrid />
+                    <ResponsiveContainer width="100%" height={500}>
+                      <ScatterChart margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                         <XAxis type="number" dataKey="x" name="x" hide />
                         <YAxis type="number" dataKey="y" name="y" hide />
-                        <ZAxis dataKey="z" range={[400, 3200]} />
+                        <ZAxis dataKey="z" range={[800, 6000]} />
                         <RechartsTooltip content={<CustomTooltip />} />
                         <Scatter
                           data={bubbleData}
-                          fill="#1976d2"
-                          onClick={(d: any) =>
-                            handleCategoryClick({ value: d.name, count: d.value })
-                          }
+                          onClick={handleBubbleClick}
+                          style={{ cursor: "pointer" }}
                         >
+                          {bubbleData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={`hsl(${(index * 137.5) % 360}, 70%, 60%)`}
+                              stroke={entry.selected ? "#1976d2" : "#fff"}
+                              strokeWidth={entry.selected ? 6 : 2}
+                              opacity={0.8}
+                            />
+                          ))}
                           <LabelList
                             dataKey="name"
                             position="inside"
                             formatter={(val: string) => val}
-                            style={{ fill: "#fff", pointerEvents: "none", fontSize: 14, fontWeight: 600 }}
+                            style={{ fill: "#fff", pointerEvents: "none", fontSize: 16, fontWeight: 400 }}
                           />
                         </Scatter>
                       </ScatterChart>
@@ -588,6 +616,29 @@ const UserDetail: React.FC<UserDetailProps> = ({
                   )}
                 </Box>
 
+                {/* Category labels below chart */}
+                {bubbleData.length > 0 && (
+                  <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                    {bubbleData.map((item, index) => (
+                      <Chip
+                        key={item.name}
+                        label={`${item.name} (${item.value})`}
+                        onClick={() => handleBubbleClick(item)}
+                        color={item.selected ? "primary" : "default"}
+                        variant={item.selected ? "filled" : "outlined"}
+                        size="small"
+                        sx={{
+                          cursor: "pointer",
+                          "&:hover": {
+                            transform: "scale(1.05)",
+                          },
+                          transition: "transform 0.2s ease",
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
+
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -595,7 +646,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
                 >
                   {t(
                     "user.tagCloudHelper",
-                    "Click on a category to filter items. Larger tags indicate more items in that category."
+                    "Click on a bubble or chip to filter items. Larger bubbles indicate more items in that category."
                   )}
                 </Typography>
               </Paper>
