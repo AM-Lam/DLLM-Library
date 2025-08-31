@@ -58,16 +58,6 @@ Phase 1 focuses on providing simple and stable features to support item data upl
 - **Privacy Protection**: User data (especially addresses) is not made public. Server administrators must adhere to basic data protection guidelines (with reference to GDPR).
 - **Free to Use**: The open-source model ensures the platform is free. Communities can cover their own server operational costs or sustain it through donations.
 
-## Technical Overview
-- **Open Source Stack**:
-  - **Frontend**: To be decided (clean, bilingual UI, supporting mobile and desktop)
-  - **Backend**: To be decided, exposing GraphQL (lightweight and easily extendable API)
-  - **Database**: PostgreSQL (open-source, efficient, and supports multi-region deployment)
-  - **Containerization**: Docker (simplifies server setup and ensures consistency)
-- **GitHub Repository**: Will contain the complete source code, installation guides, and API documentation to facilitate developer contributions.
-- **Security**: Uses HTTPS encryption to ensure secure data transmission; server administrators can configure additional security measures.
-- **UI/UX**: Minimalist design featuring three core tabs: "Upload Item," "Browse," and "My Profile," designed for easy localization.
-
 ## Community Engagement
 - **How to Contribute**: We welcome developers and communities worldwide to participate by submitting Pull Requests to improve features, translate the interface, or fix bugs.
 - **Localization Support**: Multilingual templates will be provided to make it easy for communities to translate the app into other languages (e.g., Japanese, German) to integrate with local networks.
