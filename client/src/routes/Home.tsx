@@ -166,8 +166,8 @@ const HomePage: React.FC = () => {
   // Calculate total pages for exchange points
   const totalExchangePointsPages = exchangePointsCountData?.exchangePointsCount
     ? Math.ceil(
-        exchangePointsCountData.exchangePointsCount / exchangePointsPerPage
-      )
+      exchangePointsCountData.exchangePointsCount / exchangePointsPerPage
+    )
     : 0;
 
   return (
@@ -186,6 +186,14 @@ const HomePage: React.FC = () => {
               {t("home.welcome", { nickname: user.nickname })}
             </Typography>
             {user?.isActive && <ItemForm onItemCreated={handleItemCreated} />}
+            <Button
+              variant="outlined"
+              onClick={() => {
+                if (user?.id) navigate(`/user/${user.id}`);
+              }}
+            >
+              {t("auth.myProfile")}
+            </Button>
             <Button variant="outlined" onClick={() => setShowUpdateUser(true)}>
               {t("auth.editProfile")}
             </Button>
