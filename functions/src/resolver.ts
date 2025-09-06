@@ -207,10 +207,7 @@ export const resolvers: Resolvers = {
       { userId }: any,
       __: any
     ): Promise<Transaction[]> => {
-      return transactionService.transactionsNotStatus(null, userId, [
-        TransactionStatus.Completed,
-        TransactionStatus.Cancelled,
-      ]);
+      return transactionService.transactionsNotStatus(null, userId, []);
     },
     transactionsByItem: async (
       _: any,
