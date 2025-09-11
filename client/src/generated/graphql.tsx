@@ -142,6 +142,8 @@ export type MutationCreateNewsPostArgs = {
 
 export type MutationCreateTransactionArgs = {
   itemId: Scalars['ID']['input'];
+  location?: TransactionLocation;
+  locationIndex?: Scalars['Int']['input'];
 };
 
 
@@ -395,10 +397,18 @@ export type Transaction = {
   createdAt: Scalars['Date']['output'];
   id: Scalars['ID']['output'];
   item: Item;
+  location?: Maybe<Location>;
   requestor?: Maybe<User>;
   status: TransactionStatus;
   updatedAt: Scalars['Date']['output'];
 };
+
+export enum TransactionLocation {
+  HolderLocation = 'HOLDER_LOCATION',
+  HolderPublicExchangePoint = 'HOLDER_PUBLIC_EXCHANGE_POINT',
+  RequestorLocation = 'REQUESTOR_LOCATION',
+  RequestorPublicExchangePoint = 'REQUESTOR_PUBLIC_EXCHANGE_POINT'
+}
 
 export enum TransactionStatus {
   Approved = 'APPROVED',
@@ -554,7 +564,7 @@ export type GetTransactionQueryVariables = Exact<{
 }>;
 
 
-export type GetTransactionQuery = { __typename?: 'Query', transaction?: { __typename?: 'Transaction', id: string, status: TransactionStatus, createdAt: any, updatedAt: any, item: { __typename?: 'Item', id: string, name: string, description?: string | null, images?: Array<string> | null, thumbnails?: Array<string> | null, condition: ItemCondition, category: Array<string>, ownerId: string, location?: { __typename?: 'Location', latitude: number, longitude: number } | null }, requestor?: { __typename?: 'User', id: string, nickname?: string | null, email: string, address?: string | null, contactMethods?: Array<{ __typename?: 'ContactMethod', type: string, value: string, isPublic: boolean }> | null, location?: { __typename?: 'Location', latitude: number, longitude: number } | null } | null } | null };
+export type GetTransactionQuery = { __typename?: 'Query', transaction?: { __typename?: 'Transaction', id: string, status: TransactionStatus, createdAt: any, updatedAt: any, item: { __typename?: 'Item', id: string, name: string, description?: string | null, images?: Array<string> | null, thumbnails?: Array<string> | null, condition: ItemCondition, category: Array<string>, ownerId: string, holderId?: string | null, location?: { __typename?: 'Location', latitude: number, longitude: number } | null }, requestor?: { __typename?: 'User', id: string, nickname?: string | null, email: string, address?: string | null, contactMethods?: Array<{ __typename?: 'ContactMethod', type: string, value: string, isPublic: boolean }> | null, location?: { __typename?: 'Location', latitude: number, longitude: number } | null } | null, location?: { __typename?: 'Location', latitude: number, longitude: number } | null } | null };
 
 export type ApproveTransactionMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1415,6 +1425,7 @@ export const GetTransactionDocument = gql`
       condition
       category
       ownerId
+      holderId
       location {
         latitude
         longitude
@@ -1434,6 +1445,10 @@ export const GetTransactionDocument = gql`
         longitude
       }
       address
+    }
+    location {
+      latitude
+      longitude
     }
   }
 }

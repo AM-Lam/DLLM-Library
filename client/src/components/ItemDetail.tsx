@@ -38,6 +38,7 @@ import {
   Transaction,
   User,
   TransactionStatus,
+  TransactionLocation,
 } from "../generated/graphql";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -67,8 +68,16 @@ const ITEM_DETAIL_QUERY = gql`
 `;
 
 const CREATE_TRANSACTION_MUTATION = gql`
-  mutation CreateTransaction($itemId: ID!) {
-    createTransaction(itemId: $itemId) {
+  mutation CreateTransaction(
+    $itemId: ID!
+    $location: TransactionLocation!
+    $locationIndex: Int
+  ) {
+    createTransaction(
+      itemId: $itemId
+      location: $location
+      locationIndex: $locationIndex
+    ) {
       id
       status
       createdAt
@@ -90,6 +99,7 @@ const USER_QUERY = gql`
         isPublic
       }
       address
+      exchangePoints
       location {
         latitude
         longitude
@@ -331,12 +341,15 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
     setRequestDialogOpen(true);
   };
 
-  const handleConfirmRequest = async () => {
+  const handleConfirmRequest = async (
+    location: TransactionLocation,
+    locationIndex?: number
+  ) => {
     if (!itemId) return;
 
     try {
       await createTransaction({
-        variables: { itemId },
+        variables: { itemId, location, locationIndex: locationIndex || 0 },
       });
     } catch (error) {
       console.error("Error creating transaction:", error);
@@ -1035,6 +1048,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
         item={data?.item || null}
         owner={ownerData?.user || null}
         holder={holderData?.user || null}
+        requestor={user || null}
         existingTransactions={openTransactions}
         transactionsLoading={transactionsLoading}
       />
