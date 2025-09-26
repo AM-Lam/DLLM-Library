@@ -398,7 +398,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
     if (!item?.id || !originalValues) return;
 
     if (!name.trim()) {
-      setFormError(t("item.nameAndCategoryRequired"));
+      setFormError(t("item.nameRequired"));
       return;
     }
 
@@ -481,7 +481,7 @@ const EditItemForm: React.FC<EditItemFormProps> = ({
         }
       }
 
-      if (!variables.category && !item.category?.includes("Uncategorized")) variables.category = ["Uncategorized"];
+      if ((!variables.category || variables.category.length === 0) && !item.category?.includes("Uncategorized")) variables.category = ["Uncategorized"];
 
       const currentPublishedYear =
         publishedYear === "" ? null : Number(publishedYear);
