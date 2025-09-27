@@ -64,8 +64,8 @@ import ContactMethods from "./ContactMethods";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Import custom icons for social platforms from shared utility file
-import { SignalIcon, TelegramIcon } from "./icons";
+// Import icons for social platforms from Material UI
+import { Wifi as SignalIcon, Telegram as TelegramIcon } from "@mui/icons-material";
 // Create a custom icon using Leaflet's default marker
 const customIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/535/535239.png",
