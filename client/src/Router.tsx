@@ -151,7 +151,7 @@ const Layout: React.FC<LayoutProps> = ({ email, emailVerified, user }) => {
           >
             {t("app.title", "DLLM Library")}
           </Typography>
-
+          <LanguageSwitcher />
           {/* Notification Bell - only show for authenticated users */}
           {user && (
             <IconButton
@@ -232,7 +232,6 @@ const Layout: React.FC<LayoutProps> = ({ email, emailVerified, user }) => {
               </Menu>
             </>
           )}
-          <LanguageSwitcher />
         </Toolbar>
       </AppBar>
 
