@@ -81,6 +81,7 @@ const GET_TRANSACTION = gql`
           longitude
         }
       }
+      details
       requestor {
         id
         nickname
@@ -162,6 +163,96 @@ interface OutletContext {
   user?: User;
 }
 
+// Add this helper function before the TransactionDetailPage component
+const parseTransactionDetails = (details: string | null | undefined) => {
+  if (!details) return null;
+
+  try {
+    return JSON.parse(details);
+  } catch (error) {
+    console.error("Error parsing transaction details:", error);
+    return null;
+  }
+};
+
+// Add this component before TransactionDetailPage to display JSON data nicely
+interface JsonViewerProps {
+  data: any;
+  level?: number;
+}
+
+const JsonViewer: React.FC<JsonViewerProps> = ({ data, level = 0 }) => {
+  const { t } = useTranslation();
+
+  if (data === null || data === undefined) {
+    return (
+      <Typography
+        variant="body2"
+        sx={{ color: "text.secondary", fontStyle: "italic" }}
+      >
+        {t("common.null", "null")}
+      </Typography>
+    );
+  }
+
+  if (typeof data !== "object") {
+    return (
+      <Typography variant="body2" sx={{ color: "text.primary" }}>
+        {String(data)}
+      </Typography>
+    );
+  }
+
+  if (Array.isArray(data)) {
+    return (
+      <Box sx={{ pl: level * 2 }}>
+        {data.map((item, index) => (
+          <Box key={index} sx={{ mb: 1 }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: "medium", color: "text.secondary" }}
+            >
+              [{index}]:
+            </Typography>
+            <Box sx={{ pl: 2 }}>
+              <JsonViewer data={item} level={level + 1} />
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ pl: level * 2 }}>
+      {Object.entries(data).map(([key, value]) => (
+        <Box key={key} sx={{ mb: 1 }}>
+          <Typography
+            variant="body2"
+            component="span"
+            sx={{ fontWeight: "medium", color: "primary.main" }}
+          >
+            {key}:
+          </Typography>{" "}
+          {typeof value === "object" ? (
+            <Box sx={{ mt: 0.5 }}>
+              <JsonViewer data={value} level={level + 1} />
+            </Box>
+          ) : (
+            <Typography
+              variant="body2"
+              component="span"
+              sx={{ color: "text.primary" }}
+            >
+              {String(value)}
+            </Typography>
+          )}
+        </Box>
+      ))}
+    </Box>
+  );
+};
+
 const TransactionDetailPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -171,6 +262,9 @@ const TransactionDetailPage: React.FC = () => {
 
   // Add state for receipt image upload dialog
   const [receiptImageDialogOpen, setReceiptImageDialogOpen] = useState(false);
+
+  // Add state for showing raw JSON
+  const [showRawJson, setShowRawJson] = useState(false);
 
   const { data, loading, error, refetch } = useQuery<{
     transaction: Transaction;
@@ -295,6 +389,9 @@ const TransactionDetailPage: React.FC = () => {
     ? { id: transaction.item.holderId }
     : null;
 
+  // Parse transaction details
+  const transactionDetails = parseTransactionDetails(transaction.details);
+
   // Update the receive handler to open dialog instead of direct mutation
   const handleReceiveClick = () => {
     setReceiptImageDialogOpen(true);
@@ -383,6 +480,78 @@ const TransactionDetailPage: React.FC = () => {
           </Grid>
         </Grid>
       </Paper>
+
+      {/* Transaction Details Section - Add this new section */}
+      {transactionDetails && (
+        <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              <AccountBoxIcon sx={{ mr: 1 }} />
+              {t("transactions.details", "Transaction Details")}
+            </Typography>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setShowRawJson(!showRawJson)}
+            >
+              {showRawJson
+                ? t("transactions.showFormatted", "Show Formatted")
+                : t("transactions.showRaw", "Show Raw JSON")}
+            </Button>
+          </Box>
+
+          <Divider sx={{ mb: 2 }} />
+
+          {showRawJson ? (
+            <Box
+              sx={{
+                bgcolor: "grey.100",
+                p: 2,
+                borderRadius: 1,
+                overflow: "auto",
+                maxHeight: 400,
+              }}
+            >
+              <Typography
+                component="pre"
+                variant="body2"
+                sx={{
+                  fontFamily: "monospace",
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  m: 0,
+                }}
+              >
+                {JSON.stringify(transactionDetails, null, 2)}
+              </Typography>
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                bgcolor: "background.default",
+                p: 2,
+                borderRadius: 1,
+                border: 1,
+                borderColor: "divider",
+                maxHeight: 400,
+                overflow: "auto",
+              }}
+            >
+              <JsonViewer data={transactionDetails} />
+            </Box>
+          )}
+        </Paper>
+      )}
 
       {/* Item Info */}
       <Paper elevation={1} sx={{ p: 3, mb: 3 }}>

@@ -153,6 +153,7 @@ export class TransactionService {
       requestor: requestor,
       receiver: receiver,
       status: data.status,
+      details: data.details,
       createdAt: data.created.seconds * 1000,
       updatedAt: data.updated.seconds * 1000,
       expireAt: data.expired ? data.expired.seconds * 1000 : undefined,
@@ -164,7 +165,8 @@ export class TransactionService {
     requestor: User,
     itemId: string,
     locationType: TransactionLocation,
-    locationIndex: number
+    locationIndex: number,
+    details: string
   ): Promise<Transaction> {
     // Logic to create a transaction
     const item = await this.itemService.itemById(itemId);
@@ -266,6 +268,7 @@ export class TransactionService {
       location: location,
       locationType: locationType,
       status: TransactionStatus.Pending,
+      details: details,
     };
     // Save transaction to the database
     const transactionRef = await db
@@ -288,6 +291,7 @@ export class TransactionService {
         status: TransactionStatus.Pending,
         participants: [requestor.id, exchangeId, owner.id], // Add participants array
         parentTransactionId: transactionRef.id,
+        details: details,
       };
       const chainedTransactionRef = await db
         .collection("transactions")
@@ -320,7 +324,8 @@ export class TransactionService {
 
   async createQuickTransaction(
     holder: User,
-    itemId: string
+    itemId: string,
+    details: string
   ): Promise<Transaction> {
     // Logic to create a quick transaction
     const item = await this.itemService.itemById(itemId);
@@ -342,6 +347,8 @@ export class TransactionService {
       expired: Timestamp.fromDate(new Date(Date.now() + 60 * 60 * 1000)), // expire in 1 hours,
       status: TransactionStatus.Transfered,
       participants: [holder.id, item.ownerId],
+      // You can store details in a suitable field, e.g., as part of images or a new field if needed
+      details: details,
     };
     // Save transaction to the database
     const transactionRef = await db
@@ -492,13 +499,11 @@ export class TransactionService {
     emailDetail: EmailDetail | null
   ): Promise<Transaction> {
     // Save the updated transaction to the database
-    console.log(`Updating transaction with id ${id} to status ${status}`);
     const requestor = await this.userService.userById(data.requestorId);
     if (!requestor) {
       throw new Error(`Requestor with id ${data.requestorId} not found`);
     }
     let receiver: User | null = null;
-    console.log(`Updating transaction with id ${id} to status 1${status}`);
 
     if (data.receiverId) {
       receiver = await this.userService.userById(data.receiverId);
@@ -507,13 +512,20 @@ export class TransactionService {
       }
     }
     const updated = Timestamp.now();
-    await db.collection("transactions").doc(id).update({
+    let updateObject: Partial<TransactionModel> = {
       status,
       updated,
-      images: data.images,
-      gsImageUrls: data.gsImageUrls,
-      receiverId: data.receiverId,
-    });
+    };
+    if (data.images) {
+      updateObject.images = data.images;
+    }
+    if (data.gsImageUrls) {
+      updateObject.gsImageUrls = data.gsImageUrls;
+    }
+    if (data.receiverId) {
+      updateObject.receiverId = data.receiverId;
+    }
+    await db.collection("transactions").doc(id).update(updateObject);
     // Logic to approve a transaction
     // Notify the requestor
     let toList = [requestor.email, owner.email];

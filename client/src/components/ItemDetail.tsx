@@ -75,11 +75,13 @@ const CREATE_TRANSACTION_MUTATION = gql`
     $itemId: ID!
     $location: TransactionLocation!
     $locationIndex: Int
+    $details: String!
   ) {
     createTransaction(
       itemId: $itemId
       location: $location
       locationIndex: $locationIndex
+      details: $details
     ) {
       id
       status
@@ -90,8 +92,8 @@ const CREATE_TRANSACTION_MUTATION = gql`
 `;
 
 const CREATE_QUICK_TRANSACTION_MUTATION = gql`
-  mutation CreateQuickTransaction($itemId: ID!) {
-    createQuickTransaction(itemId: $itemId) {
+  mutation CreateQuickTransaction($itemId: ID!, $details: String!) {
+    createQuickTransaction(itemId: $itemId, details: $details) {
       id
       status
       createdAt
@@ -134,6 +136,7 @@ const OPEN_TRANSACTIONS_QUERY = gql`
         nickname
         email
       }
+      details
       status
       createdAt
       updatedAt
@@ -337,8 +340,14 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
     if (!itemId) return;
 
     try {
+      const details = buildDetailsString();
       await createTransaction({
-        variables: { itemId, location, locationIndex: locationIndex || 0 },
+        variables: {
+          itemId,
+          location,
+          locationIndex: locationIndex || 0,
+          details: details,
+        },
       });
     } catch (error) {
       console.error("Error creating transaction:", error);
@@ -349,12 +358,17 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
     if (!itemId) return;
 
     try {
+      const details = buildDetailsString();
       await createQuickTransaction({
-        variables: { itemId },
+        variables: { itemId, details: details },
       });
     } catch (error) {
       console.error("Error creating quick transaction:", error);
     }
+  };
+
+  const buildDetailsString = () => {
+    return JSON.stringify({ deposit: data?.item.deposit });
   };
 
   const handleCloseRequestDialog = () => {

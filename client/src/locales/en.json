@@ -81,7 +81,8 @@
     "update": "Update",
     "loginRequired": "Please log in to view your borrowed items",
     "retry": "Retry",
-    "viewMore": "View More"
+    "viewMore": "View More",
+    "null": "null"
   },
   "location": {
     "latitude": "Latitude",
@@ -287,7 +288,10 @@
       "transfered": "Transferred",
       "completed": "Completed",
       "cancelled": "Cancelled"
-    }
+    },
+    "details": "Transaction Details",
+    "showRaw": "Show Raw JSON",
+    "showFormatted": "Show Formatted"
   },
   "itemsAll": {
     "title": "Search Items",

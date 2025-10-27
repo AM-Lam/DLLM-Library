@@ -416,7 +416,7 @@ export const resolvers: Resolvers = {
     },
     createTransaction: async (
       _: any,
-      { itemId, location, locationIndex }: any,
+      { itemId, location, locationIndex, details }: any,
       { loginUser }: Context
     ): Promise<Transaction> => {
       if (!loginUser) throw new Error("Not authenticated");
@@ -426,18 +426,19 @@ export const resolvers: Resolvers = {
         requestor,
         itemId,
         location,
-        locationIndex
+        locationIndex,
+        details
       );
     },
     createQuickTransaction: async (
       _: any,
-      { itemId }: any,
+      { itemId, details }: any,
       { loginUser }: Context
     ): Promise<Transaction> => {
       if (!loginUser) throw new Error("Not authenticated");
       const holder = await userService.me(loginUser);
       if (!holder) throw new Error("Holder not found");
-      return transactionService.createQuickTransaction(holder, itemId);
+      return transactionService.createQuickTransaction(holder, itemId, details);
     },
     approveTransaction: async (
       _: any,
