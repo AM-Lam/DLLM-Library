@@ -95,7 +95,7 @@ export const handleHomePageSSR = (req: Request, res: Response, redirectPath?: st
 <script type="text/javascript">
   // Store the intended path in sessionStorage for client-side routing
   window.addEventListener('DOMContentLoaded', function() {
-    sessionStorage.setItem('redirectPath', '${redirectPath}');
+    sessionStorage.setItem('redirectPath', ${JSON.stringify(redirectPath)});
   });
 </script>
         `;
