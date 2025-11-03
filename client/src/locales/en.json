@@ -15,7 +15,20 @@
     "resendVerification": "Resend Verification Email",
     "createProfile": "Create Profile",
     "cancel": "Cancel",
-    "submit": "Submit"
+    "submit": "Submit",
+    "confirmPassword": "Confirm Password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters long",
+    "passwordRequirements": "At least 6 characters",
+    "signInError": "Failed to sign in",
+    "signUpError": "Failed to create account",
+    "resetPasswordError": "Failed to send reset email",
+    "resetEmailSent": "Password reset email sent! Check your inbox.",
+    "resetPasswordInstructions": "Enter your email address and we'll send you a link to reset your password.",
+    "resetPasswordInfo": "Please contact support to reset your password.",
+    "createNewAccount": "Create a new account",
+    "alreadyHaveAccount": "Already have an account? Uncheck the box above to sign in.",
+    "needAccount": "Need an account? Check the box above to sign up."
   },
   "navigation": {
     "home": "Home",
@@ -84,7 +97,8 @@
     "viewMore": "View More",
     "null": "null",
     "copy": "Copy",
-    "close": "Close"
+    "close": "Close",
+    "or": "or"
   },
   "location": {
     "latitude": "Latitude",
@@ -378,7 +392,10 @@
     "shareTitle": "Transaction Details",
     "shareVia": "Share via...",
     "shareViaApps": "Share via Messaging Apps",
-    "linkCopied": "Link copied to clipboard!"
+    "linkCopied": "Link copied to clipboard!",
+    "authRequired": "Authentication Required",
+    "authRequiredMessage": "To confirm receipt of this item, please sign in to your account or create a new one.",
+    "signInToConfirm": "Please sign in or create an account to confirm receipt of this item."
   },
   "itemsAll": {
     "title": "Search Items",

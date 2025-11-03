@@ -752,7 +752,7 @@ export type TransferTransactionMutation = { __typename?: 'Mutation', transferTra
 
 export type ReceiveTransactionMutationVariables = Exact<{
   id: Scalars['ID']['input'];
-  images: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  images?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
 }>;
 
 
@@ -1884,7 +1884,7 @@ export type TransferTransactionMutationHookResult = ReturnType<typeof useTransfe
 export type TransferTransactionMutationResult = Apollo.MutationResult<TransferTransactionMutation>;
 export type TransferTransactionMutationOptions = Apollo.BaseMutationOptions<TransferTransactionMutation, TransferTransactionMutationVariables>;
 export const ReceiveTransactionDocument = gql`
-    mutation ReceiveTransaction($id: ID!, $images: [String!]!) {
+    mutation ReceiveTransaction($id: ID!, $images: [String!]) {
   receiveTransaction(id: $id, images: $images) {
     id
     status

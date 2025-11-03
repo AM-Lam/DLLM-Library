@@ -62,6 +62,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import ReceiptImageUploadDialog from "./ReceiptImageUploadDialog";
+import { AuthDialog } from "./Auth";
 
 // Create a custom icon using Leaflet's default marker
 const customIcon = new L.Icon({
@@ -155,7 +156,7 @@ const TRANSFER_TRANSACTION = gql`
 `;
 
 const RECEIVE_TRANSACTION = gql`
-  mutation ReceiveTransaction($id: ID!, $images: [String!]!) {
+  mutation ReceiveTransaction($id: ID!, $images: [String!]) {
     receiveTransaction(id: $id, images: $images) {
       id
       status
@@ -558,6 +559,11 @@ const TransactionDetailPage: React.FC = () => {
   // Add state for showing raw JSON
   const [showRawJson, setShowRawJson] = useState(false);
 
+  // Simplified auth state
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [authDefaultSignUp, setAuthDefaultSignUp] = useState(false);
+  const [pendingReceiveAction, setPendingReceiveAction] = useState(false);
+
   const { data, loading, error, refetch } = useQuery<{
     transaction: Transaction;
   }>(GET_TRANSACTION, {
@@ -639,8 +645,11 @@ const TransactionDetailPage: React.FC = () => {
   };
 
   const isOwner = user?.id === data?.transaction?.item?.ownerId;
-  const isRequestor = user?.id === data?.transaction?.requestor?.id;
-  const isReceiver = user?.id === data?.transaction?.receiver?.id;
+  const isRequestor = user && user.id === data?.transaction?.requestor?.id;
+  const isReceiver = user && user.id === data?.transaction?.receiver?.id;
+  const isQuickExchange =
+    data?.transaction?.receiver === null ||
+    data?.transaction?.receiver === undefined;
 
   if (loading) {
     return (
@@ -686,6 +695,13 @@ const TransactionDetailPage: React.FC = () => {
 
   // Update the receive handler to open dialog instead of direct mutation
   const handleReceiveClick = () => {
+    if (isQuickExchange && !user) {
+      setAuthDefaultSignUp(false); // Default to sign in
+      setAuthDialogOpen(true);
+      setPendingReceiveAction(true);
+      return;
+    }
+
     setReceiptImageDialogOpen(true);
   };
 
@@ -702,6 +718,7 @@ const TransactionDetailPage: React.FC = () => {
       });
       await refetch();
       setReceiptImageDialogOpen(false);
+      setPendingReceiveAction(false);
     } catch (err) {
       console.error("Error confirming receipt:", err);
       alert(t("transactions.receiveError", "Failed to confirm receipt"));
@@ -714,6 +731,25 @@ const TransactionDetailPage: React.FC = () => {
     if (actionLoading !== "receive") {
       setReceiptImageDialogOpen(false);
     }
+  };
+
+  const handleAuthSuccess = () => {
+    setAuthDialogOpen(false);
+
+    setTimeout(() => {
+      if (pendingReceiveAction) {
+        setReceiptImageDialogOpen(true);
+      }
+    }, 500);
+  };
+
+  const handleCloseAuthDialog = () => {
+    setAuthDialogOpen(false);
+    setPendingReceiveAction(false);
+  };
+
+  const handleSwitchAuthMode = () => {
+    setAuthDefaultSignUp(!authDefaultSignUp);
   };
 
   // Generate the full transaction URL
@@ -1223,7 +1259,7 @@ const TransactionDetailPage: React.FC = () => {
         </Typography>
 
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-          {/* Share Button - Also add here for easier access */}
+          {/* Share Button */}
           <Button
             variant="outlined"
             startIcon={<ShareIcon />}
@@ -1267,7 +1303,8 @@ const TransactionDetailPage: React.FC = () => {
               </Button>
             </>
           )}
-          {transaction.status === TransactionStatus.Approved ? (
+
+          {transaction.status === TransactionStatus.Approved && (
             <>
               <Button
                 variant="outlined"
@@ -1302,46 +1339,37 @@ const TransactionDetailPage: React.FC = () => {
                 </Button>
               )}
             </>
-          ) : null}
+          )}
 
-          {/* Requestor Actions */}
-          {isRequestor &&
+          {/* Receive Button */}
+          {(isRequestor || isReceiver || isQuickExchange) &&
             transaction.status === TransactionStatus.Transfered && (
-              <Button
-                variant="contained"
-                color="success"
-                onClick={handleReceiveClick}
-                disabled={actionLoading === "receive"}
-                startIcon={
-                  actionLoading === "receive" ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    <DoneIcon />
-                  )
-                }
-              >
-                {t("transactions.receive", "Confirm Received")}
-              </Button>
-            )}
+              <>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleReceiveClick}
+                  disabled={actionLoading === "receive"}
+                  startIcon={
+                    actionLoading === "receive" ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <DoneIcon />
+                    )
+                  }
+                >
+                  {t("transactions.receive", "Confirm Received")}
+                </Button>
 
-          {/* Receiver Actions */}
-          {isReceiver &&
-            transaction.status === TransactionStatus.Transfered && (
-              <Button
-                variant="contained"
-                color="success"
-                onClick={handleReceiveClick}
-                disabled={actionLoading === "receive"}
-                startIcon={
-                  actionLoading === "receive" ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    <DoneIcon />
-                  )
-                }
-              >
-                {t("transactions.receive", "Confirm Received")}
-              </Button>
+                {isQuickExchange && !user && (
+                  <Alert severity="info" sx={{ flexBasis: "100%" }}>
+                    {t(
+                      "transactions.signInToConfirm",
+                      "Please sign in or create an account to confirm receipt of this item."
+                    )}
+                  </Alert>
+                )}
+              </>
             )}
 
           {/* Cancel button for requestor when pending */}
@@ -1371,9 +1399,10 @@ const TransactionDetailPage: React.FC = () => {
             (isRequestor &&
               (transaction.status === TransactionStatus.Pending ||
                 transaction.status === TransactionStatus.Transfered)) ||
-            (isReceiver && transaction.status === TransactionStatus.Transfered)
+            ((isReceiver || isQuickExchange) &&
+              transaction.status === TransactionStatus.Transfered)
           ) && (
-            <Alert severity="info" sx={{ mt: 2 }}>
+            <Alert severity="info" sx={{ width: "100%" }}>
               {t(
                 "transactions.noActionsAvailable",
                 "No actions available for this transaction."
@@ -1382,6 +1411,22 @@ const TransactionDetailPage: React.FC = () => {
           )}
         </Box>
       </Paper>
+
+      {/* Unified Authentication Dialog */}
+      <AuthDialog
+        open={authDialogOpen}
+        onClose={handleCloseAuthDialog}
+        onSuccess={handleAuthSuccess}
+        onForgotPassword={() => {
+          alert(
+            t(
+              "auth.resetPasswordInfo",
+              "Please contact support to reset your password."
+            )
+          );
+        }}
+        defaultIsSignUp={authDefaultSignUp}
+      />
 
       {/* Receipt Image Upload Dialog */}
       <ReceiptImageUploadDialog
