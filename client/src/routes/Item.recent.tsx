@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -11,9 +11,11 @@ import {
   InputLabel,
   CircularProgress,
   Container,
+  Chip,
+  SelectChangeEvent,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { ArrowBack, Clear as ClearIcon } from "@mui/icons-material";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import {
   RecentAddedItemsQuery,
@@ -46,15 +48,51 @@ const ALL_RECENT_ITEMS_QUERY = gql`
   }
 `;
 
+const HotCategoriesQuery = gql`
+  query HotCategories($limit: Int!) {
+    hotCategories(limit: $limit)
+  }
+`;
+
+const DefaultCategoriesQuery = gql`
+  query DefaultCategories {
+    defaultCategories
+  }
+`;
+
 const ITEMS_PER_PAGE = 12; // Changed to 12 for better grid layout (3 columns x 4 rows)
 
 const ItemRecentPage: React.FC = () => {
   const { user } = useOutletContext<OutletContext>();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get category from URL parameters
+  const categoryFromUrl = searchParams.get("category") || "";
+
   const [statusFilter, setStatusFilter] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>(categoryFromUrl);
   const [page, setPage] = useState<number>(1);
+
+  // Query for hot categories
+  const { data: hotCategoriesData, loading: categoriesLoading } = useQuery<{
+    hotCategories: string[];
+  }>(HotCategoriesQuery, {
+    variables: { limit: 15 },
+  });
+
+  // Query for default categories as fallback
+  const { data: defaultCategoriesData } = useQuery<{
+    defaultCategories: string[];
+  }>(DefaultCategoriesQuery);
+
+  // Combine categories from both queries
+  const availableCategories = [
+    ...(hotCategoriesData?.hotCategories || []),
+    ...(defaultCategoriesData?.defaultCategories || []),
+  ].filter((category, index, self) => self.indexOf(category) === index); // Remove duplicates
 
   const { data, loading, error, refetch } = useQuery<
     RecentAddedItemsQuery,
@@ -70,12 +108,25 @@ const ItemRecentPage: React.FC = () => {
   const handleItemClick = (itemId: string) => {
     navigate(`/item/${itemId}`);
   };
-
-  const handleCategoryChange = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    setSelectedCategory(event.target.value as string);
+  const handleCategoryChange = (event: SelectChangeEvent<string>) => {
+    const newCategory = event.target.value as string;
+    setSelectedCategory(newCategory);
     setPage(1); // Reset to page 1 when category changes
+
+    // Update URL parameters
+    if (newCategory) {
+      searchParams.set("category", newCategory);
+    } else {
+      searchParams.delete("category");
+    }
+    setSearchParams(searchParams);
+  };
+
+  const handleClearCategory = () => {
+    setSelectedCategory("");
+    setPage(1);
+    searchParams.delete("category");
+    setSearchParams(searchParams);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -84,8 +135,16 @@ const ItemRecentPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Update selected category when URL parameter changes
+  useEffect(() => {
+    if (categoryFromUrl !== selectedCategory) {
+      setSelectedCategory(categoryFromUrl);
+      setPage(1);
+    }
+  }, [categoryFromUrl]);
+
   // Refetch when category, page, or status changes
-  React.useEffect(() => {
+  useEffect(() => {
     refetch({
       category: selectedCategory ? [selectedCategory] : [],
       limit: ITEMS_PER_PAGE,
@@ -97,6 +156,27 @@ const ItemRecentPage: React.FC = () => {
     data?.recentAddedItems.filter((item) =>
       statusFilter ? item.status === statusFilter : true
     ) || [];
+
+  // Generate page title based on category
+  const getPageTitle = () => {
+    if (selectedCategory) {
+      return t("item.recentInCategory", "Recent {{category}}", {
+        category: selectedCategory,
+      });
+    }
+    return t("item.recentItems", "Recent Items");
+  };
+
+  const getPageDescription = () => {
+    if (selectedCategory) {
+      return t(
+        "item.recentCategoryDescription",
+        "Recently added items in {{category}}",
+        { category: selectedCategory }
+      );
+    }
+    return t("item.recentDescription", "Recently added items");
+  };
 
   return (
     <Box sx={{ pb: 4 }}>
@@ -113,13 +193,35 @@ const ItemRecentPage: React.FC = () => {
         }}
       >
         <Container maxWidth="lg">
-          <Box sx={{ display: "flex", alignItems: "center", py: 2 }}>
-            <IconButton onClick={() => navigate("/")} sx={{ mr: 1 }}>
-              <ArrowBack />
-            </IconButton>
-            <Typography variant="h5" sx={{ flexGrow: 1, fontWeight: "bold" }}>
-              {t("item.allItems", "All Items")}
+          <Box sx={{ py: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <IconButton onClick={() => navigate("/")} sx={{ mr: 1 }}>
+                <ArrowBack />
+              </IconButton>
+              <Typography variant="h5" sx={{ flexGrow: 1, fontWeight: "bold" }}>
+                {getPageTitle()}
+              </Typography>
+            </Box>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ ml: 6, mb: selectedCategory ? 1 : 0 }}
+            >
+              {getPageDescription()}
             </Typography>
+
+            {/* Category Badge */}
+            {selectedCategory && (
+              <Box sx={{ ml: 6 }}>
+                <Chip
+                  label={selectedCategory}
+                  onDelete={handleClearCategory}
+                  color="primary"
+                  size="small"
+                  sx={{ fontWeight: "medium" }}
+                />
+              </Box>
+            )}
           </Box>
         </Container>
       </Box>
@@ -135,6 +237,27 @@ const ItemRecentPage: React.FC = () => {
             alignItems: "center",
           }}
         >
+          {/* Category Filter */}
+          <FormControl size="small" sx={{ minWidth: 200 }}>
+            <InputLabel>{t("item.category", "Category")}</InputLabel>
+            <Select
+              value={selectedCategory}
+              label={t("item.category", "Category")}
+              onChange={handleCategoryChange}
+              disabled={categoriesLoading}
+            >
+              <MenuItem value="">
+                <em>{t("item.allCategories", "All Categories")}</em>
+              </MenuItem>
+              {availableCategories.map((category) => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Status Filter */}
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>{t("item.status")}</InputLabel>
             <Select
@@ -149,6 +272,21 @@ const ItemRecentPage: React.FC = () => {
               <MenuItem value="RESERVED">{t("item.reserved")}</MenuItem>
             </Select>
           </FormControl>
+
+          {/* Clear Filters Button (if any filter is active) */}
+          {(selectedCategory || statusFilter) && (
+            <IconButton
+              size="small"
+              onClick={() => {
+                handleClearCategory();
+                setStatusFilter("");
+              }}
+              sx={{ ml: 1 }}
+              title={t("common.clearFilters", "Clear filters")}
+            >
+              <ClearIcon />
+            </IconButton>
+          )}
 
           {/* Results count */}
           <Typography
@@ -225,7 +363,15 @@ const ItemRecentPage: React.FC = () => {
             }}
           >
             <Typography variant="h6" color="text.secondary">
-              {t("item.noItemsFound", "No items found")}
+              {selectedCategory
+                ? t(
+                    "item.noItemsInCategory",
+                    "No items found in {{category}}",
+                    {
+                      category: selectedCategory,
+                    }
+                  )
+                : t("item.noItemsFound", "No items found")}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {statusFilter || selectedCategory
