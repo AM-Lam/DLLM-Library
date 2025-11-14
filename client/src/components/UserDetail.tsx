@@ -837,7 +837,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
           )}
         </>
       )}
-    </Container >
+    </Container>
   );
 };
 
