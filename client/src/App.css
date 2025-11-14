@@ -15,18 +15,18 @@
 }
 
 .App-header {
-  background-color: #000000; /* Changed to black */
+  background-color: #db036b; /* Changed to pink */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: #ffff00; /* Changed to yellow */
+  color: #25975d; /* Changed to green */
 }
 
 .App-link {
-  color: #ffff00; /* Changed to yellow */
+  color: #25975d; /* Changed to green */
 }
 
 @keyframes App-logo-spin {
