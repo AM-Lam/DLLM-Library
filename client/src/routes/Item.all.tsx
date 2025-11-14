@@ -205,7 +205,7 @@ const ItemAllPage: React.FC = () => {
   };
 
   const handleSearch = () => {
-    // Allow search with just category selected
+    // Don't search if both keyword and category are empty
     if (keyword.trim().length === 0 && selectedCategory === "") {
       return; // Don't search if both keyword and category are empty
     }
