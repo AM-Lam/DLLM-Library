@@ -120,10 +120,6 @@ const UserDetail: React.FC<UserDetailProps> = ({
   const [showUpdateUser, setShowUpdateUser] = useState(false);
   const [expanded, setExpanded] = React.useState(false);
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
   const {
     data: userData,
     loading: userLoading,
