@@ -179,6 +179,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     handleMenuClose();
   };
 
+  const handleBorrowedItems = () => {
+    navigate("/items/borrowed-items");
+    handleMenuClose();
+  };
+
   const handleItemCreated = () => {
     setShowItemForm(false);
     if (window.location.pathname === "/") {
@@ -262,6 +267,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   </ListItemIcon>
                   <ListItemText>
                     {t("item.onLoanItems", "Items On Loan")}
+                  </ListItemText>
+                </MenuItem>
+
+                <MenuItem onClick={handleBorrowedItems}>
+                  <ListItemIcon>
+                    <BookmarkIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>
+                    {t("item.borrowedItems", "Borrowed Items")}
                   </ListItemText>
                 </MenuItem>
 
