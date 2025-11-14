@@ -4,12 +4,12 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#000000", // Changed from blue to black
-      contrastText: "#ffff00", // Yellow text on black background
+      main: "#db036b", // Changed from blue to pink
+      contrastText: "#ffffff", // White text on pink background
     },
     secondary: {
-      main: "#333333", // Dark grey for secondary elements
-      contrastText: "#ffff00", // Yellow text
+      main: "#25975d", // Dark grey for secondary elements
+      contrastText: "#ffffff", // White text
     },
     background: {
       default: "#e0e0e0", // Light grey background (instead of white)
@@ -21,7 +21,7 @@ const theme = createTheme({
     },
     info: {
       main: "#000000",
-      contrastText: "#ffff00",
+      contrastText: "#25975d",
     },
     success: {
       main: "#2e7d32", // Keep success colors reasonable
@@ -40,10 +40,10 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         contained: {
-          backgroundColor: "#000000",
-          color: "#ffff00",
+          backgroundColor: "#db036b",
+          color: "#ffffff",
           "&:hover": {
-            backgroundColor: "#333333",
+            backgroundColor: "#25975d",
           },
         },
         outlined: {
@@ -59,16 +59,16 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#000000",
-          color: "#ffff00",
+          backgroundColor: "#db036b",
+          color: "#ffffff",
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         colorPrimary: {
-          backgroundColor: "#000000",
-          color: "#ffff00",
+          backgroundColor: "#25975d",
+          color: "#ffffff",
         },
       },
     },
@@ -82,14 +82,14 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: "#f5f5f5",
+          backgroundColor: "#e0f5e0",
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffff",
+          backgroundColor: "#e0ffe0",
           border: "1px solid #e0e0e0",
         },
       },
