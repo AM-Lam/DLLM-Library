@@ -13,17 +13,21 @@ import {
   SignedUrlResponse,
   Transaction,
   TransactionStatus,
+  Role,
+  CategoryMap,
 } from "./generated/graphql";
 import { GraphQLScalarType, GraphQLError } from "graphql";
 import { Kind } from "graphql/language";
 import { CategoryService } from "./categoryService";
 import { CommentService } from "./commentService";
 import { RecommendService } from "./recommendService";
+import { SystemService } from "./systemService";
 
 interface Context {
   loginUser: LoginUser | null;
 }
 
+const systemService = new SystemService();
 const categoryService = new CategoryService();
 const itemService = new ItemService(categoryService);
 const userService = new UserService(itemService, categoryService);
@@ -333,6 +337,15 @@ export const resolvers: Resolvers = {
         startAfterDate
       );
     },
+    itemConfig: async (_: any, __: any): Promise<any> => {
+      const categoryMaps = await systemService.getAllCategoryMaps();
+      const defaultCategoryTrees =
+        await systemService.getDefaultCategoryTrees();
+      return {
+        defaultCategoryTrees,
+        categoryMaps,
+      };
+    },
   },
   Mutation: {
     createUser: async (
@@ -553,6 +566,26 @@ export const resolvers: Resolvers = {
       if (!owner) throw new Error("Owner not found");
       const { itemId, commentId, content } = args;
       return commentService.editItemComment(owner, itemId, commentId, content);
+    },
+    upsertCategoryMap: async (
+      _: any,
+      { en, categoryMaps }: any,
+      { loginUser }: Context
+    ): Promise<[CategoryMap]> => {
+      if (!loginUser) throw new Error("Not authenticated");
+      const user = await userService.me(loginUser);
+      if (!user || user.role !== Role.Admin) throw new Error("Admin only");
+      return systemService.upsertCategoryMap(en, categoryMaps);
+    },
+    addCategoryTree: async (
+      _: any,
+      { parentPath, leafCategory }: any,
+      { loginUser }: Context
+    ): Promise<string> => {
+      if (!loginUser) throw new Error("Not authenticated");
+      const user = await userService.me(loginUser);
+      if (!user || user.role !== Role.Admin) throw new Error("Admin only");
+      return systemService.addCategoryTree(parentPath, leafCategory);
     },
   },
 };

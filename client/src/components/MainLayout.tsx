@@ -13,7 +13,6 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Container,
 } from "@mui/material";
 import {
   Home as HomeIcon,
@@ -22,20 +21,15 @@ import {
   Person as PersonIcon,
   Notifications as NotificationsIcon,
   Menu as MenuIcon,
-  Add as AddIcon,
   Article as ArticleIcon,
-  ExitToApp as LogoutIcon,
-  Bookmark as BookmarkIcon,
   SwapHoriz as LoanIcon,
 } from "@mui/icons-material";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery, gql } from "@apollo/client";
-import { auth } from "../firebase";
 import { User, Role } from "../generated/graphql";
 import { AuthDialog } from "./Auth";
 import LanguageSwitcher from "./LanguageSwitcher";
-import ItemForm from "./ItemForm";
 import NewsForm from "./NewsForm";
 
 const GET_USER_OPEN_TRANSACTIONS_FOR_COUNT = gql`

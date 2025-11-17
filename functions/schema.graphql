@@ -47,6 +47,21 @@ type Category {
   count: Int!
 }
 
+type CategoryMap {
+  language: String!
+  value: String!
+}
+
+input CategoryMapInput {
+  language: String!
+  value: String!
+}
+
+type ItemConfig {
+  defaultCategoryTrees: [String!]! # e.g. ["Fiction/Science Fiction", "Non-Fiction/History"]
+  categoryMaps: [[CategoryMap!]!]!
+}
+
 enum RecommendationType {
   USER_PICKED
   NEW_ARRIVALS
@@ -95,6 +110,7 @@ type Item {
   location: Location # 藏品所在地（繼承自擁有者）
   createdAt: Date!
   updatedAt: Date!
+  clssfctns: [String!] # Classifications 分類標籤 with ordering assigned by admin
 }
 
 interface ItemCommentBase {
@@ -257,7 +273,7 @@ type Query {
     keyword: String
     isExchangePointItem: Boolean
   ): Int! # 基於User的藏品總數
-  itemsOnLoanByUser( 
+  itemsOnLoanByUser(
     userId: ID!
     category: [String!]
     status: ItemStatus
@@ -324,6 +340,8 @@ type Query {
     startAfterId: ID
     startAfterDate: Date
   ): ItemCommentsByUserConnection!
+
+  itemConfig: ItemConfig!
 }
 
 # 變更
@@ -404,6 +422,15 @@ type Mutation {
     tags: [String!]
   ): NewsPost!
   hideNewsPost(id: ID!): Boolean!
+
+  upsertCategoryMap(
+    en: String!
+    categoryMaps: [CategoryMapInput!]!
+  ): [CategoryMap!]
+
+  addCategoryTree(parentPath: String, leafCategory: String!): String!
+
+  deleleteCategoryTree(categoryPath: String!): Boolean!
 
   generateSignedUrl(
     fileName: String!
