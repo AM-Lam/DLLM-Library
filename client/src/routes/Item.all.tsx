@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, use } from "react";
 import { useQuery, gql } from "@apollo/client";
 import {
   Box,
@@ -159,6 +159,7 @@ const ItemAllPage: React.FC = () => {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
+  const [categoryTrees, setCategoryTrees] = useState<CategoryTreeNode[]>([]);
 
   // Classification filter state
   const [showFilters, setShowFilters] = useState<boolean>(false);
@@ -176,12 +177,13 @@ const ItemAllPage: React.FC = () => {
     hotCategories: string[];
   }>(HotCategoriesQuery, {
     variables: { limit: 15 },
+    fetchPolicy: "cache-first",
   });
 
   // Query for default categories as fallback
   const { data: defaultCategoriesData } = useQuery<{
     defaultCategories: string[];
-  }>(DefaultCategoriesQuery);
+  }>(DefaultCategoriesQuery, { fetchPolicy: "cache-first" });
 
   // Query for item config (for classification trees)
   const { data: configData, loading: configLoading } = useQuery<{
@@ -189,7 +191,7 @@ const ItemAllPage: React.FC = () => {
       defaultCategoryTrees: string[];
       categoryMaps: CategoryMap[][];
     };
-  }>(GET_ITEM_CONFIG);
+  }>(GET_ITEM_CONFIG, { fetchPolicy: "cache-first" });
 
   // Combine categories from both queries for autocomplete suggestions
   const availableCategories = [
@@ -295,17 +297,20 @@ const ItemAllPage: React.FC = () => {
     return category;
   };
 
+  useMemo(() => {
+    const trees = parseCategoryTrees();
+    setCategoryTrees(trees);
+  }, [configData, i18n.language]);
+
   // Get root level categories (level 0)
   const getRootCategories = (): string[] => {
-    const trees = parseCategoryTrees();
-    const roots = trees.filter((node) => node.level === 0);
+    const roots = categoryTrees.filter((node) => node.level === 0);
     return [...new Set(roots.map((node) => node.value))];
   };
 
   // Get children for a given path
   const getChildrenForPath = (path: string): string[] => {
-    const trees = parseCategoryTrees();
-    const children = trees
+    const children = categoryTrees
       .filter((node) => {
         const nodeParts = node.path.split("/");
         const pathParts = path.split("/");
@@ -601,7 +606,7 @@ const ItemAllPage: React.FC = () => {
                     label={selectedClassification
                       .split("/")
                       .map(translateCategory)
-                      .join(" → ")}
+                      .join("> ")}
                     onDelete={handleRemoveClassification}
                     color="info"
                     size="small"

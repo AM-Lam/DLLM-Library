@@ -396,6 +396,7 @@ export const resolvers: Resolvers = {
       __: any
     ): Promise<Item[]> => {
       return itemService.recentItemsWithoutClassifications(limit, 0);
+    },
     itemsByKeywordExperimental: async (
       _: any,
       { keyword = "" }: any,
@@ -629,7 +630,7 @@ export const resolvers: Resolvers = {
       _: any,
       { en, categoryMaps }: any,
       { loginUser }: Context
-    ): Promise<[CategoryMap]> => {
+    ): Promise<CategoryMap[]> => {
       if (!loginUser) throw new Error("Not authenticated");
       const user = await userService.me(loginUser);
       if (!user || user.role !== Role.Admin) throw new Error("Admin only");
@@ -644,6 +645,7 @@ export const resolvers: Resolvers = {
       const user = await userService.me(loginUser);
       if (!user || user.role !== Role.Admin) throw new Error("Admin only");
       return systemService.addCategoryTree(parentPath, leafCategory);
+    },
     generateItemIndex: async (
       _parent: any,
       _args: any,

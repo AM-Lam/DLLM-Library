@@ -1,7 +1,5 @@
-import { db, GetPublicUrlForGSFile } from "./platform";
+import { db } from "./platform";
 import { CategoryMap, CategoryMapInput } from "./generated/graphql";
-import firebase from "firebase-admin";
-import { Timestamp } from "firebase-admin/firestore";
 
 const SYSTEM_DB = db.collection("system");
 
@@ -18,8 +16,8 @@ export class SystemService {
   }
   async upsertCategoryMap(
     en: string,
-    categoryMaps: [CategoryMapInput]
-  ): Promise<[CategoryMap]> {
+    categoryMaps: CategoryMapInput[]
+  ): Promise<CategoryMap[]> {
     en = en.trim().toLowerCase();
     const categoryMapsRef = await SYSTEM_DB.doc("category")
       .collection("categoryMaps")

@@ -68,7 +68,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   // State management
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [showItemForm, setShowItemForm] = useState(false);
   const [showNewsForm, setShowNewsForm] = useState(false);
   const [showClassificationAssignment, setShowClassificationAssignment] =
     useState(false);

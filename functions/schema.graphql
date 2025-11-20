@@ -254,9 +254,7 @@ type Query {
   #
   # Keep this implementation separate until it is ready.
   #
-  itemsByKeywordExperimental(
-    keyword: String
-  ): [Item!]!
+  itemsByKeywordExperimental(keyword: String): [Item!]!
   totalItemsCountByLocation(
     latitude: Float!
     longitude: Float!
@@ -444,7 +442,7 @@ type Mutation {
 
   addCategoryTree(parentPath: String, leafCategory: String!): String!
 
-  deleleteCategoryTree(categoryPath: String!): Boolean!
+  deleteCategoryTree(categoryPath: String!): Boolean!
 
   generateSignedUrl(
     fileName: String!
