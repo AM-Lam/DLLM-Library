@@ -34,6 +34,7 @@ import {
   Chip,
   SvgIcon,
   Snackbar,
+  Tooltip,
 } from "@mui/material";
 import {
   UpdateUserMutation,
@@ -673,6 +674,38 @@ const UserProfile: React.FC<UserProfileProps> = ({
               placeholder={t("userProfile.searchAddress")}
               disabled={isGeocodingAddress}
               required
+              error={Boolean(locationError)}
+              InputProps={{
+                endAdornment: (
+                  <>
+                    {isGeocodingAddress && (
+                      <CircularProgress size={18} sx={{ mr: 1 }} />
+                    )}
+                    {locationError && (
+                      <Tooltip
+                        title={t(
+                          "userProfile.geocodeErrorTooltip",
+                          "Failed to resolve address"
+                        )}
+                      >
+                        <SignalIcon color="error" fontSize="small" />
+                      </Tooltip>
+                    )}
+                    {resolvedLocation &&
+                      !locationError &&
+                      !isGeocodingAddress && (
+                        <Tooltip
+                          title={t(
+                            "userProfile.geocodeResolvedTooltip",
+                            "Address resolved"
+                          )}
+                        >
+                          <SignalIcon color="success" fontSize="small" />
+                        </Tooltip>
+                      )}
+                  </>
+                ),
+              }}
             />
 
             {isGeocodingAddress && (
