@@ -58,10 +58,7 @@ export class ItemService {
     if (classifications && classifications.length > 0)
       query = query.where("clssfctns", "array-contains-any", classifications);
     if (status) query = query.where("status", "==", status);
-    if (keyword)
-      query = query
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff");
+    query = this.applyKeywordNameFilter(query, keyword);
     const snapshot = await query.limit(limit).offset(offset).get();
     const results: Item[] = [];
     await Promise.all(
@@ -84,10 +81,7 @@ export class ItemService {
     if (classifications && classifications.length > 0)
       query = query.where("clssfctns", "array-contains-any", classifications);
     if (status) query = query.where("status", "==", status);
-    if (keyword)
-      query = query
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff");
+    query = this.applyKeywordNameFilter(query, keyword);
     const snapshot = await query.get();
     return snapshot.size;
   }
@@ -108,10 +102,7 @@ export class ItemService {
     if (classifications && classifications.length > 0)
       query = query.where("clssfctns", "array-contains-any", classifications);
     if (status) query = query.where("status", "==", status);
-    if (keyword)
-      query = query
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff");
+    query = this.applyKeywordNameFilter(query, keyword);
     const items = this.mapService.getLocationsByRadius(
       query,
       { latitude, longitude },
@@ -146,10 +137,7 @@ export class ItemService {
     if (classifications && classifications.length > 0)
       query = query.where("clssfctns", "array-contains-any", classifications);
     if (status) query = query.where("status", "==", status);
-    if (keyword)
-      query = query
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff");
+    query = this.applyKeywordNameFilter(query, keyword);
     const count = await this.mapService.getLocationsByRadiusCount(
       query,
       { latitude, longitude },
@@ -175,10 +163,7 @@ export class ItemService {
     if (category && category.length > 0)
       query = query.where("category", "array-contains-any", category);
     if (status) query = query.where("status", "==", status);
-    if (keyword)
-      query = query
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff");
+    query = this.applyKeywordNameFilter(query, keyword);
     const snapshot = await query.limit(limit).offset(offset).get();
     const results: Item[] = [];
     await Promise.all(
@@ -207,10 +192,7 @@ export class ItemService {
     if (category && category.length > 0)
       query = query.where("category", "array-contains-any", category);
     if (status) query = query.where("status", "==", status);
-    if (keyword)
-      query = query
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff");
+    query = this.applyKeywordNameFilter(query, keyword);
     const snapshot = await query.limit(limit).offset(offset).get();
     const results: Item[] = [];
     await Promise.all(
@@ -237,10 +219,7 @@ export class ItemService {
     if (category && category.length > 0)
       query = query.where("category", "array-contains-any", category);
     if (status) query = query.where("status", "==", status);
-    if (keyword)
-      query = query
-        .where("name", ">=", keyword)
-        .where("name", "<=", keyword + "\uf8ff");
+    query = this.applyKeywordNameFilter(query, keyword);
 
     const snapshot = await query.limit(limit).offset(offset).get();
     const results: Item[] = [];
@@ -335,10 +314,7 @@ export class ItemService {
         query = query.where("category", "array-contains-any", category);
       if (status && status.length > 0)
         query = query.where("status", "==", status);
-      if (keyword && keyword.length > 0)
-        query = query
-          .where("name", ">=", keyword)
-          .where("name", "<=", keyword + "\uf8ff");
+      query = this.applyKeywordNameFilter(query, keyword);
       const snapshot = await query.limit(limit).offset(offset).get();
       const results: Item[] = [];
       await Promise.all(
@@ -400,10 +376,7 @@ export class ItemService {
         query = query.where("category", "array-contains-any", category);
       if (status && status.length > 0)
         query = query.where("status", "==", status);
-      if (keyword && keyword.length > 0)
-        query = query
-          .where("name", ">=", keyword)
-          .where("name", "<=", keyword + "\uf8ff");
+      query = this.applyKeywordNameFilter(query, keyword);
 
       const snapshot = await query.get();
       console.debug(
@@ -1167,8 +1140,19 @@ export class ItemService {
     return `${nameWithoutExt}_thumbnail.jpg`;
   }
 
-
-  
+  // New helper: apply keyword name range filter to a Firestore query
+  private applyKeywordNameFilter(
+    query: firebase.firestore.Query<firebase.firestore.DocumentData>,
+    keyword?: string | null
+  ): firebase.firestore.Query<firebase.firestore.DocumentData> {
+    if (keyword && String(keyword).trim().length > 0) {
+      const k = String(keyword);
+      return query
+        .where("name", ">=", k)
+        .where("name", "<=", k + "\uf8ff");
+    }
+    return query;
+  }
 
   // Used for generating name index for search optimization.
   // And also for when we try to search using the created index.
