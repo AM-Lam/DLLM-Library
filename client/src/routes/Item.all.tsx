@@ -20,6 +20,12 @@ import {
   Stack,
   Paper,
   Collapse,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
+  Card,
+  CardContent,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -138,6 +144,8 @@ interface CategoryTreeNode {
 const ITEMS_PER_PAGE = 12;
 const SEARCH_RADIUS_KM = 30;
 
+type FilterType = "none" | "keyword" | "category" | "classification";
+
 const ItemAllPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user } = useOutletContext<OutletContext>();
@@ -151,6 +159,10 @@ const ItemAllPage: React.FC = () => {
     latitude: number;
     longitude: number;
   } | null>(null);
+
+  // NEW: Active filter type with radio button control
+  const [activeFilterType, setActiveFilterType] = useState<FilterType>("none");
+
   const [selectedCategory, setSelectedCategory] =
     useState<string>(categoryFromUrl);
   const [categoryInput, setCategoryInput] = useState<string>(categoryFromUrl);
@@ -162,15 +174,15 @@ const ItemAllPage: React.FC = () => {
   const [categoryTrees, setCategoryTrees] = useState<CategoryTreeNode[]>([]);
 
   // Classification filter state
-  const [showFilters, setShowFilters] = useState<boolean>(false);
   const [classificationSelection, setClassificationSelection] = useState<
     string[]
   >([]);
   const [classificationOptions, setClassificationOptions] = useState<
     string[][]
   >([]);
-  const [selectedClassification, setSelectedClassification] =
-    useState<string>("");
+  const [selectedClassification, setSelectedClassification] = useState<
+    string[]
+  >([]);
 
   // Query for hot categories (for autocomplete suggestions)
   const { data: hotCategoriesData, loading: categoriesLoading } = useQuery<{
@@ -199,7 +211,7 @@ const ItemAllPage: React.FC = () => {
     ...(defaultCategoriesData?.defaultCategories || []),
   ].filter((category, index, self) => self.indexOf(category) === index);
 
-  // Query for items by location with search
+  // Query for items by location with search - ONLY when filter is active
   const {
     data: itemsData,
     loading: itemsLoading,
@@ -207,38 +219,54 @@ const ItemAllPage: React.FC = () => {
     refetch: refetchItems,
   } = useQuery<{ itemsByLocation: Item[] }>(ITEMS_QUERY, {
     variables:
-      location && hasSearched
+      location && hasSearched && activeFilterType !== "none"
         ? {
             ...location,
             radiusKm: SEARCH_RADIUS_KM,
-            classifications: selectedClassification
-              ? [selectedClassification]
-              : null,
-            category: selectedCategory ? [selectedCategory] : null,
-            keyword: searchKeyword || null,
+            classifications:
+              activeFilterType === "classification" &&
+              selectedClassification.length > 0
+                ? selectedClassification
+                : null,
+            category:
+              activeFilterType === "category" && selectedCategory
+                ? [selectedCategory]
+                : null,
+            keyword:
+              activeFilterType === "keyword" && searchKeyword
+                ? searchKeyword
+                : null,
             limit: ITEMS_PER_PAGE,
             offset: (page - 1) * ITEMS_PER_PAGE,
           }
         : undefined,
-    skip: !location || !hasSearched,
+    skip: !location || !hasSearched || activeFilterType === "none",
   });
 
   const { data: totalItemsData, loading: totalItemsLoading } = useQuery<{
     totalItemsCountByLocation: number;
   }>(ITEMS_COUNT_QUERY, {
     variables:
-      location && hasSearched
+      location && hasSearched && activeFilterType !== "none"
         ? {
             ...location,
             radiusKm: SEARCH_RADIUS_KM,
-            classifications: selectedClassification
-              ? [selectedClassification]
-              : null,
-            category: selectedCategory ? [selectedCategory] : undefined,
-            keyword: searchKeyword || null,
+            classifications:
+              activeFilterType === "classification" &&
+              selectedClassification.length > 0
+                ? selectedClassification
+                : null,
+            category:
+              activeFilterType === "category" && selectedCategory
+                ? [selectedCategory]
+                : null,
+            keyword:
+              activeFilterType === "keyword" && searchKeyword
+                ? searchKeyword
+                : null,
           }
         : undefined,
-    skip: !location || !hasSearched,
+    skip: !location || !hasSearched || activeFilterType === "none",
   });
 
   // Parse category trees into hierarchical structure
@@ -336,11 +364,9 @@ const ItemAllPage: React.FC = () => {
     const newSelection = [...classificationSelection.slice(0, level), value];
     setClassificationSelection(newSelection);
 
-    // Build path from selection
     const currentPath = newSelection.join("/");
     const children = getChildrenForPath(currentPath);
 
-    // Update available options
     if (children.length > 0) {
       setClassificationOptions([
         ...classificationOptions.slice(0, level + 1),
@@ -355,8 +381,8 @@ const ItemAllPage: React.FC = () => {
   const handleAddClassification = () => {
     if (classificationSelection.length === 0) return;
 
-    const newClassification = classificationSelection.join("/");
-    setSelectedClassification(newClassification);
+    setSelectedClassification(classificationSelection);
+    setActiveFilterType("classification");
 
     // Reset selection
     setClassificationSelection([]);
@@ -365,9 +391,10 @@ const ItemAllPage: React.FC = () => {
 
   // Remove classification from selected list
   const handleRemoveClassification = () => {
-    setSelectedClassification("");
+    setSelectedClassification([]);
     setClassificationSelection([]);
     setClassificationOptions([getRootCategories()]);
+    setActiveFilterType("none");
   };
 
   const handleItemClick = (itemId: string) => {
@@ -394,22 +421,73 @@ const ItemAllPage: React.FC = () => {
     setKeyword(event.target.value);
   };
 
+  // NEW: Determine which filter type user wants to use
+  const determineFilterType = (): FilterType => {
+    if (keyword.trim().length > 0) return "keyword";
+    if (categoryInput.trim().length > 0) return "category";
+    if (selectedClassification.length > 0) return "classification";
+    return "none";
+  };
+
+  // Handle filter type change (radio button)
+  const handleFilterTypeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newType = event.target.value as FilterType;
+    setActiveFilterType(newType);
+
+    // Clear all filters when switching
+    if (newType !== "keyword") {
+      setKeyword("");
+      setSearchKeyword("");
+    }
+    if (newType !== "category") {
+      setSelectedCategory("");
+      setCategoryInput("");
+    }
+    if (newType !== "classification") {
+      setSelectedClassification([]);
+      setClassificationSelection([]);
+      setClassificationOptions([getRootCategories()]);
+    }
+
+    // Reset search state
+    setHasSearched(false);
+    setPage(1);
+  };
+
   const handleSearch = () => {
-    // Don't search if both keyword, category, and classifications are empty
+    // Don't search if no filter is active or filter is empty
+    if (activeFilterType === "none") {
+      return;
+    }
+
+    // Validate filter has content
+    if (activeFilterType === "keyword" && !keyword.trim()) {
+      return;
+    }
+    if (activeFilterType === "category" && !categoryInput.trim()) {
+      return;
+    }
     if (
-      keyword.trim().length === 0 &&
-      categoryInput.trim() === "" &&
-      selectedClassification === ""
+      activeFilterType === "classification" &&
+      selectedClassification.length === 0
     ) {
       return;
     }
-    setSearchKeyword(keyword.trim());
-    setSelectedCategory(categoryInput.trim());
+
+    // Set search values
+    if (activeFilterType === "keyword") {
+      setSearchKeyword(keyword.trim());
+    } else if (activeFilterType === "category") {
+      setSelectedCategory(categoryInput.trim());
+    }
+
     setPage(1);
     setHasSearched(true);
 
     // Update URL parameters
-    if (categoryInput.trim()) {
+    if (activeFilterType === "category" && categoryInput.trim()) {
       searchParams.set("category", categoryInput.trim());
     } else {
       searchParams.delete("category");
@@ -422,11 +500,12 @@ const ItemAllPage: React.FC = () => {
     setSearchKeyword("");
     setSelectedCategory("");
     setCategoryInput("");
-    setSelectedClassification("");
+    setSelectedClassification([]);
     setClassificationSelection([]);
     setClassificationOptions([getRootCategories()]);
     setPage(1);
     setHasSearched(false);
+    setActiveFilterType("none");
 
     // Clear URL parameters
     searchParams.delete("category");
@@ -477,16 +556,18 @@ const ItemAllPage: React.FC = () => {
     if (location && categoryFromUrl && !hasSearched) {
       setSelectedCategory(categoryFromUrl);
       setCategoryInput(categoryFromUrl);
+      setActiveFilterType("category");
       setHasSearched(true);
     }
   }, [location, categoryFromUrl, hasSearched]);
 
   // Refetch items when search parameters, page, or location changes
   useEffect(() => {
-    if (location && hasSearched) {
+    if (location && hasSearched && activeFilterType !== "none") {
       refetchItems();
     }
   }, [
+    activeFilterType,
     selectedCategory,
     selectedClassification,
     page,
@@ -496,16 +577,17 @@ const ItemAllPage: React.FC = () => {
     hasSearched,
   ]);
 
-  const canSearch =
-    keyword.trim().length > 0 ||
-    categoryInput.trim().length > 0 ||
-    selectedClassification !== "";
+  // Check if search can be performed
+  const canSearch = (() => {
+    if (activeFilterType === "none") return false;
+    if (activeFilterType === "keyword") return keyword.trim().length > 0;
+    if (activeFilterType === "category") return categoryInput.trim().length > 0;
+    if (activeFilterType === "classification")
+      return selectedClassification.length > 0;
+    return false;
+  })();
 
-  const isSearchActive =
-    hasSearched &&
-    (searchKeyword.length > 0 ||
-      selectedCategory !== "" ||
-      selectedClassification !== "");
+  const isSearchActive = hasSearched && activeFilterType !== "none";
 
   // Calculate distances for items
   const itemsWithDistance =
@@ -521,6 +603,20 @@ const ItemAllPage: React.FC = () => {
             )
           : 0,
     })) || [];
+
+  // Get active filter label for display
+  const getActiveFilterLabel = (): string => {
+    switch (activeFilterType) {
+      case "keyword":
+        return t("itemsAll.filterTypeKeyword", "Keyword");
+      case "category":
+        return t("itemsAll.filterTypeCategory", "Category");
+      case "classification":
+        return t("itemsAll.filterTypeClassification", "Classification");
+      default:
+        return "";
+    }
+  };
 
   return (
     <Box sx={{ pb: 4 }}>
@@ -583,344 +679,406 @@ const ItemAllPage: React.FC = () => {
 
         {/* Search Form */}
         {location && (
-          <Box sx={{ mb: 4 }}>
-            {/* Advanced Filters Toggle */}
-            <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
-              <Button
-                startIcon={<FilterIcon />}
-                endIcon={showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                onClick={() => setShowFilters(!showFilters)}
-                size="small"
-                variant="outlined"
-              >
-                {t("itemsAll.advancedFilters", "Advanced Filters")}
-              </Button>
-
-              {/* Show selected classification when collapsed */}
-              {!showFilters && selectedClassification && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    {t("itemsAll.classification", "Classification")}:
-                  </Typography>
-                  <Chip
-                    label={selectedClassification
-                      .split("/")
-                      .map(translateCategory)
-                      .join("> ")}
-                    onDelete={handleRemoveClassification}
-                    color="info"
-                    size="small"
-                  />
-                </Box>
-              )}
-            </Box>
-
-            {/* Classification Filter */}
-            <Collapse in={showFilters}>
-              <Paper elevation={1} sx={{ p: 2, mt: 2 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  {t(
-                    "itemsAll.filterByClassification",
-                    "Filter by Classification"
-                  )}
-                </Typography>
-
-                {configLoading && (
-                  <Box
-                    sx={{ display: "flex", justifyContent: "center", py: 2 }}
-                  >
-                    <CircularProgress size={24} />
-                  </Box>
-                )}
-
-                {!configLoading && (
-                  <>
-                    {/* Selected Classification (Single) */}
-                    {selectedClassification && (
-                      <Box sx={{ mb: 2 }}>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          gutterBottom
-                        >
-                          {t(
-                            "itemsAll.selectedClassification",
-                            "Selected Classification:"
-                          )}
-                        </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Chip
-                            label={selectedClassification
-                              .split("/")
-                              .map(translateCategory)
-                              .join(" → ")}
-                            onDelete={handleRemoveClassification}
-                            color="primary"
-                            size="small"
-                          />
-                        </Box>
-                      </Box>
+          <Card elevation={2} sx={{ mb: 4 }}>
+            <CardContent>
+              {/* Filter Type Selection - Radio Buttons */}
+              <FormControl component="fieldset" sx={{ mb: 3 }}>
+                <FormLabel component="legend">
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    {t(
+                      "itemsAll.selectFilterType",
+                      "Select Search Filter Type"
                     )}
-
-                    {/* Classification Selection */}
-                    <Stack spacing={2}>
-                      {classificationOptions.map((options, level) => (
-                        <FormControl key={level} fullWidth size="small">
-                          <InputLabel>
-                            {t("classification.level", "Level")} {level + 1}
-                          </InputLabel>
-                          <Select
-                            value={classificationSelection[level] || ""}
-                            onChange={(e: SelectChangeEvent) =>
-                              handleClassificationLevelChange(
-                                level,
-                                e.target.value
-                              )
-                            }
-                            label={`${t("classification.level", "Level")} ${
-                              level + 1
-                            }`}
-                          >
-                            <MenuItem value="">
-                              <em>{t("common.selectOption", "Select...")}</em>
-                            </MenuItem>
-                            {options.map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {translateCategory(option)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      ))}
-                    </Stack>
-
-                    {/* Current Selection Preview */}
-                    {classificationSelection.length > 0 && (
-                      <Box sx={{ mt: 2 }}>
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {t(
+                      "itemsAll.filterTypeInfo",
+                      "Choose one filter type to search. Only one filter can be active at a time."
+                    )}
+                  </Typography>
+                </FormLabel>
+                <RadioGroup
+                  row
+                  value={activeFilterType}
+                  onChange={handleFilterTypeChange}
+                  sx={{ mt: 1 }}
+                >
+                  <FormControlLabel
+                    value="keyword"
+                    control={<Radio />}
+                    label={
+                      <Box>
+                        <Typography variant="body2">
+                          {t("itemsAll.filterTypeKeyword", "Keyword")}
+                        </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {t(
-                            "classification.currentSelection",
-                            "Current Selection"
+                            "itemsAll.keywordFilterDesc",
+                            "Search by title, author, description"
                           )}
-                          :
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 0.5 }}>
-                          {classificationSelection
-                            .map(translateCategory)
-                            .join(" → ")}
                         </Typography>
                       </Box>
-                    )}
-
-                    {/* Apply/Replace Classification Button */}
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      onClick={handleAddClassification}
-                      disabled={classificationSelection.length === 0}
-                      fullWidth
-                      sx={{ mt: 2 }}
-                      size="small"
-                    >
-                      {selectedClassification
-                        ? t(
-                            "itemsAll.replaceClassificationFilter",
-                            "Replace Classification Filter"
-                          )
-                        : t(
-                            "itemsAll.applyClassificationFilter",
-                            "Apply Classification Filter"
-                          )}
-                    </Button>
-
-                    {selectedClassification && (
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        startIcon={<ClearIcon />}
-                        onClick={handleRemoveClassification}
-                        fullWidth
-                        sx={{ mt: 1 }}
-                        size="small"
-                      >
-                        {t(
-                          "itemsAll.clearClassificationFilter",
-                          "Clear Classification Filter"
-                        )}
-                      </Button>
-                    )}
-                  </>
-                )}
-              </Paper>
-            </Collapse>
-            <Grid container spacing={2} alignItems="end">
-              {/* Keyword Search */}
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  label={t("itemsAll.searchKeyword", "Search by keyword")}
-                  placeholder={t(
-                    "itemsAll.keywordPlaceholder",
-                    "Enter book title, author, or description..."
-                  )}
-                  value={keyword}
-                  onChange={handleKeywordChange}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter" && canSearch) {
-                      handleSearch();
                     }
-                  }}
-                  disabled={itemsLoading || totalItemsLoading}
-                  helperText={t(
-                    "itemsAll.keywordOptional",
-                    "Optional - you can search by category alone"
-                  )}
-                  InputProps={{
-                    endAdornment: keyword && (
-                      <IconButton
-                        size="small"
-                        onClick={() => setKeyword("")}
-                        edge="end"
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    ),
-                  }}
-                />
-              </Grid>
+                  />
+                  <FormControlLabel
+                    value="category"
+                    control={<Radio />}
+                    label={
+                      <Box>
+                        <Typography variant="body2">
+                          {t("itemsAll.filterTypeCategory", "Category")}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t(
+                            "itemsAll.categoryFilterDesc",
+                            "Browse by category"
+                          )}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                  <FormControlLabel
+                    value="classification"
+                    control={<Radio />}
+                    label={
+                      <Box>
+                        <Typography variant="body2">
+                          {t(
+                            "itemsAll.filterTypeClassification",
+                            "Classification"
+                          )}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t(
+                            "itemsAll.classificationFilterDesc",
+                            "Filter by taxonomy path"
+                          )}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </RadioGroup>
+              </FormControl>
 
-              {/* Category Input with Autocomplete */}
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Autocomplete
-                  freeSolo
-                  options={availableCategories}
-                  value={categoryInput}
-                  onChange={handleCategoryChange}
-                  onInputChange={handleCategoryInputChange}
-                  disabled={
-                    categoriesLoading || itemsLoading || totalItemsLoading
-                  }
-                  renderInput={(params) => (
+              {/* Filter Input - Show only selected type */}
+              {activeFilterType !== "none" && (
+                <Box sx={{ mb: 2 }}>
+                  {/* Keyword Search */}
+                  {activeFilterType === "keyword" && (
                     <TextField
-                      {...params}
-                      label={t("itemsAll.selectCategory", "Category")}
+                      fullWidth
+                      label={t("itemsAll.searchKeyword", "Search by keyword")}
                       placeholder={t(
-                        "itemsAll.categoryPlaceholder",
-                        "Type or select category..."
+                        "itemsAll.keywordPlaceholder",
+                        "Enter book title, author, or description..."
                       )}
-                      helperText={t(
-                        "itemsAll.categoryHelper",
-                        "You can type any category or select from suggestions"
-                      )}
+                      value={keyword}
+                      onChange={handleKeywordChange}
                       onKeyPress={(e) => {
                         if (e.key === "Enter" && canSearch) {
                           handleSearch();
                         }
                       }}
+                      disabled={itemsLoading || totalItemsLoading}
+                      helperText={t(
+                        "itemsAll.keywordHelper",
+                        "Search by item title, author, or description"
+                      )}
                       InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {categoriesLoading ? (
-                              <CircularProgress size={20} />
-                            ) : null}
-                            {categoryInput && (
-                              <IconButton
-                                size="small"
-                                onClick={() => {
-                                  setCategoryInput("");
-                                  setSelectedCategory("");
-                                }}
-                                edge="end"
-                              >
-                                <ClearIcon />
-                              </IconButton>
-                            )}
-                            {params.InputProps.endAdornment}
-                          </>
+                        endAdornment: keyword && (
+                          <IconButton
+                            size="small"
+                            onClick={() => setKeyword("")}
+                            edge="end"
+                          >
+                            <ClearIcon />
+                          </IconButton>
                         ),
                       }}
                     />
                   )}
-                />
-              </Grid>
+
+                  {/* Category Search */}
+                  {activeFilterType === "category" && (
+                    <Autocomplete
+                      freeSolo
+                      options={availableCategories}
+                      value={categoryInput}
+                      onChange={handleCategoryChange}
+                      onInputChange={handleCategoryInputChange}
+                      disabled={
+                        categoriesLoading || itemsLoading || totalItemsLoading
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={t("itemsAll.selectCategory", "Category")}
+                          placeholder={t(
+                            "itemsAll.categoryPlaceholder",
+                            "Type or select category..."
+                          )}
+                          helperText={t(
+                            "itemsAll.categoryHelper",
+                            "Search by a specific category"
+                          )}
+                          onKeyPress={(e) => {
+                            if (e.key === "Enter" && canSearch) {
+                              handleSearch();
+                            }
+                          }}
+                          InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {categoriesLoading ? (
+                                  <CircularProgress size={20} />
+                                ) : null}
+                                {categoryInput && (
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      setCategoryInput("");
+                                      setSelectedCategory("");
+                                    }}
+                                    edge="end"
+                                  >
+                                    <ClearIcon />
+                                  </IconButton>
+                                )}
+                                {params.InputProps.endAdornment}
+                              </>
+                            ),
+                          }}
+                        />
+                      )}
+                    />
+                  )}
+
+                  {/* Classification Search */}
+                  {activeFilterType === "classification" && (
+                    <Paper elevation={0} variant="outlined" sx={{ p: 2 }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        {t(
+                          "itemsAll.filterByClassification",
+                          "Filter by Classification"
+                        )}
+                      </Typography>
+
+                      {configLoading && (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            py: 2,
+                          }}
+                        >
+                          <CircularProgress size={24} />
+                        </Box>
+                      )}
+
+                      {!configLoading && (
+                        <>
+                          {/* Selected Classification Display */}
+                          {selectedClassification.length > 0 && (
+                            <Box sx={{ mb: 2 }}>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                gutterBottom
+                              >
+                                {t(
+                                  "itemsAll.selectedClassification",
+                                  "Selected Classification:"
+                                )}
+                              </Typography>
+                              <Box sx={{ mt: 1 }}>
+                                <Chip
+                                  label={selectedClassification
+                                    .map(translateCategory)
+                                    .join(" → ")}
+                                  onDelete={handleRemoveClassification}
+                                  color="primary"
+                                  size="small"
+                                />
+                              </Box>
+                            </Box>
+                          )}
+
+                          {/* Classification Selection Dropdowns */}
+                          <Stack spacing={2}>
+                            {classificationOptions.map((options, level) => (
+                              <FormControl key={level} fullWidth size="small">
+                                <InputLabel>
+                                  {t("classification.level", "Level")}{" "}
+                                  {level + 1}
+                                </InputLabel>
+                                <Select
+                                  value={classificationSelection[level] || ""}
+                                  onChange={(e: SelectChangeEvent) =>
+                                    handleClassificationLevelChange(
+                                      level,
+                                      e.target.value
+                                    )
+                                  }
+                                  label={`${t(
+                                    "classification.level",
+                                    "Level"
+                                  )} ${level + 1}`}
+                                >
+                                  <MenuItem value="">
+                                    <em>
+                                      {t("common.selectOption", "Select...")}
+                                    </em>
+                                  </MenuItem>
+                                  {options.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                      {translateCategory(option)}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            ))}
+                          </Stack>
+
+                          {/* Current Selection Preview */}
+                          {classificationSelection.length > 0 && (
+                            <Box sx={{ mt: 2 }}>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {t(
+                                  "classification.currentSelection",
+                                  "Current Selection"
+                                )}
+                                :
+                              </Typography>
+                              <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                {classificationSelection
+                                  .map(translateCategory)
+                                  .join(" → ")}
+                              </Typography>
+                            </Box>
+                          )}
+
+                          {/* Apply Classification Button */}
+                          {classificationSelection.length > 0 &&
+                            selectedClassification.join("/") !==
+                              classificationSelection.join("/") && (
+                              <Button
+                                variant="outlined"
+                                startIcon={<AddIcon />}
+                                onClick={handleAddClassification}
+                                fullWidth
+                                sx={{ mt: 2 }}
+                                size="small"
+                              >
+                                {selectedClassification.length > 0
+                                  ? t(
+                                      "itemsAll.replaceClassificationFilter",
+                                      "Replace Classification Filter"
+                                    )
+                                  : t(
+                                      "itemsAll.applyClassificationFilter",
+                                      "Apply Classification Filter"
+                                    )}
+                              </Button>
+                            )}
+
+                          {selectedClassification.length > 0 && (
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              startIcon={<ClearIcon />}
+                              onClick={handleRemoveClassification}
+                              fullWidth
+                              sx={{ mt: 1 }}
+                              size="small"
+                            >
+                              {t(
+                                "itemsAll.clearClassificationFilter",
+                                "Clear Classification Filter"
+                              )}
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </Paper>
+                  )}
+                </Box>
+              )}
 
               {/* Search Button */}
-              <Grid size={{ xs: 12, md: 2 }}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  onClick={handleSearch}
-                  disabled={!canSearch || itemsLoading || totalItemsLoading}
-                  startIcon={
-                    itemsLoading || totalItemsLoading ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      <SearchIcon />
-                    )
-                  }
-                  sx={{ height: "56px" }}
-                >
-                  {itemsLoading || totalItemsLoading
-                    ? t("common.searching", "Searching...")
-                    : t("common.search", "Search")}
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
+              <Button
+                fullWidth
+                variant="contained"
+                size="large"
+                onClick={handleSearch}
+                disabled={!canSearch || itemsLoading || totalItemsLoading}
+                startIcon={
+                  itemsLoading || totalItemsLoading ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <SearchIcon />
+                  )
+                }
+              >
+                {itemsLoading || totalItemsLoading
+                  ? t("common.searching", "Searching...")
+                  : t("common.search", "Search")}
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
-        {/* Active Search Filters */}
+        {/* Active Search Filters - Compact Display */}
         {isSearchActive && (
           <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                {t("itemsAll.activeFilters", "Active filters:")}
-              </Typography>
-              {searchKeyword && (
+            <Paper elevation={1} sx={{ p: 2 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
+                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                  {t("itemsAll.activeFilter", "Active Filter")}:
+                </Typography>
                 <Chip
-                  label={`"${searchKeyword}"`}
-                  onDelete={() => {
-                    setSearchKeyword("");
-                    setKeyword("");
-                  }}
+                  label={getActiveFilterLabel()}
                   color="primary"
                   size="small"
+                  variant="outlined"
                 />
-              )}
-              {selectedCategory && (
-                <Chip
-                  label={selectedCategory}
-                  onDelete={() => {
-                    setSelectedCategory("");
-                    setCategoryInput("");
-                    searchParams.delete("category");
-                    setSearchParams(searchParams);
-                  }}
-                  color="secondary"
-                  size="small"
-                />
-              )}
-              {selectedClassification && (
-                <Chip
-                  label={selectedClassification
-                    .split("/")
-                    .map(translateCategory)
-                    .join(" → ")}
-                  onDelete={handleRemoveClassification}
-                  color="info"
-                  size="small"
-                />
-              )}
+              </Box>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {t("itemsAll.filterValue", "Filter Value")}:
+                </Typography>
+                {activeFilterType === "keyword" && searchKeyword && (
+                  <Chip label={`"${searchKeyword}"`} size="small" />
+                )}
+                {activeFilterType === "category" && selectedCategory && (
+                  <Chip label={selectedCategory} size="small" />
+                )}
+                {activeFilterType === "classification" &&
+                  selectedClassification.length > 0 && (
+                    <Chip
+                      label={selectedClassification
+                        .map(translateCategory)
+                        .join(" → ")}
+                      size="small"
+                    />
+                  )}
+              </Box>
               <Button
                 size="small"
                 onClick={handleClearSearch}
                 startIcon={<ClearIcon />}
+                variant="outlined"
               >
-                {t("common.clearAll", "Clear All")}
+                {t("common.clearFilter", "Clear Filter")}
               </Button>
-            </Box>
+            </Paper>
           </Box>
         )}
 
@@ -1035,7 +1193,10 @@ const ItemAllPage: React.FC = () => {
                         {t("itemsAll.searchTip1", "Using different keywords")}
                       </li>
                       <li>
-                        {t("itemsAll.searchTip2", "Removing some filters")}
+                        {t(
+                          "itemsAll.searchTip2",
+                          "Selecting a different filter"
+                        )}
                       </li>
                       <li>
                         {t(
@@ -1056,7 +1217,7 @@ const ItemAllPage: React.FC = () => {
           <Alert severity="info">
             {t(
               "itemsAll.instructionsSearch",
-              "Enter a keyword, category, or classification to search for items within {{radius}}km of your location.",
+              "Please select a filter type above to search for items within {{radius}}km of your location.",
               { radius: SEARCH_RADIUS_KM }
             )}
           </Alert>

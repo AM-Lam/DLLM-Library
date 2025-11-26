@@ -31,6 +31,7 @@ import {
   NavigateBefore as PrevIcon,
   NavigateNext as NextIcon,
   PushPin as PinIcon, // Add this import
+  ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import {
@@ -39,6 +40,7 @@ import {
   User,
   TransactionStatus,
   TransactionLocation,
+  CategoryMap,
 } from "../generated/graphql";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -58,6 +60,7 @@ const ITEM_DETAIL_QUERY = gql`
       description
       condition
       category
+      clssfctns
       status
       images
       thumbnails
@@ -157,6 +160,18 @@ const UNPIN_ITEM_MUTATION = gql`
   }
 `;
 
+const GET_ITEM_CONFIG = gql`
+  query GetItemConfig {
+    itemConfig {
+      defaultCategoryTrees
+      categoryMaps {
+        language
+        value
+      }
+    }
+  }
+`;
+
 interface ItemDetailProps {
   itemId: string | null;
   user?: User | null;
@@ -164,7 +179,7 @@ interface ItemDetailProps {
 }
 
 const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   // State for request dialog and notifications
@@ -194,6 +209,14 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
       skip: !itemId,
     }
   );
+
+  // Query for item config (for classification translation)
+  const { data: configData } = useQuery<{
+    itemConfig: {
+      defaultCategoryTrees: string[];
+      categoryMaps: CategoryMap[][];
+    };
+  }>(GET_ITEM_CONFIG, { fetchPolicy: "cache-first" });
 
   // Query for owner details
   const { data: ownerData, refetch: refetchOwner } = useQuery(USER_QUERY, {
@@ -511,6 +534,108 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
     );
   }
 
+  // Add helper function to translate category/classification
+  const translateCategory = (categoryKey: string): string => {
+    if (!configData?.itemConfig?.categoryMaps) {
+      // Fallback to i18n if config not loaded
+      const translationKey = `category.${categoryKey}`;
+      const translated = t(translationKey, { defaultValue: "" });
+      if (translated && translated !== translationKey) {
+        return translated;
+      }
+      return categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+    }
+
+    const currentLang = i18n.language;
+
+    // Find the category in categoryMaps
+    for (const mapGroup of configData.itemConfig.categoryMaps) {
+      const enMap = mapGroup.find((m) => m.language === "en");
+      if (enMap?.value === categoryKey) {
+        const translatedMap = mapGroup.find((m) => m.language === currentLang);
+        return translatedMap?.value || categoryKey;
+      }
+    }
+
+    // If not found in maps, return capitalized original
+    return categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+  };
+
+  // Update renderClassificationPath to use white text
+  const renderClassificationPath = (clssfctns: string[] | null | undefined) => {
+    if (!clssfctns || clssfctns.length === 0) {
+      return null;
+    }
+
+    return (
+      <Box sx={{ mb: 2 }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mb: 0.5, display: "block" }}
+        >
+          {t("item.classification", "Classification")}:
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 0.5,
+          }}
+        >
+          {clssfctns.map((pathString, index) => {
+            // Split the path string by '/' to get individual segments
+            const segments = pathString.split("/").filter((seg) => seg.trim());
+
+            return (
+              <Box
+                key={index}
+                sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
+              >
+                {segments.map((segment, segIndex) => (
+                  <React.Fragment key={segIndex}>
+                    <Chip
+                      label={translateCategory(segment)}
+                      size="small"
+                      variant={
+                        segIndex === segments.length - 1 ? "filled" : "outlined"
+                      }
+                      color="info"
+                      sx={{
+                        fontWeight:
+                          segIndex === segments.length - 1 ? "bold" : "normal",
+                        backgroundColor:
+                          segIndex === segments.length - 1
+                            ? "info.main"
+                            : "info.light",
+                        "& .MuiChip-label": {
+                          color: "white",
+                        },
+                      }}
+                    />
+                    {segIndex < segments.length - 1 && (
+                      <ChevronRightIcon
+                        sx={{
+                          fontSize: 16,
+                          color: "text.secondary",
+                          mx: 0.5,
+                        }}
+                      />
+                    )}
+                  </React.Fragment>
+                ))}
+                {index < clssfctns.length - 1 && (
+                  <Box sx={{ mx: 1, color: "text.secondary" }}>|</Box>
+                )}
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
+    );
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       {/* Header with Back Button */}
@@ -577,8 +702,9 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                 {/* Show owner name if user is not the owner */}
                 {ownerData?.user && (
                   <Chip
-                    label={`${t("item.owner", "Owner")}: ${ownerData.user.nickname || ownerData.user.email
-                      }`}
+                    label={`${t("item.owner", "Owner")}: ${
+                      ownerData.user.nickname || ownerData.user.email
+                    }`}
                     color="primary"
                     size="small"
                     sx={{ ml: 2, cursor: "pointer" }}
@@ -598,8 +724,9 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                   holderData?.user &&
                   data.item.holderId !== data.item.ownerId && (
                     <Chip
-                      label={`${t("item.holder", "Holder")}: ${holderData.user.nickname || holderData.user.email
-                        }`}
+                      label={`${t("item.holder", "Holder")}: ${
+                        holderData.user.nickname || holderData.user.email
+                      }`}
                       color="secondary"
                       size="small"
                       sx={{ ml: 2, cursor: "pointer" }}
@@ -607,8 +734,9 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                     />
                   )}
                 <Chip
-                  label={`${t("item.deposit", "deposit")}: ${data.item.deposit
-                    }`}
+                  label={`${t("item.deposit", "deposit")}: ${
+                    data.item.deposit
+                  }`}
                   color="secondary"
                   size="small"
                   sx={{ ml: 2, cursor: "pointer" }}
@@ -798,9 +926,19 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
               </Card>
             )}
 
+          {/* Classification Path - NEW: Add before Categories */}
+          {renderClassificationPath(data.item.clssfctns)}
+
           {/* Categories */}
           {data.item.category && data.item.category.length > 0 && (
             <Box sx={{ mb: 4 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mb: 0.5, display: "block" }}
+              >
+                {t("item.categories", "Categories")}:
+              </Typography>
               <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 {data.item.category.map((category, index) => (
                   <Chip
@@ -845,40 +983,40 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
           {/* Images */}
           {((data.item.thumbnails && data.item.thumbnails.length > 0) ||
             (data.item.images && data.item.images.length > 0)) && (
-              <Box sx={{ mb: 4 }}>
-                <Grid container spacing={2}>
-                  {(data.item.thumbnails && data.item.thumbnails.length > 0
-                    ? data.item.thumbnails
-                    : data.item.images || []
-                  ).map((image, index) => (
-                    <Grid key={index} size={{ xs: 6, sm: 4, md: 3 }}>
-                      <Paper
-                        elevation={2}
-                        sx={{
-                          overflow: "hidden",
-                          cursor: "pointer",
-                          transition: "transform 0.2s",
-                          "&:hover": {
-                            transform: "scale(1.05)",
-                          },
+            <Box sx={{ mb: 4 }}>
+              <Grid container spacing={2}>
+                {(data.item.thumbnails && data.item.thumbnails.length > 0
+                  ? data.item.thumbnails
+                  : data.item.images || []
+                ).map((image, index) => (
+                  <Grid key={index} size={{ xs: 6, sm: 4, md: 3 }}>
+                    <Paper
+                      elevation={2}
+                      sx={{
+                        overflow: "hidden",
+                        cursor: "pointer",
+                        transition: "transform 0.2s",
+                        "&:hover": {
+                          transform: "scale(1.05)",
+                        },
+                      }}
+                      onClick={() => handleThumbnailClick(index)}
+                    >
+                      <img
+                        src={image}
+                        alt={`${data.item.name} - Thumbnail ${index + 1}`}
+                        style={{
+                          width: "100%",
+                          height: "120px",
+                          objectFit: "cover",
                         }}
-                        onClick={() => handleThumbnailClick(index)}
-                      >
-                        <img
-                          src={image}
-                          alt={`${data.item.name} - Thumbnail ${index + 1}`}
-                          style={{
-                            width: "100%",
-                            height: "120px",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
-            )}
+                      />
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
 
           {/* Item Info Grid */}
           <Box sx={{ mb: 4 }}>
@@ -898,15 +1036,18 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                 <Typography variant="body1" color="text.secondary">
                   <strong>{t("item.status", "Status")}:</strong>{" "}
                   <Chip
-                    label={t(`shortStatus.${data.item.status}`, data.item.status)}
+                    label={t(
+                      `shortStatus.${data.item.status}`,
+                      data.item.status
+                    )}
                     color={
                       data.item.status === "AVAILABLE"
                         ? "success"
                         : data.item.status === "EXCHANGEABLE"
-                          ? "info"
-                          : data.item.status === "GIFT"
-                            ? "warning"
-                            : "default"
+                        ? "info"
+                        : data.item.status === "GIFT"
+                        ? "warning"
+                        : "default"
                     }
                     size="small"
                     sx={{ ml: 1 }}

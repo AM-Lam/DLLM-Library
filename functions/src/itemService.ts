@@ -44,6 +44,28 @@ export class ItemService {
     this.userService = userService;
   }
 
+  _itemsQuery(
+    classifications: string[],
+    category: string[],
+    status?: string | null,
+    keyword?: string | null
+  ): firebase.firestore.Query {
+    let query = db.collection("items").where("geohash", ">=", "");
+    if (keyword && keyword.length > 0) {
+      query = this.applyKeywordNameFilter(query, keyword);
+    } else {
+      if (classifications && classifications.length > 0) {
+        query = query.where("clssfctns", "array-contains-any", classifications);
+      } else {
+        if (category && category.length > 0) {
+          query = query.where("category", "array-contains-any", category);
+        }
+      }
+    }
+    if (status) query = query.where("status", "==", status);
+    return query;
+  }
+
   async items(
     classifications: string[],
     category: string[],
@@ -52,13 +74,7 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = db.collection("items").where("geohash", ">=", "");
-    if (category && category.length > 0)
-      query = query.where("category", "array-contains-any", category);
-    if (classifications && classifications.length > 0)
-      query = query.where("clssfctns", "array-contains-any", classifications);
-    if (status) query = query.where("status", "==", status);
-    query = this.applyKeywordNameFilter(query, keyword);
+    let query = this._itemsQuery(classifications, category, status, keyword);
     const snapshot = await query.limit(limit).offset(offset).get();
     const results: Item[] = [];
     await Promise.all(
@@ -75,12 +91,7 @@ export class ItemService {
     status: string,
     keyword: string
   ): Promise<number> {
-    let query = db.collection("items").where("geohash", ">=", "");
-    if (category && category.length > 0)
-      query = query.where("category", "array-contains-any", category);
-    if (classifications && classifications.length > 0)
-      query = query.where("clssfctns", "array-contains-any", classifications);
-    if (status) query = query.where("status", "==", status);
+    let query = this._itemsQuery(classifications, category, status, keyword);
     query = this.applyKeywordNameFilter(query, keyword);
     const snapshot = await query.get();
     return snapshot.size;
@@ -96,13 +107,7 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = db.collection("items").where("geohash", ">=", "");
-    if (category && category.length > 0)
-      query = query.where("category", "array-contains-any", category);
-    if (classifications && classifications.length > 0)
-      query = query.where("clssfctns", "array-contains-any", classifications);
-    if (status) query = query.where("status", "==", status);
-    query = this.applyKeywordNameFilter(query, keyword);
+    let query = this._itemsQuery(classifications, category, status, keyword);
     const items = this.mapService.getLocationsByRadius(
       query,
       { latitude, longitude },
@@ -131,13 +136,7 @@ export class ItemService {
     status: string,
     keyword: string
   ): Promise<number> {
-    let query = db.collection("items").where("geohash", ">=", "");
-    if (category && category.length > 0)
-      query = query.where("category", "array-contains-any", category);
-    if (classifications && classifications.length > 0)
-      query = query.where("clssfctns", "array-contains-any", classifications);
-    if (status) query = query.where("status", "==", status);
-    query = this.applyKeywordNameFilter(query, keyword);
+    let query = this._itemsQuery(classifications, category, status, keyword);
     const count = await this.mapService.getLocationsByRadiusCount(
       query,
       { latitude, longitude },
@@ -154,16 +153,12 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = db
-      .collection("items")
+    let query = this._itemsQuery([], category, status, keyword);
+    query = query
       .where("ownerId", "==", userId)
       .where("holderId", "!=", null)
       .orderBy("holderId")
       .orderBy("updated", "desc");
-    if (category && category.length > 0)
-      query = query.where("category", "array-contains-any", category);
-    if (status) query = query.where("status", "==", status);
-    query = this.applyKeywordNameFilter(query, keyword);
     const snapshot = await query.limit(limit).offset(offset).get();
     const results: Item[] = [];
     await Promise.all(
@@ -183,16 +178,12 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = db
-      .collection("items")
+    let query = this._itemsQuery([], category, status, keyword);
+    query = query
       .where("ownerId", "==", userId)
       .where("holderId", "!=", null)
       .orderBy("holderId")
       .orderBy("updated", "desc");
-    if (category && category.length > 0)
-      query = query.where("category", "array-contains-any", category);
-    if (status) query = query.where("status", "==", status);
-    query = this.applyKeywordNameFilter(query, keyword);
     const snapshot = await query.limit(limit).offset(offset).get();
     const results: Item[] = [];
     await Promise.all(
@@ -212,14 +203,8 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = db
-      .collection("items")
-      .where("holderId", "==", userId)
-      .orderBy("updated", "desc");
-    if (category && category.length > 0)
-      query = query.where("category", "array-contains-any", category);
-    if (status) query = query.where("status", "==", status);
-    query = this.applyKeywordNameFilter(query, keyword);
+    let query = this._itemsQuery([], category, status, keyword);
+    query = query.where("holderId", "==", userId).orderBy("updated", "desc");
 
     const snapshot = await query.limit(limit).offset(offset).get();
     const results: Item[] = [];
@@ -306,15 +291,8 @@ export class ItemService {
 
       return items;
     } else {
-      let query = db
-        .collection("items")
-        .where("ownerId", "==", userId)
-        .orderBy("updated", "desc");
-      if (category && category.length > 0)
-        query = query.where("category", "array-contains-any", category);
-      if (status && status.length > 0)
-        query = query.where("status", "==", status);
-      query = this.applyKeywordNameFilter(query, keyword);
+      let query = this._itemsQuery([], category, status, keyword);
+      query = query.where("ownerId", "==", userId).orderBy("updated", "desc");
       const snapshot = await query.limit(limit).offset(offset).get();
       const results: Item[] = [];
       await Promise.all(
@@ -371,13 +349,8 @@ export class ItemService {
 
       return items.length;
     } else {
-      let query = db.collection("items").where("ownerId", "==", userId);
-      if (category && category.length > 0)
-        query = query.where("category", "array-contains-any", category);
-      if (status && status.length > 0)
-        query = query.where("status", "==", status);
-      query = this.applyKeywordNameFilter(query, keyword);
-
+      let query = this._itemsQuery([], category, status, keyword);
+      query = query.where("ownerId", "==", userId);
       const snapshot = await query.get();
       console.debug(
         `Total ${snapshot.size} items for user ${userId} with category ${category}, status ${status}, keyword ${keyword}`
@@ -1147,9 +1120,7 @@ export class ItemService {
   ): firebase.firestore.Query<firebase.firestore.DocumentData> {
     if (keyword && String(keyword).trim().length > 0) {
       const k = String(keyword);
-      return query
-        .where("name", ">=", k)
-        .where("name", "<=", k + "\uf8ff");
+      return query.where("name", ">=", k).where("name", "<=", k + "\uf8ff");
     }
     return query;
   }
@@ -1159,53 +1130,80 @@ export class ItemService {
   //
   // tokenizes a name: split by spaces, group ASCII letters/digits together,
   // and make every non-ASCII-or-digit character a separate token.
-  private readonly SKIP_INDEX = new Set(["a", "an", "the", "and", "or", "of", "in", "on", "at", "to", "for", "with", "is", "are", "by", "as", "it", "this", "that"]);
+  private readonly SKIP_INDEX = new Set([
+    "a",
+    "an",
+    "the",
+    "and",
+    "or",
+    "of",
+    "in",
+    "on",
+    "at",
+    "to",
+    "for",
+    "with",
+    "is",
+    "are",
+    "by",
+    "as",
+    "it",
+    "this",
+    "that",
+  ]);
 
   private tokenizeName(name: string): string[] {
-      if (!name) return []
+    if (!name) return [];
 
-      const tokens: Set<string> = new Set();
-      const parts = name
-        .toLowerCase()
-        .split(/[\s\p{P}\p{S}]+/u)
-        .filter(Boolean);
-      const latinOrNumbers = /\p{Script=Latin}|\p{Nd}/u;
+    const tokens: Set<string> = new Set();
+    const parts = name
+      .toLowerCase()
+      .split(/[\s\p{P}\p{S}]+/u)
+      .filter(Boolean);
+    const latinOrNumbers = /\p{Script=Latin}|\p{Nd}/u;
 
-      // Parts is separated by spaces and punctuations.
-      for (const part of parts) {
-        let cur = "";
-        for (const ch of part) {
-          if (latinOrNumbers.test(ch)) {
-            cur += ch;
-          } else {
-            if ( cur && !this.SKIP_INDEX.has(cur) ) {
-                tokens.add(cur);
-                cur = "";
-             }
-            tokens.add(ch);
+    // Parts is separated by spaces and punctuations.
+    for (const part of parts) {
+      let cur = "";
+      for (const ch of part) {
+        if (latinOrNumbers.test(ch)) {
+          cur += ch;
+        } else {
+          if (cur && !this.SKIP_INDEX.has(cur)) {
+            tokens.add(cur);
+            cur = "";
           }
+          tokens.add(ch);
         }
-        if (cur && !this.SKIP_INDEX.has(cur)) tokens.add(cur);
       }
-      return Array.from(tokens).filter(Boolean);
-  };
+      if (cur && !this.SKIP_INDEX.has(cur)) tokens.add(cur);
+    }
+    return Array.from(tokens).filter(Boolean);
+  }
 
-  public generateItemIndexIncremental() : Promise<boolean>{
-
+  public generateItemIndexIncremental(): Promise<boolean> {
     return (async () => {
       try {
         const BATCH_READ_SIZE = 500;
         let lastDoc: firebase.firestore.QueryDocumentSnapshot | null = null;
         let processed = 0;
 
-        console.log("generateItemIndexIncremental: Generating index for version ", this.ITEM_INDEX_VER );
+        console.log(
+          "generateItemIndexIncremental: Generating index for version ",
+          this.ITEM_INDEX_VER
+        );
 
-        const totalCount = (await db
-          .collection("items")
-          .where("nameIndexVer", "!=", this.ITEM_INDEX_VER)
-          .count().get()).data().count;
+        const totalCount = (
+          await db
+            .collection("items")
+            .where("nameIndexVer", "!=", this.ITEM_INDEX_VER)
+            .count()
+            .get()
+        ).data().count;
 
-        console.log(`generateItemIndexIncremental: total ${totalCount} items to process`);
+        console.log(
+          `generateItemIndexIncremental: total ${totalCount} items to process`
+        );
 
         while (true) {
           let q = db
@@ -1223,9 +1221,9 @@ export class ItemService {
           const batch = db.batch();
           snap.docs.forEach((doc) => {
             const data = doc.data();
-            const name = (data && data.name) ? String(data.name) : "";
+            const name = data && data.name ? String(data.name) : "";
             const nameIndex = this.tokenizeName(name);
-            batch.update(doc.ref, { 
+            batch.update(doc.ref, {
               nameIndex: nameIndex,
               nameIndexVer: this.ITEM_INDEX_VER,
             });
@@ -1233,12 +1231,14 @@ export class ItemService {
 
           await batch.commit();
           processed += snap.size;
-          console.log(`generateItemIndexIncremental: processed total ${processed} of ${totalCount} previously remaining items`);
+          console.log(
+            `generateItemIndexIncremental: processed total ${processed} of ${totalCount} previously remaining items`
+          );
 
           lastDoc = snap.docs[snap.docs.length - 1];
           if (snap.size < BATCH_READ_SIZE) break;
         }
-        
+
         return true;
       } catch (error) {
         console.error("generateItemIndex failed:", error);
@@ -1246,7 +1246,6 @@ export class ItemService {
       }
     })();
   }
-
 
   /**
    * Stub for experimental keyword search used by resolver.itemsByKeywordExperimental.

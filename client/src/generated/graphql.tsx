@@ -760,7 +760,7 @@ export type ItemQueryVariables = Exact<{
 }>;
 
 
-export type ItemQuery = { __typename?: 'Query', item?: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, holderId?: string | null, deposit?: number | null } | null };
+export type ItemQuery = { __typename?: 'Query', item?: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, clssfctns?: Array<string> | null, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, holderId?: string | null, deposit?: number | null } | null };
 
 export type CreateTransactionMutationVariables = Exact<{
   itemId: Scalars['ID']['input'];
@@ -1478,6 +1478,7 @@ export const ItemDocument = gql`
     description
     condition
     category
+    clssfctns
     status
     images
     thumbnails
