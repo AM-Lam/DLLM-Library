@@ -185,6 +185,8 @@
     "publishedYear": "Published Year",
     "publishedYearHelper": "Optional: Enter a 4-digit year, e.g. 2024",
     "status": "Status",
+    "classification": "Classification",
+    "categories": "#Tags",
     "conditions": {
       "NEW": "New",
       "LIKE_NEW": "Like New",
@@ -554,11 +556,17 @@
     "noResults": "No items found matching your search criteria within {{radius}}km.",
     "searchTips": "Try:",
     "searchTip1": "Using different keywords",
-    "searchTip2": "Removing some filters",
+    "searchTip2": "Selecting a different filter",
     "searchTip3": "Checking for spelling mistakes",
-    "instructionsSearch": "Enter a keyword, category, or classification to search for items within {{radius}}km of your location.",
+    "instructionsSearch": "Please select a filter type above to search for items within {{radius}}km of your location.",
     "needLocation": "Please enable location services to search for nearby items.",
-    "itemCount": "Showing {{count}} item(s)"
+    "itemCount": "Showing {{count}} item(s)",
+    "selectFilterType": "Select Search Filter Type",
+    "filterTypeInfo": "Choose one filter type to search. Only one filter can be active at a time.",
+    "keywordFilterDesc": "Search by title",
+    "categoryFilterDesc": "Browse by #tags",
+    "classificationFilterDesc": "Filter by taxonomy path",
+    "filterValue": "Filter Value"
   },
   "classification": {
     "level": "Level",
