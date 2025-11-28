@@ -3,7 +3,7 @@ import { useQuery, gql } from "@apollo/client";
 import { User as fireUser } from "firebase/auth";
 import { User, HostConfig } from "./generated/graphql"; // Adjust the import path as necessary
 import { createRouter } from "./Router";
-import { RouterProvider, useNavigate, useLocation } from "react-router";
+import { RouterProvider } from "react-router";
 
 const ME_QUERY = gql`
   query Me {
