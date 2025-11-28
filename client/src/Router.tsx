@@ -12,7 +12,6 @@ import TransactionsPage from "./routes/Transactions";
 import TransactionDetailPage from "./components/TransactionDetail";
 import LoanItems from "./routes/LoanItems";
 
-import { gql } from "@apollo/client";
 import OnLoanItemsView from "./routes/OnLoanItemsView";
 import BorrowedItemsView from "./routes/BorrowedItemsView";
 import MainLayout from "./components/MainLayout";
