@@ -362,7 +362,7 @@ const HomePage: React.FC = () => {
             onClick={handleChatClick}
             sx={{
               position: "fixed",
-              bottom: 64,
+              bottom: 80, // Increased from 64 to 80 to avoid overlap with bottom navigation bar
               right: 16,
               zIndex: 1000,
             }}
