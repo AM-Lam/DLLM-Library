@@ -66,6 +66,44 @@ export class ItemService {
     return query;
   }
 
+  // Helper method to handle pagination with keyword filtering
+  private async _queryWithKeywordPagination(
+    queryBuilder: (offset: number) => firebase.firestore.Query,
+    keyword: string | null | undefined,
+    requestedLimit: number,
+    initialOffset: number = 0
+  ): Promise<Item[]> {
+    const results: Item[] = [];
+    let currentOffset = initialOffset;
+
+    while (results.length < requestedLimit ) {
+      const query = queryBuilder(currentOffset);
+      const snapshot = await query.limit(requestedLimit).get();
+
+      if (snapshot.empty) break;
+
+      const batchResults: Item[] = [];
+      await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const item = await this._itemQueryToItem(doc);
+          batchResults.push(item);
+        })
+      );
+
+      // Apply keyword filtering
+      const filtered = this.filterItemsByKeyword(batchResults, keyword);
+      results.push(...filtered);
+
+      // If we got fewer docs than requested, we've reached the end
+      if (snapshot.size < requestedLimit) break;
+
+      currentOffset += requestedLimit;
+    }
+
+    // Return only up to the requested limit
+    return results.slice(0, requestedLimit);
+  }
+
   async items(
     classifications: string[],
     category: string[],
@@ -74,18 +112,15 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = this._itemsQuery(classifications, category, status, keyword);
-    const snapshot = await query.limit(limit).offset(offset).get();
-    const results: Item[] = [];
-    await Promise.all(
-      snapshot.docs.map(async (doc) => {
-        const item = await this._itemQueryToItem(doc);
-        results.push(item);
-      })
+    return this._queryWithKeywordPagination(
+      (currentOffset) =>
+        this._itemsQuery(classifications, category, status, keyword).offset(
+          currentOffset
+        ),
+      keyword,
+      limit,
+      offset
     );
-
-    // Filter client-side by keyword tokens to ensure nameIndex contains all tokens
-    return this.filterItemsByKeyword(results, keyword);
   }
   async totalItemsCount(
     classifications: string[],
@@ -156,22 +191,20 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = this._itemsQuery([], category, status, keyword);
-    query = query
-      .where("ownerId", "==", userId)
-      .where("holderId", "!=", null)
-      .orderBy("holderId")
-      .orderBy("updated", "desc");
-    const snapshot = await query.limit(limit).offset(offset).get();
-    const results: Item[] = [];
-    await Promise.all(
-      snapshot.docs.map(async (doc) => {
-        const item = await this._itemQueryToItem(doc);
-        results.push(item);
-      })
+    return this._queryWithKeywordPagination(
+      (currentOffset) => {
+        let query = this._itemsQuery([], category, status, keyword);
+        return query
+          .where("ownerId", "==", userId)
+          .where("holderId", "!=", null)
+          .orderBy("holderId")
+          .orderBy("updated", "desc")
+          .offset(currentOffset);
+      },
+      keyword,
+      limit,
+      offset
     );
-
-    return this.filterItemsByKeyword(results, keyword);
   }
 
   async itemsOnLoanByOwner(
@@ -182,22 +215,20 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = this._itemsQuery([], category, status, keyword);
-    query = query
-      .where("ownerId", "==", userId)
-      .where("holderId", "!=", null)
-      .orderBy("holderId")
-      .orderBy("updated", "desc");
-    const snapshot = await query.limit(limit).offset(offset).get();
-    const results: Item[] = [];
-    await Promise.all(
-      snapshot.docs.map(async (doc) => {
-        const item = await this._itemQueryToItem(doc);
-        results.push(item);
-      })
+    return this._queryWithKeywordPagination(
+      (currentOffset) => {
+        let query = this._itemsQuery([], category, status, keyword);
+        return query
+          .where("ownerId", "==", userId)
+          .where("holderId", "!=", null)
+          .orderBy("holderId")
+          .orderBy("updated", "desc")
+          .offset(currentOffset);
+      },
+      keyword,
+      limit,
+      offset
     );
-
-    return this.filterItemsByKeyword(results, keyword);
   }
 
   async itemsOnLoanByHolder(
@@ -208,19 +239,18 @@ export class ItemService {
     limit: number = 20,
     offset: number = 0
   ): Promise<Item[]> {
-    let query = this._itemsQuery([], category, status, keyword);
-    query = query.where("holderId", "==", userId).orderBy("updated", "desc");
-
-    const snapshot = await query.limit(limit).offset(offset).get();
-    const results: Item[] = [];
-    await Promise.all(
-      snapshot.docs.map(async (doc) => {
-        const item = await this._itemQueryToItem(doc);
-        results.push(item);
-      })
+    return this._queryWithKeywordPagination(
+      (currentOffset) => {
+        let query = this._itemsQuery([], category, status, keyword);
+        return query
+          .where("holderId", "==", userId)
+          .orderBy("updated", "desc")
+          .offset(currentOffset);
+      },
+      keyword,
+      limit,
+      offset
     );
-
-    return this.filterItemsByKeyword(results, keyword);
   }
 
   async itemById(itemId: string): Promise<Item | null> {
@@ -290,28 +320,20 @@ export class ItemService {
       }
 
       const items = await this.itemsByIds(cachedItemIds);
-
-      console.debug(
-        `Found ${items.length} cached items for exchange point user ${userId}`
-      );
-
       return this.filterItemsByKeyword(items, keyword);
     } else {
-      let query = this._itemsQuery([], category, status, keyword);
-      query = query.where("ownerId", "==", userId).orderBy("updated", "desc");
-      const snapshot = await query.limit(limit).offset(offset).get();
-      const results: Item[] = [];
-      await Promise.all(
-        snapshot.docs.map(async (doc) => {
-          const item = await this._itemQueryToItem(doc);
-          results.push(item);
-        })
+      return this._queryWithKeywordPagination(
+        (currentOffset) => {
+          let query = this._itemsQuery([], category, status, keyword);
+          return query
+            .where("ownerId", "==", userId)
+            .orderBy("updated", "desc")
+            .offset(currentOffset);
+        },
+        keyword,
+        limit,
+        offset
       );
-      console.debug(
-        `Found ${results.length} items for user ${userId} with category ${category}, status ${status}, keyword ${keyword}`
-      );
-
-      return this.filterItemsByKeyword(results, keyword);
     }
   }
 
@@ -1205,7 +1227,7 @@ export class ItemService {
       .filter(Boolean);
     if (tokens.length === 0) return items;
 
-    console.log("filterItemsByKeyword: filtering for tokens:", tokens);
+    // console.log("filterItemsByKeyword: filtering for tokens:", tokens);
 
     return items.filter((item) => {
       const idx = Array.isArray((item as any).nameIndex)
