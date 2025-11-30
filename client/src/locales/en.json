@@ -468,7 +468,7 @@
   "transactions": {
     "title": "My Records",
     "viewTransactions": "View Records",
-    "openTransactions": "Going",
+    "openTransactions": "Ongoing",
     "allTransactions": "All Records",
     "transactionInfo": "Information",
     "itemInfo": "Item Information",
