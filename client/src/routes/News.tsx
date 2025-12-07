@@ -139,8 +139,7 @@ const NewsPage: React.FC = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       {/* Header */}
-      < Box sx={{ mb: 4 }
-      }>
+      <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
           {t("news.aboutUs", "About Us")}
         </Typography>
@@ -155,7 +154,7 @@ const NewsPage: React.FC = () => {
               "Learn more about our community library"
             )}
         </Typography>
-      </Box >
+      </Box>
 
       {/* Admin Edit Controls */}
       {
@@ -399,7 +398,7 @@ const NewsPage: React.FC = () => {
           </Box>
         )
       }
-    </Container >
+    </Container>
   );
 };
 

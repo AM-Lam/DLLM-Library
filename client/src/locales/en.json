@@ -367,10 +367,10 @@
   },
   "languages": {
     "en": "English",
-    "zh-TW": "繁體中文",
+    "zh-TW": "正體中文",
     "EN": "English",
-    "ZH_HK": "繁體中文",
-    "zh-HK": "繁體中文"
+    "ZH_HK": "港文",
+    "zh-HK": "港文"
   },
   "userProfile": {
     "nickname": "Nickname",
@@ -386,7 +386,7 @@
     "exchangePointsError": "Error loading exchange points",
     "noExchangePoints": "No exchange points available.",
     "loadingExchangePoints": "Loading exchange points...",
-    "selecPtedPoints": "{{count}} exchange point(s) selected",
+    "selectedPoints": "{{count}} exchange point(s) selected",
     "exchangePointsCount": "{{current}} of {{total}} exchange points",
     "locationNotFound": "Could not find location for the address.",
     "geocodeError": "Failed to resolve address location",
@@ -505,6 +505,8 @@
     "notFound": "Record not found",
     "noOpenTransactions": "No ongoing record found.",
     "noTransactions": "No records found.",
+    "noOpenTransactionsHint": "All your transactions are completed or cancelled.",
+    "noTransactionsHint": "Start by borrowing or lending items in the community.",
     "noActionsAvailable": "No actions available for this record.",
     "status": {
       "pending": "Requested",
