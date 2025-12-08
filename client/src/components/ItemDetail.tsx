@@ -32,6 +32,7 @@ import {
   NavigateNext as NextIcon,
   PushPin as PinIcon, // Add this import
   ChevronRight as ChevronRightIcon,
+  Article as ArticleIcon,
 } from "@mui/icons-material";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import {
@@ -54,6 +55,7 @@ import { convertLinksToClickable } from "../utils/helpers";
 import { AuthDialog } from "./Auth";
 import ImageGalleryModal from "./ImageGalleryModal";
 import { translateCategory } from "../utils/categoryTranslation";
+import NewsForm from "./NewsForm";
 
 const ITEM_DETAIL_QUERY = gql`
   query Item($itemId: ID!) {
@@ -204,6 +206,9 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
 
   // Add state for Face-to-Face dialog
   const [faceToFaceDialogOpen, setFaceToFaceDialogOpen] = useState(false);
+
+  // Add state for news form dialog
+  const [newsFormOpen, setNewsFormOpen] = useState(false);
 
   const { data, loading, error, refetch } = useQuery<{ item: Item }>(
     ITEM_DETAIL_QUERY,
@@ -390,6 +395,10 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
 
   const handleFaceToFaceClick = () => {
     setFaceToFaceDialogOpen(true);
+  };
+
+  const handleCreateNewsClick = () => {
+    setNewsFormOpen(true);
   };
 
   const handleConfirmRequest = async (
@@ -1153,6 +1162,19 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
               </Button>
             )}
 
+            {/* Create News Button - Show for admins only */}
+            {isAdmin && (
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                onClick={handleCreateNewsClick}
+                startIcon={<ArticleIcon />}
+              >
+                {t("item.createNews", "Create News")}
+              </Button>
+            )}
+
             {(isOwner || isAdmin) && (
               <>
                 <Button
@@ -1280,6 +1302,17 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
         <Box sx={{ mt: 4 }}>
           <ItemComments itemId={itemId!} currentUser={user} />
         </Box>
+      )}
+
+      {/* News Form Dialog - For admins to create news related to the item */}
+      {user && isAdmin && (
+        <NewsForm
+          open={newsFormOpen}
+          onClose={() => setNewsFormOpen(false)}
+          relatedItem={data?.item || null}
+          onSuccess={handleEditSuccess}
+          onError={handleEditError}
+        />
       )}
     </Container>
   );
