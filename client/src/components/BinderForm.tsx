@@ -344,10 +344,10 @@ const BinderForm: React.FC<BinderFormProps> = ({
 
               return idx === actualIndex
                 ? {
-                    ...img,
-                    isUploading: true,
-                    uploadProgress: progress.percentage,
-                  }
+                  ...img,
+                  isUploading: true,
+                  uploadProgress: progress.percentage,
+                }
                 : img;
             })
           );
@@ -367,11 +367,11 @@ const BinderForm: React.FC<BinderFormProps> = ({
 
               return idx === actualIndex
                 ? {
-                    ...img,
-                    isUploading: false,
-                    uploadProgress: 100,
-                    gsUrl: gsUrl,
-                  }
+                  ...img,
+                  isUploading: false,
+                  uploadProgress: 100,
+                  gsUrl: gsUrl,
+                }
                 : img;
             })
           );
@@ -390,10 +390,10 @@ const BinderForm: React.FC<BinderFormProps> = ({
         prev.map((img) =>
           !img.isExisting && !img.gsUrl
             ? {
-                ...img,
-                isUploading: false,
-                uploadError: `Upload failed: ${error}`,
-              }
+              ...img,
+              isUploading: false,
+              uploadError: `Upload failed: ${error}`,
+            }
             : img
         )
       );
@@ -669,7 +669,7 @@ const BinderForm: React.FC<BinderFormProps> = ({
                   disabled={isProcessingImages || isUploading || loading}
                   startIcon={<PhotoCamera />}
                 >
-                  {t("common.addImage", "Add Image")}
+                  {t("common.addImages", "Add Image")}
                 </Button>
                 <Menu
                   anchorEl={imageMenuAnchor}
@@ -864,11 +864,10 @@ const BinderForm: React.FC<BinderFormProps> = ({
                                   )}
                                   <MuiListItemText
                                     primary={bind.name}
-                                    secondary={`#${index + 1} - ${
-                                      bind.type === BindType.Binder
+                                    secondary={`#${index + 1} - ${bind.type === BindType.Binder
                                         ? t("binder.typeBinder", "Binder")
                                         : t("binder.typeItem", "Item")
-                                    }`}
+                                      }`}
                                   />
                                 </ListItem>
                               )}
@@ -898,10 +897,10 @@ const BinderForm: React.FC<BinderFormProps> = ({
               {isProcessingImages
                 ? t("common.processingImages", "Processing...")
                 : isUploading
-                ? t("common.uploadingImages", "Uploading...")
-                : loading
-                ? t("common.updating", "Updating...")
-                : t("common.save", "Save")}
+                  ? t("common.uploadingImages", "Uploading...")
+                  : loading
+                    ? t("common.updating", "Updating...")
+                    : t("common.save", "Save")}
             </Button>
           </DialogActions>
         </form>

@@ -767,9 +767,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                 {/* Show owner name if user is not the owner */}
                 {ownerData?.user && (
                   <Chip
-                    label={`${t("item.owner", "Owner")}: ${
-                      ownerData.user.nickname || ownerData.user.email
-                    }`}
+                    label={`${t("item.owner", "Owner")}: ${ownerData.user.nickname || ownerData.user.email
+                      }`}
                     color="primary"
                     size="small"
                     sx={{ ml: 2, cursor: "pointer" }}
@@ -789,9 +788,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                   holderData?.user &&
                   data.item.holderId !== data.item.ownerId && (
                     <Chip
-                      label={`${t("item.holder", "Holder")}: ${
-                        holderData.user.nickname || holderData.user.email
-                      }`}
+                      label={`${t("item.holder", "Holder")}: ${holderData.user.nickname || holderData.user.email
+                        }`}
                       color="secondary"
                       size="small"
                       sx={{ ml: 2, cursor: "pointer" }}
@@ -799,9 +797,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                     />
                   )}
                 <Chip
-                  label={`${t("item.deposit", "deposit")}: ${
-                    data.item.deposit
-                  }`}
+                  label={`${t("item.deposit", "deposit")}: ${data.item.deposit
+                    }`}
                   color="secondary"
                   size="small"
                   sx={{ ml: 2, cursor: "pointer" }}
@@ -1048,40 +1045,40 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
           {/* Images */}
           {((data.item.thumbnails && data.item.thumbnails.length > 0) ||
             (data.item.images && data.item.images.length > 0)) && (
-            <Box sx={{ mb: 4 }}>
-              <Grid container spacing={2}>
-                {(data.item.thumbnails && data.item.thumbnails.length > 0
-                  ? data.item.thumbnails
-                  : data.item.images || []
-                ).map((image, index) => (
-                  <Grid key={index} size={{ xs: 6, sm: 4, md: 3 }}>
-                    <Paper
-                      elevation={2}
-                      sx={{
-                        overflow: "hidden",
-                        cursor: "pointer",
-                        transition: "transform 0.2s",
-                        "&:hover": {
-                          transform: "scale(1.05)",
-                        },
-                      }}
-                      onClick={() => handleThumbnailClick(index)}
-                    >
-                      <img
-                        src={image}
-                        alt={`${data.item.name} - Thumbnail ${index + 1}`}
-                        style={{
-                          width: "100%",
-                          height: "120px",
-                          objectFit: "cover",
+              <Box sx={{ mb: 4 }}>
+                <Grid container spacing={2}>
+                  {(data.item.thumbnails && data.item.thumbnails.length > 0
+                    ? data.item.thumbnails
+                    : data.item.images || []
+                  ).map((image, index) => (
+                    <Grid key={index} size={{ xs: 6, sm: 4, md: 3 }}>
+                      <Paper
+                        elevation={2}
+                        sx={{
+                          overflow: "hidden",
+                          cursor: "pointer",
+                          transition: "transform 0.2s",
+                          "&:hover": {
+                            transform: "scale(1.05)",
+                          },
                         }}
-                      />
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          )}
+                        onClick={() => handleThumbnailClick(index)}
+                      >
+                        <img
+                          src={image}
+                          alt={`${data.item.name} - Thumbnail ${index + 1}`}
+                          style={{
+                            width: "100%",
+                            height: "120px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
 
           {/* Item Info Grid */}
           <Box sx={{ mb: 4 }}>
@@ -1109,10 +1106,10 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                       data.item.status === "AVAILABLE"
                         ? "success"
                         : data.item.status === "EXCHANGEABLE"
-                        ? "info"
-                        : data.item.status === "GIFT"
-                        ? "warning"
-                        : "default"
+                          ? "info"
+                          : data.item.status === "GIFT"
+                            ? "warning"
+                            : "default"
                     }
                     size="small"
                     sx={{ ml: 1 }}
@@ -1220,11 +1217,18 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
             </Box>
           )}
 
-          {/* Action Buttons */}
+          {/* Action Buttons - All equal weight */}
           <Box
-            sx={{ mt: 4, display: "flex", gap: 2, justifyContent: "flex-end" }}
+            sx={{
+              mt: 4,
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 2,
+              justifyContent: "flex-end",
+              flexWrap: "wrap",
+            }}
           >
-            {/* Bind Button - Show for all verified users */}
+            {/* Bind Button */}
             {user && user.isVerified && (
               <Button
                 variant="outlined"
@@ -1232,12 +1236,16 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                 size="large"
                 onClick={handleBindClick}
                 startIcon={<BinderIcon />}
+                sx={{
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { sm: 180 },
+                }}
               >
                 {t("binder.bindItem", "Bind to Binder")}
               </Button>
             )}
 
-            {/* Face-to-Face Transfer Button - Show for owner or holder */}
+            {/* Face-to-Face Transfer Button */}
             {(isOwner || isHolder) && (
               <Button
                 variant="outlined"
@@ -1246,6 +1254,10 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                 onClick={handleFaceToFaceClick}
                 disabled={quickTransactionLoading}
                 startIcon={<TransferIcon />}
+                sx={{
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { sm: 180 },
+                }}
               >
                 {t("item.faceToFaceTransfer", "Face-to-Face Transfer")}
               </Button>
@@ -1259,24 +1271,32 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                 size="large"
                 onClick={handleCreateNewsClick}
                 startIcon={<ArticleIcon />}
+                sx={{
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { sm: 150 },
+                }}
               >
-                {t("item.createNews", "Create News")}
+                {t("news.create", "Create News")}
               </Button>
             )}
 
+            {/* Edit Button */}
             {(isOwner || isAdmin) && (
-              <>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="large"
-                  onClick={() => setEditDialogOpen(true)}
-                >
-                  {t("item.editItem")}
-                </Button>
-              </>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                onClick={() => setEditDialogOpen(true)}
+                sx={{
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { sm: 120 },
+                }}
+              >
+                {t("item.editItem")}
+              </Button>
             )}
 
+            {/* Request Button */}
             {(canCreateTransaction || !user) && (
               <Button
                 variant="contained"
@@ -1284,6 +1304,10 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ itemId, user, onBack }) => {
                 size="large"
                 onClick={handleRequestClick}
                 disabled={createTransactionLoading}
+                sx={{
+                  width: { xs: "100%", sm: "auto" },
+                  minWidth: { sm: 150 },
+                }}
               >
                 {createTransactionLoading ? (
                   <CircularProgress size={20} sx={{ mr: 1 }} />

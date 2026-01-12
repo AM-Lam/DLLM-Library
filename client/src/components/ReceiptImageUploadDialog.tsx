@@ -219,10 +219,10 @@ const ReceiptImageUploadDialog: React.FC<ReceiptImageUploadDialogProps> = ({
             prev.map((img, idx) =>
               idx === fileIndex
                 ? {
-                    ...img,
-                    isUploading: true,
-                    uploadProgress: progress.percentage,
-                  }
+                  ...img,
+                  isUploading: true,
+                  uploadProgress: progress.percentage,
+                }
                 : img
             )
           );
@@ -239,11 +239,11 @@ const ReceiptImageUploadDialog: React.FC<ReceiptImageUploadDialogProps> = ({
             prev.map((img, idx) =>
               idx === fileIndex
                 ? {
-                    ...img,
-                    isUploading: false,
-                    uploadProgress: 100,
-                    gsUrl: gsUrl,
-                  }
+                  ...img,
+                  isUploading: false,
+                  uploadProgress: 100,
+                  gsUrl: gsUrl,
+                }
                 : img
             )
           );
@@ -261,10 +261,10 @@ const ReceiptImageUploadDialog: React.FC<ReceiptImageUploadDialogProps> = ({
         prev.map((img) =>
           !img.gsUrl
             ? {
-                ...img,
-                isUploading: false,
-                uploadError: `Upload failed: ${error}`,
-              }
+              ...img,
+              isUploading: false,
+              uploadError: `Upload failed: ${error}`,
+            }
             : img
         )
       );
@@ -372,7 +372,7 @@ const ReceiptImageUploadDialog: React.FC<ReceiptImageUploadDialogProps> = ({
             fullWidth
             size="large"
           >
-            {t("transactions.addImages", "Add Images")}
+            {t("common.addImages", "Add Images")}
           </Button>
 
           {/* Image Source Menu */}
@@ -546,16 +546,16 @@ const ReceiptImageUploadDialog: React.FC<ReceiptImageUploadDialogProps> = ({
           {isProcessingImages
             ? t("transactions.processingImages", "Processing...")
             : isUploading
-            ? t("transactions.uploadingImages", "Uploading...")
-            : loading
-            ? t("transactions.confirming", "Confirming...")
-            : images.length > 0
-            ? t(
-                "transactions.confirmWithImages",
-                "Confirm with {{count}} image(s)",
-                { count: images.length }
-              )
-            : t("transactions.confirmWithoutImages", "Confirm without images")}
+              ? t("transactions.uploadingImages", "Uploading...")
+              : loading
+                ? t("transactions.confirming", "Confirming...")
+                : images.length > 0
+                  ? t(
+                    "transactions.confirmWithImages",
+                    "Confirm with {{count}} image(s)",
+                    { count: images.length }
+                  )
+                  : t("transactions.confirmWithoutImages", "Confirm without images")}
         </Button>
       </DialogActions>
     </Dialog>

@@ -441,10 +441,10 @@ const NewsForm: React.FC<NewsFormProps> = ({
 
               return idx === actualIndex
                 ? {
-                    ...img,
-                    isUploading: true,
-                    uploadProgress: progress.percentage,
-                  }
+                  ...img,
+                  isUploading: true,
+                  uploadProgress: progress.percentage,
+                }
                 : img;
             })
           );
@@ -462,11 +462,11 @@ const NewsForm: React.FC<NewsFormProps> = ({
 
               return idx === actualIndex
                 ? {
-                    ...img,
-                    isUploading: false,
-                    uploadProgress: 100,
-                    gsUrl: gsUrl,
-                  }
+                  ...img,
+                  isUploading: false,
+                  uploadProgress: 100,
+                  gsUrl: gsUrl,
+                }
                 : img;
             })
           );
@@ -481,10 +481,10 @@ const NewsForm: React.FC<NewsFormProps> = ({
         prev.map((img) =>
           !img.isExisting && !img.gsUrl
             ? {
-                ...img,
-                isUploading: false,
-                uploadError: `Upload failed: ${error}`,
-              }
+              ...img,
+              isUploading: false,
+              uploadError: `Upload failed: ${error}`,
+            }
             : img
         )
       );
@@ -545,7 +545,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
             newImages.length > 0 ||
             allImageUrls.length !== originalValues.images.length ||
             JSON.stringify(allImageUrls) !==
-              JSON.stringify(originalValues.images);
+            JSON.stringify(originalValues.images);
 
           if (hasImageChanges) {
             variables.images = allImageUrls;
@@ -696,12 +696,12 @@ const NewsForm: React.FC<NewsFormProps> = ({
                   <Tab
                     icon={<EditIcon />}
                     iconPosition="start"
-                    label={t("news.edit", "Edit")}
+                    label={t("common.edit", "Edit")}
                   />
                   <Tab
                     icon={<Visibility />}
                     iconPosition="start"
-                    label={t("news.preview", "Preview")}
+                    label={t("common.preview", "Preview")}
                   />
                 </Tabs>
               </Box>
@@ -877,7 +877,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
                 disabled={isProcessingImages || isUploading}
                 sx={{ mb: 2 }}
               >
-                {t("news.addImages", "Add Images")}
+                {t("common.addImages", "Add Images")}
               </Button>
 
               <Menu
@@ -1025,14 +1025,14 @@ const NewsForm: React.FC<NewsFormProps> = ({
               {isProcessingImages
                 ? t("common.processingImages", "Processing...")
                 : isUploading
-                ? t("common.uploading", "Uploading...")
-                : loading
-                ? isEditMode
-                  ? t("common.updating", "Updating...")
-                  : t("common.creating", "Creating...")
-                : isEditMode
-                ? t("common.save", "Save")
-                : t("news.publish", "Publish")}
+                  ? t("common.uploading", "Uploading...")
+                  : loading
+                    ? isEditMode
+                      ? t("common.updating", "Updating...")
+                      : t("common.creating", "Creating...")
+                    : isEditMode
+                      ? t("common.save", "Save")
+                      : t("news.publish", "Publish")}
             </Button>
           </DialogActions>
         </form>

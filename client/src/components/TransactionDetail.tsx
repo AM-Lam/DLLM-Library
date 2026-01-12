@@ -361,13 +361,13 @@ const getRoleInstructions = (
           role: t("transactions.roleRequestor", "Requestor"),
           instruction: isQuickExchange
             ? t(
-                "transactions.requestorInstructionTransferredQuick",
-                "The item has been marked as transferred to you. Please inspect the item and take photos if needed, then click 'Confirm Received' to complete the transaction."
-              )
+              "transactions.requestorInstructionTransferredQuick",
+              "The item has been marked as transferred to you. Please inspect the item and take photos if needed, then click 'Confirm Received' to complete the transaction."
+            )
             : t(
-                "transactions.requestorInstructionTransferred",
-                "The item has been marked as transferred. Waiting for the designated receiver to confirm receipt."
-              ),
+              "transactions.requestorInstructionTransferred",
+              "The item has been marked as transferred. Waiting for the designated receiver to confirm receipt."
+            ),
           severity: isQuickExchange ? "warning" : "info",
         };
       case TransactionStatus.Completed:
@@ -595,9 +595,9 @@ const TransactionDetailPage: React.FC = () => {
         <Alert severity="error">
           {error
             ? `${t(
-                "transactions.errorLoading",
-                "Error loading transaction"
-              )}: ${error.message}`
+              "transactions.errorLoading",
+              "Error loading transaction"
+            )}: ${error.message}`
             : t("transactions.notFound", "Transaction not found")}
         </Alert>
       </Container>
@@ -985,9 +985,9 @@ const TransactionDetailPage: React.FC = () => {
                     secondary={
                       holder
                         ? t(
-                            "transactions.holderIsRequestor",
-                            "Requestor has the item"
-                          )
+                          "transactions.holderIsRequestor",
+                          "Requestor has the item"
+                        )
                         : t("transactions.ownerHasItem", "Owner has the item")
                     }
                   />
@@ -1389,7 +1389,7 @@ const TransactionDetailPage: React.FC = () => {
                     }
                     fullWidth
                   >
-                    {t("transactions.cancel", "Cancel")}
+                    {t("common.cancel", "Cancel")}
                   </Button>
                   <Typography
                     variant="caption"
@@ -1424,7 +1424,7 @@ const TransactionDetailPage: React.FC = () => {
                   }
                   fullWidth
                 >
-                  {t("transactions.cancel", "Cancel")}
+                  {t("common.cancel", "Cancel")}
                 </Button>
                 <Typography
                   variant="caption"
@@ -1527,13 +1527,13 @@ const TransactionDetailPage: React.FC = () => {
             ((isReceiver || isQuickExchange) &&
               transaction.status === TransactionStatus.Transfered)
           ) && (
-            <Alert severity="info">
-              {t(
-                "transactions.noActionsAvailable",
-                "No actions available for this transaction."
-              )}
-            </Alert>
-          )}
+              <Alert severity="info">
+                {t(
+                  "transactions.noActionsAvailable",
+                  "No actions available for this transaction."
+                )}
+              </Alert>
+            )}
 
           {/* Share Button - Always available */}
           <Divider sx={{ my: 1 }} />

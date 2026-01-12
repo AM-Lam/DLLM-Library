@@ -477,10 +477,10 @@ const ItemForm: React.FC<ItemFormProps> = ({
 
               return idx === actualIndex
                 ? {
-                    ...img,
-                    isUploading: true,
-                    uploadProgress: progress.percentage,
-                  }
+                  ...img,
+                  isUploading: true,
+                  uploadProgress: progress.percentage,
+                }
                 : img;
             })
           );
@@ -500,11 +500,11 @@ const ItemForm: React.FC<ItemFormProps> = ({
 
               return idx === actualIndex
                 ? {
-                    ...img,
-                    isUploading: false,
-                    uploadProgress: 100,
-                    gsUrl: gsUrl,
-                  }
+                  ...img,
+                  isUploading: false,
+                  uploadProgress: 100,
+                  gsUrl: gsUrl,
+                }
                 : img;
             })
           );
@@ -523,10 +523,10 @@ const ItemForm: React.FC<ItemFormProps> = ({
         prev.map((img) =>
           !img.isExisting && !img.gsUrl
             ? {
-                ...img,
-                isUploading: false,
-                uploadError: `Upload failed: ${error}`,
-              }
+              ...img,
+              isUploading: false,
+              uploadError: `Upload failed: ${error}`,
+            }
             : img
         )
       );
@@ -624,7 +624,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
             newImages.length > 0 ||
             allImageUrls.length !== originalValues.images.length ||
             JSON.stringify(allImageUrls) !==
-              JSON.stringify(originalValues.images);
+            JSON.stringify(originalValues.images);
 
           if (hasImageChanges) {
             variables.images = allImageUrls;
@@ -796,7 +796,7 @@ const ItemForm: React.FC<ItemFormProps> = ({
                   disabled={isProcessingImages || isUploading}
                   sx={{ mb: 2 }}
                 >
-                  {t("item.addImages", "Add Images")}
+                  {t("common.addImages", "Add Images")}
                 </Button>
 
                 {/* Image Source Menu */}
@@ -995,14 +995,14 @@ const ItemForm: React.FC<ItemFormProps> = ({
                 {isProcessingImages
                   ? t("common.processingImages")
                   : isUploading
-                  ? t("common.uploading")
-                  : loading
-                  ? isEditMode
-                    ? t("common.updating")
-                    : t("common.creating")
-                  : isEditMode
-                  ? t("common.save")
-                  : t("item.create")}
+                    ? t("common.uploading")
+                    : loading
+                      ? isEditMode
+                        ? t("common.updating")
+                        : t("common.creating")
+                      : isEditMode
+                        ? t("common.save")
+                        : t("item.create")}
               </Button>
             </DialogActions>
           </form>
