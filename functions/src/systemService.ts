@@ -1,4 +1,4 @@
-import { db } from "./platform";
+import { db, GetPublicUrlForGSFile } from "./platform";
 import {
   CategoryMap,
   CategoryMapInput,
@@ -43,7 +43,22 @@ export class SystemService {
   ): Promise<HostConfig> {
     const hostConfigRef = SYSTEM_DB.doc("hostConfig");
     console.log("Updating host config:", hostConfigInput);
-    await hostConfigRef.set(hostConfigInput, { merge: true });
+    let updatedFields: any = hostConfigInput;
+    if (updatedFields.splashScreenImageUrl === undefined) {
+      updatedFields.splashScreenImageUrl = null;
+    } else if (updatedFields.splashScreenImageUrl?.startsWith("gs://")) {
+      try {
+        const publicUrl = await GetPublicUrlForGSFile(
+          updatedFields.splashScreenImageUrl
+        );
+        updatedFields.splashScreenImageGsLink =
+          updatedFields.splashScreenImageUrl;
+        updatedFields.splashScreenImageUrl = publicUrl;
+      } catch (error) {
+        console.error("Error getting public URL for GS file:", error);
+      }
+    }
+    await hostConfigRef.set(updatedFields, { merge: true });
     return this.getHostConfig();
   }
   async upsertCategoryMap(
