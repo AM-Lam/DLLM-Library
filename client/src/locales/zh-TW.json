@@ -29,7 +29,9 @@
     "resetPasswordInfo": "請聯繫支持以重設你的密碼。",
     "createNewAccount": "創建新帳戶",
     "alreadyHaveAccount": "已經有帳戶？取消上方的勾選以登入。",
-    "needAccount": "需要帳戶？勾選上方的框以註冊。"
+    "needAccount": "需要帳戶？勾選上方的框以註冊。",
+    "signInWithGoogle": "使用 Google 登入",
+    "googleSignInError": "Google 登入失敗"
   },
   "navigation": {
     "home": "首頁",

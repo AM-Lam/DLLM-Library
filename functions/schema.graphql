@@ -67,6 +67,8 @@ type ItemConfig {
 type HostConfig {
   chatLink: String!
   aboutUsText: String!
+  splashScreenImageUrl: String
+  splashScreenText: String
 }
 
 enum RecommendationType {
@@ -545,4 +547,6 @@ input ContactMethodInput {
 input HostConfigInput {
   chatLink: String!
   aboutUsText: String!
+  splashScreenImageUrl: String
+  splashScreenText: String!
 }
