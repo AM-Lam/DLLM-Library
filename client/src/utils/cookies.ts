@@ -12,6 +12,9 @@ export interface CookieOptions {
 
 /**
  * Set a cookie with the specified name, value, and options
+ * @param name Cookie name
+ * @param value Cookie value
+ * @param options Cookie options (expires, path, domain, secure, sameSite)
  */
 export function setCookie(
   name: string,
@@ -23,6 +26,7 @@ export function setCookie(
   if (options.expires) {
     let expiresDate: Date;
     if (typeof options.expires === "number") {
+      // Convert days to date
       expiresDate = new Date();
       expiresDate.setTime(
         expiresDate.getTime() + options.expires * 24 * 60 * 60 * 1000
@@ -34,6 +38,11 @@ export function setCookie(
   }
 
   cookieString += `; path=${options.path || "/"}`;
+  if (options.path) {
+    cookieString += `; path=${options.path}`;
+  } else {
+    cookieString += `; path=/`; // Default to root path
+  }
 
   if (options.domain) {
     cookieString += `; domain=${options.domain}`;
@@ -52,6 +61,8 @@ export function setCookie(
 
 /**
  * Get a cookie value by name
+ * @param name Cookie name
+ * @returns Cookie value or null if not found
  */
 export function getCookie(name: string): string | null {
   const nameEQ = encodeURIComponent(name) + "=";
@@ -72,6 +83,8 @@ export function getCookie(name: string): string | null {
 
 /**
  * Delete a cookie by name
+ * @param name Cookie name
+ * @param options Cookie options (path, domain)
  */
 export function deleteCookie(
   name: string,
@@ -79,12 +92,14 @@ export function deleteCookie(
 ): void {
   setCookie(name, "", {
     ...options,
-    expires: -1,
+    expires: -1, // Set expiration to past date
   });
 }
 
 /**
  * Check if a cookie exists
+ * @param name Cookie name
+ * @returns true if cookie exists, false otherwise
  */
 export function hasCookie(name: string): boolean {
   return getCookie(name) !== null;
