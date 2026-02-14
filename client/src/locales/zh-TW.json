@@ -55,6 +55,32 @@
       "popular": "熱門項目"
     }
   },
+  "onboarding": {
+    "skip": "跳過",
+    "next": "下一步",
+    "prev": "上一步",
+    "finish": "知道了！",
+    "guest": {
+      "signIn": {
+        "title": "登入或註冊",
+        "description": "點擊這裡登入您的帳戶或創建新帳戶，開始借閱和分享物品！"
+      },
+      "news": {
+        "title": "查看我們的新聞",
+        "description": "了解社區公告、活動，並了解更多關於我們圖書館運作方式的資訊。"
+      }
+    },
+    "user": {
+      "browseItems": {
+        "title": "瀏覽可用物品",
+        "description": "點擊這裡查看所有可用物品。找到喜歡的物品後，可以申請借閱！"
+      },
+      "addItem": {
+        "title": "分享您的物品",
+        "description": "有東西想分享？點擊這裡將您的物品添加到社區圖書館，供他人借閱。"
+      }
+    }
+  },
   "common": {
     "name": "名稱",
     "tags": "標籤",

@@ -68,6 +68,32 @@
       "popular": "Popular Items"
     }
   },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "prev": "Back",
+    "finish": "Got it!",
+    "guest": {
+      "signIn": {
+        "title": "Sign In or Sign Up",
+        "description": "Click here to sign in to your account or create a new one to start borrowing and sharing items!"
+      },
+      "news": {
+        "title": "Check Out Our News",
+        "description": "Stay updated with community announcements, events, and learn more about how our library works."
+      }
+    },
+    "user": {
+      "browseItems": {
+        "title": "Browse Available Items",
+        "description": "Click here to see all available items. Find something you like and request to borrow it!"
+      },
+      "addItem": {
+        "title": "Share Your Items",
+        "description": "Have something to share? Click here to add your items to the community library for others to borrow."
+      }
+    }
+  },
   "common": {
     "name": "Name",
     "tags": "Tags",

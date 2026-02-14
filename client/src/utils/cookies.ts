@@ -37,6 +37,7 @@ export function setCookie(
     cookieString += `; expires=${expiresDate.toUTCString()}`;
   }
 
+  cookieString += `; path=${options.path || "/"}`;
   if (options.path) {
     cookieString += `; path=${options.path}`;
   } else {
