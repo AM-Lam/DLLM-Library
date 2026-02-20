@@ -82,6 +82,7 @@ export type Item = {
   holderId?: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   images?: Maybe<Array<Scalars['String']['output']>>;
+  isbn?: Maybe<Scalars['String']['output']>;
   language: Language;
   location?: Maybe<Location>;
   name: Scalars['String']['output'];
@@ -182,6 +183,7 @@ export type Mutation = {
   approveTransaction: Transaction;
   cancelTransaction: Scalars['Boolean']['output'];
   createItem: Item;
+  createItemsFromJSON: Array<Item>;
   createNewsPost: NewsPost;
   createQuickTransaction: Transaction;
   createTransaction: Transaction;
@@ -234,10 +236,17 @@ export type MutationCreateItemArgs = {
   deposit?: Scalars['Int']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   images?: InputMaybe<Array<Scalars['String']['input']>>;
+  isbn?: InputMaybe<Scalars['String']['input']>;
   language: Language;
   name: Scalars['String']['input'];
   publishedYear?: InputMaybe<Scalars['Int']['input']>;
   status: ItemStatus;
+};
+
+
+export type MutationCreateItemsFromJsonArgs = {
+  bookJson?: InputMaybe<Array<Scalars['String']['input']>>;
+  deposit?: Scalars['Int']['input'];
 };
 
 
@@ -345,6 +354,7 @@ export type MutationUpdateItemArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   images?: InputMaybe<Array<Scalars['String']['input']>>;
+  isbn?: InputMaybe<Scalars['String']['input']>;
   language?: InputMaybe<Language>;
   name?: InputMaybe<Scalars['String']['input']>;
   publishedYear?: InputMaybe<Scalars['Int']['input']>;
@@ -394,6 +404,7 @@ export type Query = {
   commentsByItemId: ItemCommentsConnection;
   commentsByUserId: ItemCommentsByUserConnection;
   defaultCategories: Array<Scalars['String']['output']>;
+  duplicateTitlesByUser: Array<Scalars['String']['output']>;
   exchangePoints: Array<User>;
   exchangePointsCount: Scalars['Int']['output'];
   geocodeAddress?: Maybe<Location>;
@@ -441,6 +452,12 @@ export type QueryCommentsByUserIdArgs = {
   first: Scalars['Int']['input'];
   startAfterDate?: InputMaybe<Scalars['Date']['input']>;
   startAfterId?: InputMaybe<Scalars['ID']['input']>;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryDuplicateTitlesByUserArgs = {
+  names?: InputMaybe<Array<Scalars['String']['input']>>;
   userId: Scalars['ID']['input'];
 };
 
@@ -721,7 +738,7 @@ export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', addres
 export type HostConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type HostConfigQuery = { __typename?: 'Query', hostConfig: { __typename?: 'HostConfig', aboutUsText: string, chatLink: string } };
+export type HostConfigQuery = { __typename?: 'Query', hostConfig: { __typename?: 'HostConfig', aboutUsText: string, chatLink: string, splashScreenImageUrl?: string | null, splashScreenText?: string | null } };
 
 export type RecentItemsWithoutClassificationsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -780,7 +797,7 @@ export type ItemQueryVariables = Exact<{
 }>;
 
 
-export type ItemQuery = { __typename?: 'Query', item?: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, clssfctns?: Array<string> | null, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, holderId?: string | null, deposit?: number | null } | null };
+export type ItemQuery = { __typename?: 'Query', item?: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, clssfctns?: Array<string> | null, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, holderId?: string | null, deposit?: number | null, isbn?: string | null } | null };
 
 export type CreateTransactionMutationVariables = Exact<{
   itemId: Scalars['ID']['input'];
@@ -1039,6 +1056,22 @@ export type GetExchangePointsCountQueryVariables = Exact<{ [key: string]: never;
 
 export type GetExchangePointsCountQuery = { __typename?: 'Query', exchangePointsCount: number };
 
+export type DuplicateTitlesByUserQueryVariables = Exact<{
+  userId: Scalars['ID']['input'];
+  names?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+}>;
+
+
+export type DuplicateTitlesByUserQuery = { __typename?: 'Query', duplicateTitlesByUser: Array<string> };
+
+export type CreateItemsFromJsonMutationVariables = Exact<{
+  bookJson: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  deposit?: Scalars['Int']['input'];
+}>;
+
+
+export type CreateItemsFromJsonMutation = { __typename?: 'Mutation', createItemsFromJSON: Array<{ __typename?: 'Item', id: string, name: string }> };
+
 export type RecentCategoriesQueryVariables = Exact<{
   limit: Scalars['Int']['input'];
 }>;
@@ -1104,14 +1137,14 @@ export type RecentAddedItemsQuery = { __typename?: 'Query', recentAddedItems: Ar
 export type GetHostConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetHostConfigQuery = { __typename?: 'Query', hostConfig: { __typename?: 'HostConfig', chatLink: string, aboutUsText: string } };
+export type GetHostConfigQuery = { __typename?: 'Query', hostConfig: { __typename?: 'HostConfig', chatLink: string, aboutUsText: string, splashScreenImageUrl?: string | null, splashScreenText?: string | null } };
 
 export type UpdateHostConfigMutationVariables = Exact<{
   input: HostConfigInput;
 }>;
 
 
-export type UpdateHostConfigMutation = { __typename?: 'Mutation', updateHostConfig: { __typename?: 'HostConfig', chatLink: string, aboutUsText: string } };
+export type UpdateHostConfigMutation = { __typename?: 'Mutation', updateHostConfig: { __typename?: 'HostConfig', chatLink: string, aboutUsText: string, splashScreenImageUrl?: string | null, splashScreenText?: string | null } };
 
 export type GetOnLoanItemsByOwnerQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -1202,6 +1235,8 @@ export const HostConfigDocument = gql`
   hostConfig {
     aboutUsText
     chatLink
+    splashScreenImageUrl
+    splashScreenText
   }
 }
     `;
@@ -1534,6 +1569,7 @@ export const ItemDocument = gql`
     ownerId
     holderId
     deposit
+    isbn
   }
 }
     `;
@@ -3046,6 +3082,80 @@ export type GetExchangePointsCountQueryHookResult = ReturnType<typeof useGetExch
 export type GetExchangePointsCountLazyQueryHookResult = ReturnType<typeof useGetExchangePointsCountLazyQuery>;
 export type GetExchangePointsCountSuspenseQueryHookResult = ReturnType<typeof useGetExchangePointsCountSuspenseQuery>;
 export type GetExchangePointsCountQueryResult = Apollo.QueryResult<GetExchangePointsCountQuery, GetExchangePointsCountQueryVariables>;
+export const DuplicateTitlesByUserDocument = gql`
+    query DuplicateTitlesByUser($userId: ID!, $names: [String!]) {
+  duplicateTitlesByUser(userId: $userId, names: $names)
+}
+    `;
+
+/**
+ * __useDuplicateTitlesByUserQuery__
+ *
+ * To run a query within a React component, call `useDuplicateTitlesByUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDuplicateTitlesByUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDuplicateTitlesByUserQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      names: // value for 'names'
+ *   },
+ * });
+ */
+export function useDuplicateTitlesByUserQuery(baseOptions: Apollo.QueryHookOptions<DuplicateTitlesByUserQuery, DuplicateTitlesByUserQueryVariables> & ({ variables: DuplicateTitlesByUserQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DuplicateTitlesByUserQuery, DuplicateTitlesByUserQueryVariables>(DuplicateTitlesByUserDocument, options);
+      }
+export function useDuplicateTitlesByUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DuplicateTitlesByUserQuery, DuplicateTitlesByUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DuplicateTitlesByUserQuery, DuplicateTitlesByUserQueryVariables>(DuplicateTitlesByUserDocument, options);
+        }
+export function useDuplicateTitlesByUserSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DuplicateTitlesByUserQuery, DuplicateTitlesByUserQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DuplicateTitlesByUserQuery, DuplicateTitlesByUserQueryVariables>(DuplicateTitlesByUserDocument, options);
+        }
+export type DuplicateTitlesByUserQueryHookResult = ReturnType<typeof useDuplicateTitlesByUserQuery>;
+export type DuplicateTitlesByUserLazyQueryHookResult = ReturnType<typeof useDuplicateTitlesByUserLazyQuery>;
+export type DuplicateTitlesByUserSuspenseQueryHookResult = ReturnType<typeof useDuplicateTitlesByUserSuspenseQuery>;
+export type DuplicateTitlesByUserQueryResult = Apollo.QueryResult<DuplicateTitlesByUserQuery, DuplicateTitlesByUserQueryVariables>;
+export const CreateItemsFromJsonDocument = gql`
+    mutation CreateItemsFromJSON($bookJson: [String!]!, $deposit: Int! = 0) {
+  createItemsFromJSON(bookJson: $bookJson, deposit: $deposit) {
+    id
+    name
+  }
+}
+    `;
+export type CreateItemsFromJsonMutationFn = Apollo.MutationFunction<CreateItemsFromJsonMutation, CreateItemsFromJsonMutationVariables>;
+
+/**
+ * __useCreateItemsFromJsonMutation__
+ *
+ * To run a mutation, you first call `useCreateItemsFromJsonMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateItemsFromJsonMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createItemsFromJsonMutation, { data, loading, error }] = useCreateItemsFromJsonMutation({
+ *   variables: {
+ *      bookJson: // value for 'bookJson'
+ *      deposit: // value for 'deposit'
+ *   },
+ * });
+ */
+export function useCreateItemsFromJsonMutation(baseOptions?: Apollo.MutationHookOptions<CreateItemsFromJsonMutation, CreateItemsFromJsonMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateItemsFromJsonMutation, CreateItemsFromJsonMutationVariables>(CreateItemsFromJsonDocument, options);
+      }
+export type CreateItemsFromJsonMutationHookResult = ReturnType<typeof useCreateItemsFromJsonMutation>;
+export type CreateItemsFromJsonMutationResult = Apollo.MutationResult<CreateItemsFromJsonMutation>;
+export type CreateItemsFromJsonMutationOptions = Apollo.BaseMutationOptions<CreateItemsFromJsonMutation, CreateItemsFromJsonMutationVariables>;
 export const RecentCategoriesDocument = gql`
     query RecentCategories($limit: Int!) {
   recentUpdateCategories(limit: $limit)
@@ -3388,6 +3498,8 @@ export const GetHostConfigDocument = gql`
   hostConfig {
     chatLink
     aboutUsText
+    splashScreenImageUrl
+    splashScreenText
   }
 }
     `;
@@ -3428,6 +3540,8 @@ export const UpdateHostConfigDocument = gql`
   updateHostConfig(input: $input) {
     chatLink
     aboutUsText
+    splashScreenImageUrl
+    splashScreenText
   }
 }
     `;
