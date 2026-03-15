@@ -143,7 +143,8 @@ interface CategoryTreeNode {
 }
 
 const ITEMS_PER_PAGE = 12;
-const SEARCH_RADIUS_KM = 30;
+const SEARCH_RADIUS_OPTIONS = [1, 5, 10, 25, 50];
+const DEFAULT_SEARCH_RADIUS_KM = 10;
 
 type FilterType = "none" | "keyword" | "category" | "classification";
 
@@ -168,6 +169,9 @@ const ItemAllPage: React.FC = () => {
     useState<string>(categoryFromUrl);
   const [categoryInput, setCategoryInput] = useState<string>(categoryFromUrl);
   const [keyword, setKeyword] = useState<string>("");
+  const [searchRadiusKm, setSearchRadiusKm] = useState<number>(
+    DEFAULT_SEARCH_RADIUS_KM,
+  );
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [locationError, setLocationError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
@@ -223,7 +227,7 @@ const ItemAllPage: React.FC = () => {
       location && hasSearched && activeFilterType !== "none"
         ? {
             ...location,
-            radiusKm: SEARCH_RADIUS_KM,
+            radiusKm: searchRadiusKm,
             classifications:
               activeFilterType === "classification" &&
               selectedClassification.length > 0
@@ -251,7 +255,7 @@ const ItemAllPage: React.FC = () => {
       location && hasSearched && activeFilterType !== "none"
         ? {
             ...location,
-            radiusKm: SEARCH_RADIUS_KM,
+            radiusKm: searchRadiusKm,
             classifications:
               activeFilterType === "classification" &&
               selectedClassification.length > 0
@@ -387,7 +391,7 @@ const ItemAllPage: React.FC = () => {
 
   const handleCategoryChange = (
     _: React.SyntheticEvent,
-    value: string | null
+    value: string | null,
   ) => {
     const newCategory = value || "";
     setCategoryInput(newCategory);
@@ -396,7 +400,7 @@ const ItemAllPage: React.FC = () => {
 
   const handleCategoryInputChange = (
     _: React.SyntheticEvent,
-    value: string
+    value: string,
   ) => {
     setCategoryInput(value);
   };
@@ -415,7 +419,7 @@ const ItemAllPage: React.FC = () => {
 
   // Handle filter type change (radio button)
   const handleFilterTypeChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const newType = event.target.value as FilterType;
     setActiveFilterType(newType);
@@ -522,10 +526,10 @@ const ItemAllPage: React.FC = () => {
           setLocationError(
             t(
               "itemsAll.locationError",
-              "Failed to get your location. Please enable location services and try again."
-            )
+              "Failed to get your location. Please enable location services and try again.",
+            ),
           );
-        }
+        },
       );
     }
   };
@@ -559,6 +563,7 @@ const ItemAllPage: React.FC = () => {
     refetchItems,
     location,
     hasSearched,
+    searchRadiusKm,
   ]);
 
   // Check if search can be performed
@@ -583,7 +588,7 @@ const ItemAllPage: React.FC = () => {
               item.location.latitude,
               item.location.longitude,
               location.latitude,
-              location.longitude
+              location.longitude,
             )
           : 0,
     })) || [];
@@ -649,15 +654,34 @@ const ItemAllPage: React.FC = () => {
           )}
 
           {location && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {t(
-                "itemsAll.locationReady",
-                "Location ready. You can now search for items within {{radius}}km.",
-                {
-                  radius: SEARCH_RADIUS_KM,
-                }
-              )}
-            </Alert>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+              <Alert severity="success" sx={{ flex: 1 }}>
+                {t(
+                  "itemsAll.locationReady",
+                  "Location ready. You can now search for items within {{radius}}km.",
+                  {
+                    radius: searchRadiusKm,
+                  },
+                )}
+              </Alert>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>{t("itemsAll.searchRadius", "Radius")}</InputLabel>
+                <Select
+                  value={searchRadiusKm}
+                  label={t("itemsAll.searchRadius", "Radius")}
+                  onChange={(e: SelectChangeEvent<number>) => {
+                    setSearchRadiusKm(Number(e.target.value));
+                    setPage(1);
+                  }}
+                >
+                  {SEARCH_RADIUS_OPTIONS.map((r) => (
+                    <MenuItem key={r} value={r}>
+                      {r} km
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
           )}
         </Box>
 
@@ -671,13 +695,13 @@ const ItemAllPage: React.FC = () => {
                   <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                     {t(
                       "itemsAll.selectFilterType",
-                      "Select Search Filter Type"
+                      "Select Search Filter Type",
                     )}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {t(
                       "itemsAll.filterTypeInfo",
-                      "Choose one filter type to search. Only one filter can be active at a time."
+                      "Choose one filter type to search. Only one filter can be active at a time.",
                     )}
                   </Typography>
                 </FormLabel>
@@ -698,7 +722,7 @@ const ItemAllPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           {t(
                             "itemsAll.keywordFilterDesc",
-                            "Search by title, author, description"
+                            "Search by title, author, description",
                           )}
                         </Typography>
                       </Box>
@@ -715,7 +739,7 @@ const ItemAllPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           {t(
                             "itemsAll.categoryFilterDesc",
-                            "Browse by category"
+                            "Browse by category",
                           )}
                         </Typography>
                       </Box>
@@ -729,13 +753,13 @@ const ItemAllPage: React.FC = () => {
                         <Typography variant="body2">
                           {t(
                             "itemsAll.filterTypeClassification",
-                            "Classification"
+                            "Classification",
                           )}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {t(
                             "itemsAll.classificationFilterDesc",
-                            "Filter by taxonomy path"
+                            "Filter by taxonomy path",
                           )}
                         </Typography>
                       </Box>
@@ -754,7 +778,7 @@ const ItemAllPage: React.FC = () => {
                       label={t("itemsAll.searchKeyword", "Search by keyword")}
                       placeholder={t(
                         "itemsAll.keywordPlaceholder",
-                        "Enter book title, author, or description..."
+                        "Enter book title, author, or description...",
                       )}
                       value={keyword}
                       onChange={handleKeywordChange}
@@ -766,7 +790,7 @@ const ItemAllPage: React.FC = () => {
                       disabled={itemsLoading || totalItemsLoading}
                       helperText={t(
                         "itemsAll.keywordHelper",
-                        "Search by item title, author, or description"
+                        "Search by item title, author, or description",
                       )}
                       InputProps={{
                         endAdornment: keyword && (
@@ -799,11 +823,11 @@ const ItemAllPage: React.FC = () => {
                           label={t("itemsAll.selectCategory", "Category")}
                           placeholder={t(
                             "itemsAll.categoryPlaceholder",
-                            "Type or select category..."
+                            "Type or select category...",
                           )}
                           helperText={t(
                             "itemsAll.categoryHelper",
-                            "Search by a specific category"
+                            "Search by a specific category",
                           )}
                           onKeyPress={(e) => {
                             if (e.key === "Enter" && canSearch) {
@@ -844,7 +868,7 @@ const ItemAllPage: React.FC = () => {
                       <Typography variant="subtitle2" gutterBottom>
                         {t(
                           "itemsAll.filterByClassification",
-                          "Filter by Classification"
+                          "Filter by Classification",
                         )}
                       </Typography>
 
@@ -872,7 +896,7 @@ const ItemAllPage: React.FC = () => {
                               >
                                 {t(
                                   "itemsAll.selectedClassification",
-                                  "Selected Classification:"
+                                  "Selected Classification:",
                                 )}
                               </Typography>
                               <Box sx={{ mt: 1 }}>
@@ -882,8 +906,8 @@ const ItemAllPage: React.FC = () => {
                                       translateCategory(
                                         cat,
                                         configData?.itemConfig?.categoryMaps,
-                                        i18n.language
-                                      )
+                                        i18n.language,
+                                      ),
                                     )
                                     .join(" → ")}
                                   onDelete={handleRemoveClassification}
@@ -907,12 +931,12 @@ const ItemAllPage: React.FC = () => {
                                   onChange={(e: SelectChangeEvent) =>
                                     handleClassificationLevelChange(
                                       level,
-                                      e.target.value
+                                      e.target.value,
                                     )
                                   }
                                   label={`${t(
                                     "classification.level",
-                                    "Level"
+                                    "Level",
                                   )} ${level + 1}`}
                                 >
                                   <MenuItem value="">
@@ -925,7 +949,7 @@ const ItemAllPage: React.FC = () => {
                                       {translateCategory(
                                         option,
                                         configData?.itemConfig?.categoryMaps,
-                                        i18n.language
+                                        i18n.language,
                                       )}
                                     </MenuItem>
                                   ))}
@@ -943,7 +967,7 @@ const ItemAllPage: React.FC = () => {
                               >
                                 {t(
                                   "classification.currentSelection",
-                                  "Current Selection"
+                                  "Current Selection",
                                 )}
                                 :
                               </Typography>
@@ -953,8 +977,8 @@ const ItemAllPage: React.FC = () => {
                                     translateCategory(
                                       cat,
                                       configData?.itemConfig?.categoryMaps,
-                                      i18n.language
-                                    )
+                                      i18n.language,
+                                    ),
                                   )
                                   .join(" → ")}
                               </Typography>
@@ -976,11 +1000,11 @@ const ItemAllPage: React.FC = () => {
                                 {selectedClassification.length > 0
                                   ? t(
                                       "itemsAll.replaceClassificationFilter",
-                                      "Replace Classification Filter"
+                                      "Replace Classification Filter",
                                     )
                                   : t(
                                       "itemsAll.applyClassificationFilter",
-                                      "Apply Classification Filter"
+                                      "Apply Classification Filter",
                                     )}
                               </Button>
                             )}
@@ -997,7 +1021,7 @@ const ItemAllPage: React.FC = () => {
                             >
                               {t(
                                 "itemsAll.clearClassificationFilter",
-                                "Clear Classification Filter"
+                                "Clear Classification Filter",
                               )}
                             </Button>
                           )}
@@ -1068,8 +1092,8 @@ const ItemAllPage: React.FC = () => {
                           translateCategory(
                             cat,
                             configData?.itemConfig?.categoryMaps,
-                            i18n.language
-                          )
+                            i18n.language,
+                          ),
                         )
                         .join(" → ")}
                       size="small"
@@ -1109,12 +1133,16 @@ const ItemAllPage: React.FC = () => {
                 {itemsLoading || totalItemsLoading
                   ? t("common.loading", "Loading...")
                   : totalItemsData?.totalItemsCountByLocation
-                  ? t("itemsAll.resultsFoundTotal", "Found {{count}} item(s)", {
-                      count: totalItemsData.totalItemsCountByLocation,
-                    })
-                  : t("itemsAll.resultsFound", "Found {{count}} item(s)", {
-                      count: itemsWithDistance.length,
-                    })}
+                    ? t(
+                        "itemsAll.resultsFoundTotal",
+                        "Found {{count}} item(s)",
+                        {
+                          count: totalItemsData.totalItemsCountByLocation,
+                        },
+                      )
+                    : t("itemsAll.resultsFound", "Found {{count}} item(s)", {
+                        count: itemsWithDistance.length,
+                      })}
               </Typography>
             </Box>
 
@@ -1187,8 +1215,8 @@ const ItemAllPage: React.FC = () => {
                     "itemsAll.noResults",
                     "No items found matching your search criteria within {{radius}}km.",
                     {
-                      radius: SEARCH_RADIUS_KM,
-                    }
+                      radius: searchRadiusKm,
+                    },
                   )}
                   <Box sx={{ mt: 1 }}>
                     <Typography variant="body2">
@@ -1201,13 +1229,13 @@ const ItemAllPage: React.FC = () => {
                       <li>
                         {t(
                           "itemsAll.searchTip2",
-                          "Selecting a different filter"
+                          "Selecting a different filter",
                         )}
                       </li>
                       <li>
                         {t(
                           "itemsAll.searchTip3",
-                          "Checking for spelling mistakes"
+                          "Checking for spelling mistakes",
                         )}
                       </li>
                     </Typography>
@@ -1224,7 +1252,7 @@ const ItemAllPage: React.FC = () => {
             {t(
               "itemsAll.instructionsSearch",
               "Please select a filter type above to search for items within {{radius}}km of your location.",
-              { radius: SEARCH_RADIUS_KM }
+              { radius: searchRadiusKm },
             )}
           </Alert>
         )}
@@ -1233,7 +1261,7 @@ const ItemAllPage: React.FC = () => {
           <Alert severity="info">
             {t(
               "itemsAll.needLocation",
-              "Please enable location services to search for nearby items."
+              "Please enable location services to search for nearby items.",
             )}
           </Alert>
         )}
