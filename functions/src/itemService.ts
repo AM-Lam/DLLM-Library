@@ -50,8 +50,12 @@ export class ItemService {
     category: string[],
     status?: string | null,
     keyword?: string | null,
+    withGeoHash: boolean = true,
   ): firebase.firestore.Query {
-    let query = db.collection("items").where("geohash", ">=", "");
+    let query: any = db.collection("items");
+    if (withGeoHash) {
+      query = query.where("geohash", ">=", "");
+    }
     if (keyword && keyword.length > 0) {
       query = this.applyKeywordNameFilter(query, keyword);
     } else {
@@ -115,9 +119,13 @@ export class ItemService {
   ): Promise<Item[]> {
     return this._queryWithKeywordPagination(
       (currentOffset) =>
-        this._itemsQuery(classifications, category, status, keyword).offset(
-          currentOffset,
-        ),
+        this._itemsQuery(
+          classifications,
+          category,
+          status,
+          keyword,
+          false,
+        ).offset(currentOffset),
       keyword,
       limit,
       offset,
@@ -129,7 +137,13 @@ export class ItemService {
     status: string,
     keyword: string,
   ): Promise<number> {
-    let query = this._itemsQuery(classifications, category, status, keyword);
+    let query = this._itemsQuery(
+      classifications,
+      category,
+      status,
+      keyword,
+      false,
+    );
     const snapshot = await query.get();
     return snapshot.size;
   }
@@ -192,7 +206,7 @@ export class ItemService {
   ): Promise<Item[]> {
     return this._queryWithKeywordPagination(
       (currentOffset) => {
-        let query = this._itemsQuery([], category, status, keyword);
+        let query = this._itemsQuery([], category, status, keyword, false);
         return query
           .where("ownerId", "==", userId)
           .where("holderId", "!=", null)
@@ -216,7 +230,7 @@ export class ItemService {
   ): Promise<Item[]> {
     return this._queryWithKeywordPagination(
       (currentOffset) => {
-        let query = this._itemsQuery([], category, status, keyword);
+        let query = this._itemsQuery([], category, status, keyword, false);
         return query
           .where("ownerId", "==", userId)
           .where("holderId", "!=", null)
@@ -240,7 +254,7 @@ export class ItemService {
   ): Promise<Item[]> {
     return this._queryWithKeywordPagination(
       (currentOffset) => {
-        let query = this._itemsQuery([], category, status, keyword);
+        let query = this._itemsQuery([], category, status, keyword, false);
         return query
           .where("holderId", "==", userId)
           .orderBy("updated", "desc")
@@ -330,7 +344,7 @@ export class ItemService {
     } else {
       return this._queryWithKeywordPagination(
         (currentOffset) => {
-          let query = this._itemsQuery([], category, status, keyword);
+          let query = this._itemsQuery([], category, status, keyword, false);
           return query
             .where("ownerId", "==", userId)
             .orderBy("updated", "desc")
@@ -384,7 +398,7 @@ export class ItemService {
 
       return items.length;
     } else {
-      let query = this._itemsQuery([], category, status, keyword);
+      let query = this._itemsQuery([], category, status, keyword, false);
       query = query.where("ownerId", "==", userId);
       const snapshot = await query.get();
       console.debug(
@@ -1040,10 +1054,7 @@ export class ItemService {
     const MAX_UPDATE_ITERATIONS = 2;
     let updateTime = 0;
     while (updateTime !== MAX_UPDATE_ITERATIONS) {
-      let query = db
-        .collection("items")
-        .where("ownerId", "==", userId)
-        .where("holderId", "==", null);
+      let query = db.collection("items").where("ownerId", "==", userId);
       if (updateTime === 1) {
         query = db.collection("items").where("holderId", "==", userId);
       }
@@ -1065,7 +1076,9 @@ export class ItemService {
 
       const batch = db.batch();
       itemsSnapshot.docs.forEach((doc) => {
-        batch.update(doc.ref, updateData);
+        if (updateTime === 1 || (doc.exists && !doc.data().holderId)) {
+          batch.update(doc.ref, updateData);
+        }
       });
       await batch.commit();
       console.log(
