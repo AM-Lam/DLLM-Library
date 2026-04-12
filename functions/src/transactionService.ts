@@ -52,6 +52,7 @@ export class TransactionService {
 
   async transactionById(id: string): Promise<Transaction | null> {
     let data = await this._transactionById(id);
+    const user = await this.userService.userById(data.requestorId);
     // check if the transaction is open
     if (
       data.status !== TransactionStatus.Completed &&
@@ -59,7 +60,7 @@ export class TransactionService {
       data.status !== TransactionStatus.Expired
     ) {
       if (data.expired && data.expired.toDate() < new Date()) {
-        const user = await this.userService.userById(data.requestorId);
+        
         if (!user) {
           throw new Error(`User with id ${data.requestorId} not found`);
         }
@@ -68,7 +69,7 @@ export class TransactionService {
       }
     }
 
-    const rv = await this._transactionModeltoTransaction(id, data);
+    const rv = await this._transactionModeltoTransaction(user, id, data);
     return rv;
   }
 
@@ -86,6 +87,8 @@ export class TransactionService {
     userId: string | null,
     statuses: TransactionStatus[]
   ): Promise<Transaction[]> {
+    const user = userId ? await this.userService.userById(userId) : null;
+
     const transactionsMap = await this._transactionsNotStatus(
       itemId,
       userId,
@@ -93,7 +96,7 @@ export class TransactionService {
     );
     const transactions: Transaction[] = [];
     for (const [id, data] of transactionsMap) {
-      const transaction = await this._transactionModeltoTransaction(id, data);
+      const transaction = await this._transactionModeltoTransaction(user, id, data);
       transactions.push(transaction);
     }
     return transactions;
@@ -128,10 +131,11 @@ export class TransactionService {
   }
 
   async _transactionModeltoTransaction(
+    user: User | null,
     id: string,
     data: TransactionModel
   ): Promise<Transaction> {
-    const item = await this.itemService.itemById(data.itemId);
+    const item = await this.itemService.itemById(user, data.itemId);
     if (!item) {
       throw new Error(`Item with id ${data.itemId} not found`);
     }
@@ -169,7 +173,7 @@ export class TransactionService {
     details: string
   ): Promise<Transaction> {
     // Logic to create a transaction
-    const item = await this.itemService.itemById(itemId);
+    const item = await this.itemService.itemById(requestor, itemId);
     if (!item) {
       throw new Error(`Item with id ${itemId} not found`);
     }
@@ -333,7 +337,7 @@ export class TransactionService {
     details: string
   ): Promise<Transaction> {
     // Logic to create a quick transaction
-    const item = await this.itemService.itemById(itemId);
+    const item = await this.itemService.itemById(holder, itemId);
     if (!item) {
       throw new Error(`Item with id ${itemId} not found`);
     }
@@ -386,7 +390,7 @@ export class TransactionService {
       );
     }
     // if the item is not owned by the owner, throw an error
-    const item = await this.itemService.itemById(data.itemId);
+    const item = await this.itemService.itemById(owner, data.itemId);
     if (!item) {
       throw new Error(`Item with id ${data.itemId} not found`);
     }
@@ -433,7 +437,7 @@ export class TransactionService {
     }
     // either owner and requestor can cancel the transaction
     // if the item is not owned by the owner, throw an error
-    const item = await this.itemService.itemById(data.itemId);
+    const item = await this.itemService.itemById(user, data.itemId); // TODO: Edge case, no gurantee the item is visible to user.
     if (!item) {
       throw new Error(`Item with id ${data.itemId} not found`);
     }
@@ -576,7 +580,7 @@ export class TransactionService {
       );
     }
     // check if the item is holder by owner, confirm that the user is the owner or holder
-    const item = await this.itemService.itemById(data.itemId);
+    const item = await this.itemService.itemById(user, data.itemId); // TODO: no gurantee the item is visible to user, need to handle edge case
     if (!item) {
       throw new Error(`Item with id ${data.itemId} not found`);
     }
@@ -638,7 +642,7 @@ export class TransactionService {
     }
 
     // update the item holder to the requestor
-    const item = await this.itemService.itemById(data.itemId);
+    const item = await this.itemService.itemById(receiver, data.itemId); // TODO: no gurantee the item is visible to user, need to handle edge case
     if (!item) {
       throw new Error(`Item with id ${data.itemId} not found`);
     }

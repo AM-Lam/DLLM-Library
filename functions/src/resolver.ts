@@ -235,7 +235,7 @@ export const resolvers: Resolvers = {
     itemsOnLoanByHolder: async (
       _: any,
       { userId, category, status, keyword, limit = 20, offset = 0 }: any,
-      __: any,
+      { loginUser }: Context,
     ): Promise<Item[]> => {
       return itemService.itemsOnLoanByHolder(
         userId,
@@ -246,8 +246,13 @@ export const resolvers: Resolvers = {
         offset,
       );
     },
-    item: async (_: any, { id }: any, __: any): Promise<Item | null> => {
-      return itemService.itemById(id);
+    item: async (
+      _: any, 
+      { id }: any, 
+      { loginUser }: Context,
+    ): Promise<Item | null> => {
+      const user = loginUser ? await userService.userById(loginUser.uid) : null;
+      return itemService.itemById(user, id);
     },
     duplicateTitlesByUser: async (
       _: any,
@@ -290,8 +295,9 @@ export const resolvers: Resolvers = {
     newsRecentPosts: async (
       _: any,
       { keyword, tags = [], limit = 10, offset = 0 }: any,
-      __: any,
+      { loginUser }: Context,
     ): Promise<NewsPost[]> => {
+      const user = loginUser ? await userService.userById(loginUser.uid) : null;
       return newsService.RecentNews(keyword, tags, limit, offset);
     },
     geocodeAddress: async (
@@ -375,9 +381,10 @@ export const resolvers: Resolvers = {
     recommendedItems: async (
       _: any,
       { type, category, limit = 10 }: any,
-      __: any,
+      { loginUser }: Context,
     ): Promise<Item[]> => {
-      return recommendService.recommendationItems(type, category, limit);
+      const user = loginUser ? await userService.userModelById(loginUser.uid) : null;
+      return recommendService.recommendationItems(user, type, category, limit);
     },
     commentsByItemId: async (
       _: any,
@@ -417,16 +424,19 @@ export const resolvers: Resolvers = {
     recentItemsWithoutClassifications: async (
       _: any,
       { limit = 20 }: any,
-      __: any,
+      { loginUser }: Context
     ): Promise<Item[]> => {
-      return itemService.recentItemsWithoutClassifications(limit, 0);
+      const user = loginUser ? await userService.userById(loginUser.uid) : null;
+      return itemService.recentItemsWithoutClassifications(limit, 0, user);
     },
     itemsByKeywordExperimental: async (
       _: any,
       { keyword = "" }: any,
-      __: any,
+      { loginUser }: Context,
     ): Promise<Item[]> => {
-      return itemService.itemsByKeywordExperimental(keyword);
+
+      const user = loginUser ? await userService.userById(loginUser.uid) : null;
+      return itemService.itemsByKeywordExperimental(keyword, user);
     },
     binder: async (_: any, { id }: any, __: any): Promise<Binder | null> => {
       return binderService.binder(id);

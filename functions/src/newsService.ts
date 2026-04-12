@@ -76,6 +76,7 @@ export class NewsService {
     if (newsModel.relatedItemIds && newsModel.relatedItemIds.length > 0) {
       // get related items by id
       const relatedItems = await this.itemService.itemsByIds(
+        null, // TODO: is this correct ?
         newsModel.relatedItemIds
       );
       rv.relatedItems = relatedItems;

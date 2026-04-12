@@ -3,6 +3,7 @@ import { RecommendationType, Item } from "./generated/graphql";
 import firebase from "firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
 import { ItemService } from "./itemService";
+import { UserModel } from "./userService";
 
 type RecommendModel = {
   updated: Timestamp;
@@ -48,6 +49,7 @@ export class RecommendService {
   }
 
   async recommendationItems(
+    userModel: UserModel | null,
     recommendationType: RecommendationType,
     category: string | null,
     offset: number = 0,
@@ -82,7 +84,7 @@ export class RecommendService {
       const data = doc.data() as RecommendModel;
       itemIds.push(data.itemId);
     });
-    const items = await this.itemService.itemsByIds(itemIds);
+    const items = await this.itemService.itemsByIds(userModel, itemIds);
     return items;
   }
 }
