@@ -18,7 +18,10 @@ import { Timestamp } from "firebase-admin/firestore";
 import { generateThumbnail, ThumbnailConfig } from "./utils/imageUtils";
 import sharp from "sharp";
 import axios from "axios";
-import { DEFAULT_CONTENT_RATING, CONTENT_RATING_CENSOR_THRESHOLD } from "./contentRatingDefaults";
+import {
+  DEFAULT_CONTENT_RATING,
+  CONTENT_RATING_CENSOR_THRESHOLD,
+} from "./contentRatingDefaults";
 import { UserModel } from "./userService";
 
 type ItemModel = Omit<Item, "id" | "createdAt" | "updatedAt"> & {
@@ -94,7 +97,7 @@ export class ItemService {
       await Promise.all(
         snapshot.docs.map(async (doc) => {
           const item = await this._itemQueryToItem(doc, loggedInUser);
-          if ( item != null){
+          if (item != null) {
             batchResults.push(item);
           }
         }),
@@ -178,7 +181,7 @@ export class ItemService {
     await Promise.all(
       (await items).map(async (item) => {
         const rv = await this._itemModelToItem(item, loggedInUser);
-        if ( rv != null ){
+        if (rv != null) {
           filteredItems.push(rv);
         }
       }),
@@ -295,7 +298,7 @@ export class ItemService {
 
   async itemById(
     loggedInUser: User | UserModel | null,
-    itemId: string
+    itemId: string,
   ): Promise<Item | null> {
     const data = await this.itemModelById(itemId);
     if (!data) return null;
@@ -306,7 +309,7 @@ export class ItemService {
   // this function should be limited to internal use only
   async itemsByIds(
     loggedInUser: User | UserModel | null,
-    itemIds: string[]
+    itemIds: string[],
   ): Promise<Item[]> {
     if (!itemIds || itemIds.length === 0) {
       return [];
@@ -328,7 +331,7 @@ export class ItemService {
         await Promise.all(
           snapshot.docs.map(async (doc) => {
             const item = await this._itemQueryToItem(doc, loggedInUser);
-            if ( item != null ){
+            if (item != null) {
               results.push(item);
             }
           }),
@@ -485,7 +488,10 @@ export class ItemService {
     return duplicateTitles;
   }
 
-  async itemCategoriesByUser(loggedInUser: User | UserModel | null, userId: string) {
+  async itemCategoriesByUser(
+    loggedInUser: User | UserModel | null,
+    userId: string,
+  ) {
     // Assuming that we do not have anyone with large number of entries
     let items: Item[] = [];
     // Fetch all items by user by batch
@@ -526,14 +532,13 @@ export class ItemService {
       firebase.firestore.DocumentData
     >,
     user: User | UserModel | null,
-  ): Promise<Item|null> {
+  ): Promise<Item | null> {
     const itemId = query.id;
     const data = query.data();
     data.id = itemId;
     const item: Item | null = await this._itemModelToItem(data, user);
     return item;
   }
-
 
   /*
    * This funcction assumes censor info is already present in the item data.
@@ -543,20 +548,27 @@ export class ItemService {
    * - Allow admin to view all books so that they can change/verfiy content rating.
    * - Hide items above or at censor threshold if content rating is not checked by admin.
    * - Always hide items with content rating above user threshold.
-  */
-  shouldCensorItem(item: Item | ItemModel, user: User | UserModel | null): boolean {
-
-    if (user != null && item.ownerId === user.id) {
+   */
+  shouldCensorItem(
+    item: Item | ItemModel,
+    user: User | UserModel | null,
+  ): boolean {
+    if (
+      user != null &&
+      (item.ownerId === user.id || user.role === Role.Admin)
+    ) {
       return false;
     }
-    if (user != null &&user.role === Role.Admin) {
-      return false;
-    }
-    if (item.contentRating >= CONTENT_RATING_CENSOR_THRESHOLD && !item.contentRatingChecked) {
+    if (
+      item.contentRating >= CONTENT_RATING_CENSOR_THRESHOLD &&
+      !item.contentRatingChecked
+    ) {
       return true;
     }
 
-    let userContentRatingThreshold = user ? user.visibleContentRating : DEFAULT_CONTENT_RATING;
+    let userContentRatingThreshold = user
+      ? user.visibleContentRating
+      : DEFAULT_CONTENT_RATING;
 
     if (item.contentRating > userContentRatingThreshold) {
       return true;
@@ -572,17 +584,16 @@ export class ItemService {
     const itemId = docData.id;
     const data = docData as ItemModel;
 
-
     /*
      * Implement censor function here as failsafe since all DB data need to go through here
      * before returning to GUI. Make sure we don't omit filtering for any API call.
      */
-    if ( data.contentRating === undefined || data.contentRating === null) {
+    if (data.contentRating === undefined || data.contentRating === null) {
       data.contentRating = DEFAULT_CONTENT_RATING; // default content rating if not set
       data.contentRatingChecked = false;
     }
 
-    if ( this.shouldCensorItem(data, user) ) {
+    if (this.shouldCensorItem(data, user)) {
       return null;
     }
 
@@ -1268,7 +1279,7 @@ export class ItemService {
     await Promise.all(
       snapshot.docs.map(async (doc) => {
         const rv = await this._itemQueryToItem(doc, loggedInUser);
-        if (rv != null){
+        if (rv != null) {
           items.push(rv);
         }
       }),
@@ -1279,7 +1290,7 @@ export class ItemService {
   async recentItemsWithoutClassifications(
     limit: number = 20,
     offset: number = 0,
-    user : User | UserModel | null = null,
+    user: User | UserModel | null = null,
   ): Promise<Item[]> {
     // for the eariest items with classifications
     let query = db
@@ -1314,7 +1325,7 @@ export class ItemService {
         const data = doc.data() as ItemModel;
         if (data.clssfctns === undefined || data.clssfctns === null) {
           const rv = await this._itemQueryToItem(doc, user);
-          if (rv != null){
+          if (rv != null) {
             items.push(rv);
           }
         }
@@ -1646,7 +1657,10 @@ export class ItemService {
    * Stub for experimental keyword search used by resolver.itemsByKeywordExperimental.
    * Returns empty array for now. Will later use nameIndex / tokenizeName for search.
    */
-  async itemsByKeywordExperimental(keyword: string = "", user: User | UserModel | null): Promise<Item[]> {
+  async itemsByKeywordExperimental(
+    keyword: string = "",
+    user: User | UserModel | null,
+  ): Promise<Item[]> {
     if (!keyword || keyword.trim() === "") return [];
 
     // Tokenize and normalize to lowercase for matching
@@ -1683,7 +1697,7 @@ export class ItemService {
       const hasAll = tokens.every((t) => idx.includes(t));
       if (hasAll) {
         const item = await this._itemQueryToItem(doc, user);
-        if ( item != null ){
+        if (item != null) {
           results.push(item);
         }
       }
