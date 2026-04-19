@@ -323,7 +323,7 @@ export const ShareTransactionDialog: React.FC<ShareTransactionDialogProps> = ({
           sx={{ width: "100%" }}
         >
           {t(
-            "transactions.linkCopied",
+            "transactions.messageAndLinkCopied",
             "Link and summary copied to clipboard!",
           )}
         </Alert>
