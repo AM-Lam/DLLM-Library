@@ -115,6 +115,8 @@ export type Item = {
   category: Array<Scalars['String']['output']>;
   clssfctns?: Maybe<Array<Scalars['String']['output']>>;
   condition: ItemCondition;
+  contentRating: Scalars['Int']['output'];
+  contentRatingChecked: Scalars['Boolean']['output'];
   createdAt: Scalars['Date']['output'];
   deposit?: Maybe<Scalars['Int']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -284,6 +286,7 @@ export type MutationCancelTransactionArgs = {
 export type MutationCreateItemArgs = {
   category: Array<Scalars['String']['input']>;
   condition: ItemCondition;
+  contentRating?: InputMaybe<Scalars['Int']['input']>;
   deposit?: Scalars['Int']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   images?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -328,6 +331,7 @@ export type MutationCreateUserArgs = {
   address?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
   nickname?: InputMaybe<Scalars['String']['input']>;
+  visibleContentRating?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -423,6 +427,8 @@ export type MutationUpdateItemArgs = {
   category?: InputMaybe<Array<Scalars['String']['input']>>;
   classifications?: InputMaybe<Array<Scalars['String']['input']>>;
   condition?: InputMaybe<ItemCondition>;
+  contentRating?: InputMaybe<Scalars['Int']['input']>;
+  contentRatingChecked?: InputMaybe<Scalars['Boolean']['input']>;
   deposit?: InputMaybe<Scalars['Int']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
@@ -450,6 +456,7 @@ export type MutationUpdateUserArgs = {
   contactMethods?: InputMaybe<Array<ContactMethodInput>>;
   exchangePoints?: InputMaybe<Array<Scalars['String']['input']>>;
   nickname?: InputMaybe<Scalars['String']['input']>;
+  visibleContentRating?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -819,12 +826,13 @@ export type User = {
   nickname?: Maybe<Scalars['String']['output']>;
   pinItems?: Maybe<Array<Item>>;
   role: Role;
+  visibleContentRating: Scalars['Int']['output'];
 };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', address?: string | null, createdAt: any, email: string, id: string, isVerified: boolean, isActive: boolean, role: Role, exchangePoints?: Array<string> | null, nickname?: string | null, location?: { __typename?: 'Location', latitude: number, longitude: number } | null } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', address?: string | null, createdAt: any, email: string, id: string, isVerified: boolean, isActive: boolean, role: Role, exchangePoints?: Array<string> | null, nickname?: string | null, visibleContentRating: number, location?: { __typename?: 'Location', latitude: number, longitude: number } | null } | null };
 
 export type HostConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -902,6 +910,21 @@ export type AddCategoryTreeMutationVariables = Exact<{
 
 export type AddCategoryTreeMutation = { __typename?: 'Mutation', addCategoryTree: string };
 
+export type PendingContentRatingItemsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type PendingContentRatingItemsQuery = { __typename?: 'Query', recentItemsWithoutClassifications?: Array<{ __typename?: 'Item', id: string, name: string, category: Array<string>, condition: ItemCondition, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, contentRating: number, contentRatingChecked: boolean, ownerId: string }> | null };
+
+export type ApproveContentRatingMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  contentRatingChecked?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type ApproveContentRatingMutation = { __typename?: 'Mutation', updateItem: { __typename?: 'Item', id: string, contentRating: number, contentRatingChecked: boolean } };
+
 export type AddItemCommentMutationVariables = Exact<{
   itemId: Scalars['ID']['input'];
   content: Scalars['String']['input'];
@@ -923,7 +946,15 @@ export type ItemQueryVariables = Exact<{
 }>;
 
 
-export type ItemQuery = { __typename?: 'Query', item?: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, clssfctns?: Array<string> | null, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, holderId?: string | null, deposit?: number | null, isbn?: string | null } | null };
+export type ItemQuery = { __typename?: 'Query', item?: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, clssfctns?: Array<string> | null, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, holderId?: string | null, deposit?: number | null, isbn?: string | null, contentRating: number, contentRatingChecked: boolean } | null };
+
+export type UpdateItemCheckedMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  contentRatingChecked?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type UpdateItemCheckedMutation = { __typename?: 'Mutation', updateItem: { __typename?: 'Item', id: string, contentRating: number, contentRatingChecked: boolean } };
 
 export type CreateTransactionMutationVariables = Exact<{
   itemId: Scalars['ID']['input'];
@@ -988,10 +1019,11 @@ export type CreateItemMutationVariables = Exact<{
   publishedYear?: InputMaybe<Scalars['Int']['input']>;
   status: ItemStatus;
   deposit?: InputMaybe<Scalars['Int']['input']>;
+  contentRating?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type CreateItemMutation = { __typename?: 'Mutation', createItem: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, status: ItemStatus, images?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, updatedAt: any, deposit?: number | null } };
+export type CreateItemMutation = { __typename?: 'Mutation', createItem: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, status: ItemStatus, images?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, updatedAt: any, deposit?: number | null, contentRating: number, contentRatingChecked: boolean } };
 
 export type UpdateItemMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1005,10 +1037,12 @@ export type UpdateItemMutationVariables = Exact<{
   publishedYear?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<ItemStatus>;
   deposit?: InputMaybe<Scalars['Int']['input']>;
+  contentRating?: InputMaybe<Scalars['Int']['input']>;
+  contentRatingChecked?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
-export type UpdateItemMutation = { __typename?: 'Mutation', updateItem: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, status: ItemStatus, images?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, updatedAt: any, deposit?: number | null } };
+export type UpdateItemMutation = { __typename?: 'Mutation', updateItem: { __typename?: 'Item', id: string, name: string, description?: string | null, condition: ItemCondition, category: Array<string>, status: ItemStatus, images?: Array<string> | null, publishedYear?: number | null, language: Language, createdAt: any, ownerId: string, updatedAt: any, deposit?: number | null, contentRating: number, contentRatingChecked: boolean } };
 
 export type GetUserOpenTransactionsForCountQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -1146,17 +1180,18 @@ export type UserQueryVariables = Exact<{
 }>;
 
 
-export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', createdAt: any, email: string, id: string, nickname?: string | null, address?: string | null, isVerified: boolean, isActive: boolean, role: Role, exchangePoints?: Array<string> | null, itemCategory?: Array<{ __typename?: 'Category', category: string, count: number }> | null, contactMethods?: Array<{ __typename?: 'ContactMethod', type: ContactMethodType, value: string, isPublic: boolean }> | null, location?: { __typename?: 'Location', latitude: number, longitude: number } | null, pinItems?: Array<{ __typename?: 'Item', id: string, name: string, condition: ItemCondition, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, category: Array<string>, location?: { __typename?: 'Location', latitude: number, longitude: number } | null }> | null } | null };
+export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', createdAt: any, email: string, id: string, nickname?: string | null, address?: string | null, isVerified: boolean, isActive: boolean, role: Role, exchangePoints?: Array<string> | null, visibleContentRating: number, itemCategory?: Array<{ __typename?: 'Category', category: string, count: number }> | null, contactMethods?: Array<{ __typename?: 'ContactMethod', type: ContactMethodType, value: string, isPublic: boolean }> | null, location?: { __typename?: 'Location', latitude: number, longitude: number } | null, pinItems?: Array<{ __typename?: 'Item', id: string, name: string, condition: ItemCondition, status: ItemStatus, images?: Array<string> | null, thumbnails?: Array<string> | null, category: Array<string>, location?: { __typename?: 'Location', latitude: number, longitude: number } | null }> | null } | null };
 
 export type UpdateUserMutationVariables = Exact<{
   address?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;
   exchangePoints?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
   contactMethods?: InputMaybe<Array<ContactMethodInput> | ContactMethodInput>;
+  visibleContentRating?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, address?: string | null, nickname?: string | null, createdAt: any, isVerified: boolean, isActive: boolean, exchangePoints?: Array<string> | null, location?: { __typename?: 'Location', latitude: number, longitude: number, geohash?: string | null } | null, contactMethods?: Array<{ __typename?: 'ContactMethod', type: ContactMethodType, value: string, isPublic: boolean }> | null } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, address?: string | null, nickname?: string | null, createdAt: any, isVerified: boolean, isActive: boolean, exchangePoints?: Array<string> | null, visibleContentRating: number, location?: { __typename?: 'Location', latitude: number, longitude: number, geohash?: string | null } | null, contactMethods?: Array<{ __typename?: 'ContactMethod', type: ContactMethodType, value: string, isPublic: boolean }> | null } };
 
 export type GetExchangePointsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -1170,10 +1205,11 @@ export type CreateUserMutationVariables = Exact<{
   email: Scalars['String']['input'];
   address?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;
+  visibleContentRating?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, email: string, address?: string | null, nickname?: string | null, createdAt: any, isVerified: boolean, isActive: boolean, location?: { __typename?: 'Location', latitude: number, longitude: number, geohash?: string | null } | null } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, email: string, address?: string | null, nickname?: string | null, createdAt: any, isVerified: boolean, isActive: boolean, visibleContentRating: number, location?: { __typename?: 'Location', latitude: number, longitude: number, geohash?: string | null } | null } };
 
 export type GetOnLoanItemsByHolderQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -1331,6 +1367,7 @@ export const MeDocument = gql`
     role
     exchangePoints
     nickname
+    visibleContentRating
     location {
       latitude
       longitude
@@ -1831,6 +1868,94 @@ export function useAddCategoryTreeMutation(baseOptions?: Apollo.MutationHookOpti
 export type AddCategoryTreeMutationHookResult = ReturnType<typeof useAddCategoryTreeMutation>;
 export type AddCategoryTreeMutationResult = Apollo.MutationResult<AddCategoryTreeMutation>;
 export type AddCategoryTreeMutationOptions = Apollo.BaseMutationOptions<AddCategoryTreeMutation, AddCategoryTreeMutationVariables>;
+export const PendingContentRatingItemsDocument = gql`
+    query PendingContentRatingItems($limit: Int) {
+  recentItemsWithoutClassifications(limit: $limit) {
+    id
+    name
+    category
+    condition
+    status
+    images
+    thumbnails
+    contentRating
+    contentRatingChecked
+    ownerId
+  }
+}
+    `;
+
+/**
+ * __usePendingContentRatingItemsQuery__
+ *
+ * To run a query within a React component, call `usePendingContentRatingItemsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePendingContentRatingItemsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePendingContentRatingItemsQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function usePendingContentRatingItemsQuery(baseOptions?: Apollo.QueryHookOptions<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>(PendingContentRatingItemsDocument, options);
+      }
+export function usePendingContentRatingItemsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>(PendingContentRatingItemsDocument, options);
+        }
+// @ts-ignore
+export function usePendingContentRatingItemsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>): Apollo.UseSuspenseQueryResult<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>;
+export function usePendingContentRatingItemsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>): Apollo.UseSuspenseQueryResult<PendingContentRatingItemsQuery | undefined, PendingContentRatingItemsQueryVariables>;
+export function usePendingContentRatingItemsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>(PendingContentRatingItemsDocument, options);
+        }
+export type PendingContentRatingItemsQueryHookResult = ReturnType<typeof usePendingContentRatingItemsQuery>;
+export type PendingContentRatingItemsLazyQueryHookResult = ReturnType<typeof usePendingContentRatingItemsLazyQuery>;
+export type PendingContentRatingItemsSuspenseQueryHookResult = ReturnType<typeof usePendingContentRatingItemsSuspenseQuery>;
+export type PendingContentRatingItemsQueryResult = Apollo.QueryResult<PendingContentRatingItemsQuery, PendingContentRatingItemsQueryVariables>;
+export const ApproveContentRatingDocument = gql`
+    mutation ApproveContentRating($id: ID!, $contentRatingChecked: Boolean) {
+  updateItem(id: $id, contentRatingChecked: $contentRatingChecked) {
+    id
+    contentRating
+    contentRatingChecked
+  }
+}
+    `;
+export type ApproveContentRatingMutationFn = Apollo.MutationFunction<ApproveContentRatingMutation, ApproveContentRatingMutationVariables>;
+
+/**
+ * __useApproveContentRatingMutation__
+ *
+ * To run a mutation, you first call `useApproveContentRatingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApproveContentRatingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [approveContentRatingMutation, { data, loading, error }] = useApproveContentRatingMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      contentRatingChecked: // value for 'contentRatingChecked'
+ *   },
+ * });
+ */
+export function useApproveContentRatingMutation(baseOptions?: Apollo.MutationHookOptions<ApproveContentRatingMutation, ApproveContentRatingMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ApproveContentRatingMutation, ApproveContentRatingMutationVariables>(ApproveContentRatingDocument, options);
+      }
+export type ApproveContentRatingMutationHookResult = ReturnType<typeof useApproveContentRatingMutation>;
+export type ApproveContentRatingMutationResult = Apollo.MutationResult<ApproveContentRatingMutation>;
+export type ApproveContentRatingMutationOptions = Apollo.BaseMutationOptions<ApproveContentRatingMutation, ApproveContentRatingMutationVariables>;
 export const AddItemCommentDocument = gql`
     mutation AddItemComment($itemId: ID!, $content: String!) {
   addItemComment(itemId: $itemId, content: $content)
@@ -1936,6 +2061,8 @@ export const ItemDocument = gql`
     holderId
     deposit
     isbn
+    contentRating
+    contentRatingChecked
   }
 }
     `;
@@ -1975,6 +2102,42 @@ export type ItemQueryHookResult = ReturnType<typeof useItemQuery>;
 export type ItemLazyQueryHookResult = ReturnType<typeof useItemLazyQuery>;
 export type ItemSuspenseQueryHookResult = ReturnType<typeof useItemSuspenseQuery>;
 export type ItemQueryResult = Apollo.QueryResult<ItemQuery, ItemQueryVariables>;
+export const UpdateItemCheckedDocument = gql`
+    mutation UpdateItemChecked($id: ID!, $contentRatingChecked: Boolean) {
+  updateItem(id: $id, contentRatingChecked: $contentRatingChecked) {
+    id
+    contentRating
+    contentRatingChecked
+  }
+}
+    `;
+export type UpdateItemCheckedMutationFn = Apollo.MutationFunction<UpdateItemCheckedMutation, UpdateItemCheckedMutationVariables>;
+
+/**
+ * __useUpdateItemCheckedMutation__
+ *
+ * To run a mutation, you first call `useUpdateItemCheckedMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateItemCheckedMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateItemCheckedMutation, { data, loading, error }] = useUpdateItemCheckedMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      contentRatingChecked: // value for 'contentRatingChecked'
+ *   },
+ * });
+ */
+export function useUpdateItemCheckedMutation(baseOptions?: Apollo.MutationHookOptions<UpdateItemCheckedMutation, UpdateItemCheckedMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateItemCheckedMutation, UpdateItemCheckedMutationVariables>(UpdateItemCheckedDocument, options);
+      }
+export type UpdateItemCheckedMutationHookResult = ReturnType<typeof useUpdateItemCheckedMutation>;
+export type UpdateItemCheckedMutationResult = Apollo.MutationResult<UpdateItemCheckedMutation>;
+export type UpdateItemCheckedMutationOptions = Apollo.BaseMutationOptions<UpdateItemCheckedMutation, UpdateItemCheckedMutationVariables>;
 export const CreateTransactionDocument = gql`
     mutation CreateTransaction($itemId: ID!, $location: TransactionLocation!, $locationIndex: Int, $details: String!) {
   createTransaction(
@@ -2290,7 +2453,7 @@ export type BindersFromItemIdLazyQueryHookResult = ReturnType<typeof useBindersF
 export type BindersFromItemIdSuspenseQueryHookResult = ReturnType<typeof useBindersFromItemIdSuspenseQuery>;
 export type BindersFromItemIdQueryResult = Apollo.QueryResult<BindersFromItemIdQuery, BindersFromItemIdQueryVariables>;
 export const CreateItemDocument = gql`
-    mutation CreateItem($name: String!, $category: [String!]!, $condition: ItemCondition!, $description: String, $images: [String!], $language: Language!, $publishedYear: Int, $status: ItemStatus!, $deposit: Int) {
+    mutation CreateItem($name: String!, $category: [String!]!, $condition: ItemCondition!, $description: String, $images: [String!], $language: Language!, $publishedYear: Int, $status: ItemStatus!, $deposit: Int, $contentRating: Int) {
   createItem(
     name: $name
     category: $category
@@ -2301,6 +2464,7 @@ export const CreateItemDocument = gql`
     publishedYear: $publishedYear
     status: $status
     deposit: $deposit
+    contentRating: $contentRating
   ) {
     id
     name
@@ -2315,6 +2479,8 @@ export const CreateItemDocument = gql`
     ownerId
     updatedAt
     deposit
+    contentRating
+    contentRatingChecked
   }
 }
     `;
@@ -2342,6 +2508,7 @@ export type CreateItemMutationFn = Apollo.MutationFunction<CreateItemMutation, C
  *      publishedYear: // value for 'publishedYear'
  *      status: // value for 'status'
  *      deposit: // value for 'deposit'
+ *      contentRating: // value for 'contentRating'
  *   },
  * });
  */
@@ -2353,7 +2520,7 @@ export type CreateItemMutationHookResult = ReturnType<typeof useCreateItemMutati
 export type CreateItemMutationResult = Apollo.MutationResult<CreateItemMutation>;
 export type CreateItemMutationOptions = Apollo.BaseMutationOptions<CreateItemMutation, CreateItemMutationVariables>;
 export const UpdateItemDocument = gql`
-    mutation UpdateItem($id: ID!, $name: String, $category: [String!], $classifications: [String!], $condition: ItemCondition, $description: String, $images: [String!], $language: Language, $publishedYear: Int, $status: ItemStatus, $deposit: Int) {
+    mutation UpdateItem($id: ID!, $name: String, $category: [String!], $classifications: [String!], $condition: ItemCondition, $description: String, $images: [String!], $language: Language, $publishedYear: Int, $status: ItemStatus, $deposit: Int, $contentRating: Int, $contentRatingChecked: Boolean) {
   updateItem(
     id: $id
     name: $name
@@ -2366,6 +2533,8 @@ export const UpdateItemDocument = gql`
     publishedYear: $publishedYear
     status: $status
     deposit: $deposit
+    contentRating: $contentRating
+    contentRatingChecked: $contentRatingChecked
   ) {
     id
     name
@@ -2380,6 +2549,8 @@ export const UpdateItemDocument = gql`
     ownerId
     updatedAt
     deposit
+    contentRating
+    contentRatingChecked
   }
 }
     `;
@@ -2409,6 +2580,8 @@ export type UpdateItemMutationFn = Apollo.MutationFunction<UpdateItemMutation, U
  *      publishedYear: // value for 'publishedYear'
  *      status: // value for 'status'
  *      deposit: // value for 'deposit'
+ *      contentRating: // value for 'contentRating'
+ *      contentRatingChecked: // value for 'contentRatingChecked'
  *   },
  * });
  */
@@ -3258,6 +3431,7 @@ export const UserDocument = gql`
     isActive
     role
     exchangePoints
+    visibleContentRating
     itemCategory {
       category
       count
@@ -3324,12 +3498,13 @@ export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserSuspenseQueryHookResult = ReturnType<typeof useUserSuspenseQuery>;
 export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
 export const UpdateUserDocument = gql`
-    mutation UpdateUser($address: String, $nickname: String, $exchangePoints: [String!], $contactMethods: [ContactMethodInput!]) {
+    mutation UpdateUser($address: String, $nickname: String, $exchangePoints: [String!], $contactMethods: [ContactMethodInput!], $visibleContentRating: Int) {
   updateUser(
     address: $address
     nickname: $nickname
     exchangePoints: $exchangePoints
     contactMethods: $contactMethods
+    visibleContentRating: $visibleContentRating
   ) {
     id
     address
@@ -3348,6 +3523,7 @@ export const UpdateUserDocument = gql`
     isVerified
     isActive
     exchangePoints
+    visibleContentRating
   }
 }
     `;
@@ -3370,6 +3546,7 @@ export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, U
  *      nickname: // value for 'nickname'
  *      exchangePoints: // value for 'exchangePoints'
  *      contactMethods: // value for 'contactMethods'
+ *      visibleContentRating: // value for 'visibleContentRating'
  *   },
  * });
  */
@@ -3432,8 +3609,13 @@ export type GetExchangePointsLazyQueryHookResult = ReturnType<typeof useGetExcha
 export type GetExchangePointsSuspenseQueryHookResult = ReturnType<typeof useGetExchangePointsSuspenseQuery>;
 export type GetExchangePointsQueryResult = Apollo.QueryResult<GetExchangePointsQuery, GetExchangePointsQueryVariables>;
 export const CreateUserDocument = gql`
-    mutation CreateUser($email: String!, $address: String, $nickname: String) {
-  createUser(email: $email, address: $address, nickname: $nickname) {
+    mutation CreateUser($email: String!, $address: String, $nickname: String, $visibleContentRating: Int) {
+  createUser(
+    email: $email
+    address: $address
+    nickname: $nickname
+    visibleContentRating: $visibleContentRating
+  ) {
     id
     email
     address
@@ -3446,6 +3628,7 @@ export const CreateUserDocument = gql`
     }
     isVerified
     isActive
+    visibleContentRating
   }
 }
     `;
@@ -3467,6 +3650,7 @@ export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, C
  *      email: // value for 'email'
  *      address: // value for 'address'
  *      nickname: // value for 'nickname'
+ *      visibleContentRating: // value for 'visibleContentRating'
  *   },
  * });
  */

@@ -33,6 +33,7 @@ import { AuthDialog } from "./Auth";
 import LanguageSwitcher from "./LanguageSwitcher";
 import NewsForm from "./NewsForm";
 import ClassificationAssignment from "./ClassificationAssignment";
+import ContentRatingApprovalDialog from "./ContentRatingApprovalDialog";
 import OnboardingTour from "./OnboardingTour";
 
 const GET_USER_OPEN_TRANSACTIONS_FOR_COUNT = gql`
@@ -73,6 +74,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showNewsForm, setShowNewsForm] = useState(false);
   const [showClassificationAssignment, setShowClassificationAssignment] =
+    useState(false);
+  const [showContentRatingApproval, setShowContentRatingApproval] =
     useState(false);
 
   // Query for user's open transactions
@@ -166,6 +169,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     handleMenuClose();
   };
 
+  const handleContentRatingApproval = () => {
+    setShowContentRatingApproval(true);
+    handleMenuClose();
+  };
+
   const handleNotificationsClick = () => {
     navigate("/transactions");
   };
@@ -246,6 +254,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                     {t(
                       "classification.assignClassifications",
                       "Assign Classifications"
+                    )}
+                  </ListItemText>
+                </MenuItem>
+
+                <MenuItem onClick={handleContentRatingApproval}>
+                  <ListItemIcon>
+                    <ClassificationIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>
+                    {t(
+                      "contentRating.approvalDialog",
+                      "Content Rating Approval"
                     )}
                   </ListItemText>
                 </MenuItem>
@@ -332,6 +352,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       <ClassificationAssignment
         open={showClassificationAssignment}
         onClose={() => setShowClassificationAssignment(false)}
+      />
+
+      <ContentRatingApprovalDialog
+        open={showContentRatingApproval}
+        onClose={() => setShowContentRatingApproval(false)}
       />
 
       {/* Onboarding Tour */}
