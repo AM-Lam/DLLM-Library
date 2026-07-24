@@ -1341,6 +1341,15 @@ export class ItemService {
 
     await itemRef.update(updateData);
 
+    // Unpin the item from the old owner's pinned items
+    if (this.userService) {
+      try {
+        await this.userService.unpinItemIfPinned(currentUser.id, itemId);
+      } catch (error) {
+        console.error(`Failed to unpin item ${itemId} from old owner:`, error);
+      }
+    }
+
     // Record ownership transfer event for history
     const newOwnerId = itemData.holderId;
     await db.collection("transactions").add({

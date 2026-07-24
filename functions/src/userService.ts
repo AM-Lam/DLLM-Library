@@ -142,6 +142,15 @@ export class UserService {
     return true;
   }
 
+  async unpinItemIfPinned(userId: string, itemId: string): Promise<boolean> {
+    const userModel = await this.userModelById(userId);
+    if (!userModel) return false;
+    if (!userModel.pinItemIds || !userModel.pinItemIds.includes(itemId)) {
+      return false;
+    }
+    return this.unpinItem(userModel, itemId);
+  }
+
   /**
    * Gets the user item category based on items in the user's collection.
    * If one is not available, then compute the value.
