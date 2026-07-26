@@ -191,6 +191,12 @@ export class UserService {
     }
   }
 
+  async removeItemFromUser(user: User, itemId: string): Promise<void> {
+    for (const point of user.exchangePoints || []) {
+      await this._RemoveItemCacheFromExchangePoint(point, [itemId]);
+    }
+  }
+
   async createUser(
     loginUser: LoginUser | null,
     nickname: string,
@@ -361,7 +367,7 @@ export class UserService {
             };
             itemCacheModelMap.set(item.id, itemCacheModel);
           }
-          // add item cache to new exchange points
+            // add item cache to new exchange points
           for (const point of newExchangePoints) {
             await this._AddItemCacheToExchangePoint(point, itemCacheModelMap);
           }

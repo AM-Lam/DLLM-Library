@@ -1368,6 +1368,45 @@ export class ItemService {
     if (!updatedItem) {
       throw new Error(`Failed to fetch updated item with ID ${itemId}`);
     }
+
+    // Update exchange-point caches after ownership transfer
+    if (this.userService && updatedItem) {
+      try {
+        const oldUser = await this.userService.userById(currentUser.id);
+        const newUser = await this.userService.userById(updatedItem.ownerId);
+        if (oldUser) {
+          await this.userService.removeItemFromUser(oldUser, itemId);
+        }
+        if (newUser) {
+          await this.userService.addItemToUser(newUser, updatedItem);
+        }
+      } catch (e) {
+        console.error("Failed to update caches after transfer:", e);
+      }
+    }
+
+    // Update category counts for both owners
+    if (this.categoryService && updatedItem) {
+      try {
+        const oldUser = await this.userService?.userById(currentUser.id);
+        const newUser = await this.userService?.userById(updatedItem.ownerId);
+        if (oldUser && updatedItem.category) {
+          await this.categoryService.reduceCategories(
+            oldUser,
+            updatedItem.category
+          );
+        }
+        if (newUser && updatedItem.category) {
+          await this.categoryService.upsertCategories(
+            newUser,
+            updatedItem.category
+          );
+        }
+      } catch (e) {
+        console.error("Failed to update category counts after transfer:", e);
+      }
+    }
+
     return updatedItem;
   }
 
