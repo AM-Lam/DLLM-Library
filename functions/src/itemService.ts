@@ -1369,11 +1369,20 @@ export class ItemService {
       throw new Error(`Failed to fetch updated item with ID ${itemId}`);
     }
 
+    // Use the non-mutating lookup here. userById() refreshes the user cache and
+    // can initialize itemCategory from the transferred item before the explicit
+    // category reduction/upsert below runs.
+    const oldUser = (await this.userService?.userModelById(
+      currentUser.id,
+    )) as User | null;
+    const newUser = (await this.userService?.userModelById(
+      updatedItem.ownerId,
+    )) as User | null;
+
     // Update exchange-point caches after ownership transfer
+    // ALSO: implicitly updates "user.
     if (this.userService && updatedItem) {
       try {
-        const oldUser = await this.userService.userById(currentUser.id);
-        const newUser = await this.userService.userById(updatedItem.ownerId);
         if (oldUser) {
           await this.userService.removeItemFromUser(oldUser, itemId);
         }
@@ -1388,8 +1397,6 @@ export class ItemService {
     // Update category counts for both owners
     if (this.categoryService && updatedItem) {
       try {
-        const oldUser = await this.userService?.userById(currentUser.id);
-        const newUser = await this.userService?.userById(updatedItem.ownerId);
         if (oldUser && updatedItem.category) {
           await this.categoryService.reduceCategories(
             oldUser,
