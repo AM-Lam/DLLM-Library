@@ -490,6 +490,12 @@
     "showingResults": "顯示 {{start}}-{{end}} 的 {{total}} 項結果",
     "previousHolder": "前持有者",
     "faceToFaceTransfer": "面對面交收",
+    "transferOwnership": {
+      "title": "轉移物品",
+      "warningTitle": "警告：轉移物品所有權",
+      "warningBody": "你即將將物品的所有權轉移給另一個用戶。這個操作是不可逆的，並且會將物品從你的帳戶中移除。請確保你已經與接收者確認了交收細節。",
+      "confirmTransfer": "確認轉移"
+    },
     "quickTransferExpiry": "此交易將在 1 小時內過期",
     "quickTransferExpiryDescription": "接收者必須在 1 小時內確認收貨，否則交易將自動取消。",
     "faceToFaceInstructions": "操作指示：",
@@ -500,7 +506,6 @@
     "faceToFaceNotice": "在創建此交易之前，請確保你與接收者在同一地點。",
     "confirmTransfer": "確認轉移",
     "creating": "創建中...",
-    "itemName": "物品",
     "browseItems": "瀏覽可用物品",
     "updated": "已更新",
     "shareItem": "分享物品",

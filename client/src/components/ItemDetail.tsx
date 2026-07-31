@@ -53,6 +53,7 @@ import { calculateDistance, formatDistance } from "../utils/geoProcessor";
 import RequestConfirmationDialog from "./RequestConfirmationDialog";
 import ItemForm from "./ItemForm";
 import FaceToFaceConfirmDialog from "./FaceToFaceConfirmDialog";
+import TransferOwnershipConfirmDialog from "./TransferOwnershipConfirmDialog";
 import ItemComments from "./ItemComments";
 import { convertLinksToClickable } from "../utils/helpers";
 import { AuthDialog } from "./Auth";
@@ -139,6 +140,17 @@ const CREATE_QUICK_TRANSACTION_MUTATION = gql`
       id
       status
       createdAt
+      updatedAt
+    }
+  }
+`;
+
+const TRANSFER_OWNERSHIP_MUTATION = gql`
+  mutation TransferOwnership($itemId: ID!) {
+    transferOwnership(itemId: $itemId) {
+      id
+      ownerId
+      holderId
       updatedAt
     }
   }
@@ -635,6 +647,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
 
   // Add state for Face-to-Face dialog
   const [faceToFaceDialogOpen, setFaceToFaceDialogOpen] = useState(false);
+  const [transferOwnershipDialogOpen, setTransferOwnershipDialogOpen] = useState(false);
 
   // Add state for news form dialog
   const [newsFormOpen, setNewsFormOpen] = useState(false);
@@ -744,6 +757,22 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
         setErrorMessage(error.message);
         setErrorSnackbarOpen(true);
         console.error("Quick transaction creation error:", error);
+      },
+    });
+
+  const [transferOwnership, { loading: transferOwnershipLoading }] =
+    useMutation(TRANSFER_OWNERSHIP_MUTATION, {
+      onCompleted: async () => {
+        setTransferOwnershipDialogOpen(false);
+        setSuccessMessage(
+          t("item.transferOwnershipSuccess", "Ownership transferred"),
+        );
+        setSuccessSnackbarOpen(true);
+        await refetch();
+      },
+      onError: (mutationError) => {
+        setErrorMessage(mutationError.message);
+        setErrorSnackbarOpen(true);
       },
     });
 
@@ -999,6 +1028,21 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
     setNewsFormOpen(true);
   };
 
+  const handleTransferOwnershipClick = async () => {
+    if (!itemId) return;
+    setTransferOwnershipDialogOpen(true);
+  };
+
+  const handleConfirmTransferOwnership = async () => {
+    if (!itemId) return;
+
+    try {
+      await transferOwnership({ variables: { itemId } });
+    } catch (error) {
+      console.error("Error transferring ownership:", error);
+    }
+  };
+
   const handleConfirmRequest = async (
     location: TransactionLocation,
     locationIndex?: number,
@@ -1047,6 +1091,11 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
 
   const handleCloseFaceToFaceDialog = () => {
     setFaceToFaceDialogOpen(false);
+  };
+
+  const handleCloseTransferOwnershipDialog = () => {
+    if (transferOwnershipLoading) return;
+    setTransferOwnershipDialogOpen(false);
   };
 
   const handleCloseSuccessSnackbar = () => {
@@ -1616,31 +1665,31 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
           {/* IMAGES — visual first */}
           {((data.item.thumbnails && data.item.thumbnails.length > 0) ||
             (data.item.images && data.item.images.length > 0)) && (
-            <Box sx={mb4Sx}>
-              <Box sx={sectionMb4Sx}>
-                <Grid container spacing={2}>
-                  {(data.item.thumbnails && data.item.thumbnails.length > 0
-                    ? data.item.thumbnails
-                    : data.item.images || []
-                  ).map((image, index) => (
-                    <Grid key={index} size={{ xs: 6, sm: 4, md: 3 }}>
-                      <Paper
-                        elevation={2}
-                        sx={thumbnailPaperSx}
-                        onClick={() => handleThumbnailClick(index)}
-                      >
-                        <img
-                          src={image}
-                          alt={`${data.item.name} - Thumbnail ${index + 1} `}
-                          style={thumbnailImageStyle}
-                        />
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
+              <Box sx={mb4Sx}>
+                <Box sx={sectionMb4Sx}>
+                  <Grid container spacing={2}>
+                    {(data.item.thumbnails && data.item.thumbnails.length > 0
+                      ? data.item.thumbnails
+                      : data.item.images || []
+                    ).map((image, index) => (
+                      <Grid key={index} size={{ xs: 6, sm: 4, md: 3 }}>
+                        <Paper
+                          elevation={2}
+                          sx={thumbnailPaperSx}
+                          onClick={() => handleThumbnailClick(index)}
+                        >
+                          <img
+                            src={image}
+                            alt={`${data.item.name} - Thumbnail ${index + 1} `}
+                            style={thumbnailImageStyle}
+                          />
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
               </Box>
-            </Box>
-          )}
+            )}
 
           {/* ITEM INFO GRID */}
           <Card elevation={0} sx={infoCardSx}>
@@ -1769,6 +1818,18 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
                 {t("item.faceToFaceTransfer", "Face-to-Face Transfer")}
               </Button>
             )}
+            {isOwner && !isHolder && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                size="small"
+                onClick={handleTransferOwnershipClick}
+                disabled={transferOwnershipLoading}
+                startIcon={<TransferIcon />}
+              >
+                {t("item.transferOwnership.title", "Transfer Ownership")}
+              </Button>
+            )}
             {isAdmin && (
               <Button
                 variant="outlined"
@@ -1888,6 +1949,14 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
         onClose={handleCloseFaceToFaceDialog}
         onConfirm={handleConfirmFaceToFace}
         loading={quickTransactionLoading}
+        itemName={data?.item?.name || ""}
+      />
+
+      <TransferOwnershipConfirmDialog
+        open={transferOwnershipDialogOpen}
+        onClose={handleCloseTransferOwnershipDialog}
+        onConfirm={handleConfirmTransferOwnership}
+        loading={transferOwnershipLoading}
         itemName={data?.item?.name || ""}
       />
 

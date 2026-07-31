@@ -394,6 +394,12 @@
     "lastUpdated": "Last Updated",
     "browseItems": "Browse Available Items",
     "faceToFaceTransfer": "Face-to-Face Transfer",
+    "transferOwnership": {
+      "title": "Transfer Ownership",
+      "warningTitle": "This action changes the permanent owner of this item",
+      "warningBody": "Use this only after the item has been handed over. The current holder will become the new owner.",
+      "confirmTransfer": "Confirm Transfer Ownership"
+    },
     "quickTransferExpiry": "This transfer will expire in 1 hour",
     "quickTransferExpiryDescription": "The recipient must confirm receipt within 1 hour, or the transaction will be automatically cancelled.",
     "faceToFaceInstructions": "How it works:",
@@ -404,7 +410,6 @@
     "faceToFaceNotice": "Make sure you are physically present with the recipient before creating this transaction.",
     "confirmTransfer": "Confirm Transfer",
     "creating": "Creating...",
-    "itemName": "Item",
     "peopleInvolved": "Participants",
     "currentHolder": "Current Holder",
     "transactionLocation": "Transaction Location",
