@@ -181,6 +181,17 @@ const UNPIN_ITEM_MUTATION = gql`
   }
 `;
 
+const TRANSFER_OWNERSHIP_MUTATION = gql`
+  mutation TransferOwnership($itemId: ID!) {
+    transferOwnership(itemId: $itemId) {
+      id
+      ownerId
+      holderId
+      updatedAt
+    }
+  }
+`;
+
 const GET_ITEM_CONFIG = gql`
   query GetItemConfig {
     itemConfig {
@@ -642,6 +653,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
   const [booklistDialogOpen, setBooklistDialogOpen] = useState(false);
   const [selectedNewsPostId, setSelectedNewsPostId] = useState("");
   const [comment, setComment] = useState("");
+  const [transferOwnershipDialogOpen, setTransferOwnershipDialogOpen] =
+    useState(false);
 
   // State for location prompt dialog
   const [locationPromptOpen, setLocationPromptOpen] = useState(false);
@@ -811,6 +824,22 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
       },
     });
 
+  const [transferOwnership, { loading: transferOwnershipLoading }] =
+    useMutation(TRANSFER_OWNERSHIP_MUTATION, {
+      onCompleted: () => {
+        setTransferOwnershipDialogOpen(false);
+        setSuccessMessage(
+          t("item.transferOwnershipSuccess", "Ownership transferred"),
+        );
+        setSuccessSnackbarOpen(true);
+        refetch();
+      },
+      onError: (mutationError) => {
+        setErrorMessage(mutationError.message);
+        setErrorSnackbarOpen(true);
+      },
+    });
+
   const availableBooklists = useMemo(() => {
     if (!itemId || !newsRecent.data?.newsRecentPosts) {
       return [];
@@ -827,6 +856,11 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
       (isOwner && data?.item?.holderId === null));
   const canBorrowBook = user && !isHolder;
   const canReturnBook = user && !isOwner && isHolder;
+  const canTransferOwnership = Boolean(
+    isOwner &&
+      data?.item?.holderId &&
+      data.item.holderId !== data.item.ownerId,
+  );
 
   const hasAddToBooklistButton = Boolean(user && availableBooklists.length > 0);
   const hasRequestButton = Boolean(canBorrowBook || canReturnBook || !user);
@@ -997,6 +1031,31 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
 
   const handleCreateNewsClick = () => {
     setNewsFormOpen(true);
+  };
+
+  const handleOpenTransferOwnershipDialog = () => {
+    setTransferOwnershipDialogOpen(true);
+  };
+
+  const handleCloseTransferOwnershipDialog = () => {
+    if (transferOwnershipLoading) {
+      return;
+    }
+    setTransferOwnershipDialogOpen(false);
+  };
+
+  const handleConfirmTransferOwnership = async () => {
+    if (!itemId) {
+      return;
+    }
+
+    try {
+      await transferOwnership({
+        variables: { itemId },
+      });
+    } catch (mutationError) {
+      console.error("Error transferring ownership:", mutationError);
+    }
   };
 
   const handleConfirmRequest = async (
@@ -1791,6 +1850,19 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
                 {t("item.editItem")}
               </Button>
             )}
+
+            {canTransferOwnership && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                size="small"
+                onClick={handleOpenTransferOwnershipDialog}
+                disabled={transferOwnershipLoading}
+                startIcon={<TransferIcon />}
+              >
+                {t("item.transferOwnership", "Transfer Ownership")}
+              </Button>
+            )}
           </Box>
 
           {/* related news */}
@@ -1950,6 +2022,43 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
               <CircularProgress size={20} sx={progressMr1Sx} />
             ) : null}
             {t("common.add", "Add")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={transferOwnershipDialogOpen}
+        onClose={handleCloseTransferOwnershipDialog}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          {t("item.transferOwnershipTitle", "Transfer Ownership")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t(
+              "item.transferOwnershipDescription",
+              "Are you sure you want to transfer ownership of this item to the current holder?",
+            )}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseTransferOwnershipDialog}
+            disabled={transferOwnershipLoading}
+          >
+            {t("common.cancel", "Cancel")}
+          </Button>
+          <Button
+            onClick={handleConfirmTransferOwnership}
+            variant="contained"
+            disabled={transferOwnershipLoading}
+          >
+            {transferOwnershipLoading ? (
+              <CircularProgress size={20} sx={progressMr1Sx} />
+            ) : null}
+            {t("item.transferOwnershipConfirm", "Confirm Transfer")}
           </Button>
         </DialogActions>
       </Dialog>
