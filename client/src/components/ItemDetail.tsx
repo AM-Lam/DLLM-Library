@@ -1858,6 +1858,9 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
           {itemNewsPosts?.data?.newsRecentPosts &&
             itemNewsPosts?.data?.newsRecentPosts.length > 0 && (
               <List sx={relatedNewsListSx}>
+                <Typography variant="h6">
+                  {t("item.relatedNews", "Related News")}
+                </Typography>
                 {itemNewsPosts.data.newsRecentPosts.map((news: SimpleNews) => (
                   <NewsSummary
                     key={news.id}

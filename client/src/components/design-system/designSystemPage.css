@@ -1,0 +1,49 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+.design-system-page {
+  --color-bg-canvas: #faf7f4;
+  --color-bg-subtle: #f2ece5;
+  --color-bg-curator: #f1e9ea;
+  --color-border-subtle: #e6ddd3;
+  --color-border-default: #d4c8bc;
+  --color-border-soft: #f2ece5;
+  --color-text-primary: #2e2420;
+  --color-text-body: #6b5c50;
+  --color-text-secondary: #8f7b6e;
+  --color-text-muted: #8f7b6e;
+  --color-text-tertiary: #b8a89a;
+  --color-text-link: #8a0047;
+  --color-brand-primary-hover: #b3005a;
+
+  --font-family-body: "IBM Plex Sans", sans-serif;
+  --font-family-display: "Noto Serif TC", serif;
+  --font-family-mono: "IBM Plex Mono", monospace;
+
+  text-align: left;
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-body);
+  background: var(--color-bg-canvas);
+}
+
+.design-system-page .MuiTypography-root {
+  letter-spacing: normal;
+}
+
+.design-system-page .MuiListItemButton-root {
+  border-radius: 0;
+}
+
+.design-system-page .MuiTableCell-root {
+  border-color: var(--color-border-subtle);
+}
+
+.design-system-page .MuiDrawer-paper::-webkit-scrollbar {
+  width: 3px;
+}
+
+.design-system-page .MuiDrawer-paper::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+  border-radius: 2px;
+}

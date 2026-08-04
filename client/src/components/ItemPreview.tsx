@@ -242,6 +242,22 @@ const ItemPreview: React.FC<ItemPreviewProps> = ({ item, onClick }) => {
         <CardContent sx={cardContentSx}>
           {/* Book Title & year summary */}
           <Box sx={{ mb: 1 }}>
+            {/* {hasImage && (
+              <Typography
+                sx={{
+                  fontWeight: "var(--font-weight-bold)",
+                  fontSize: "var(--font-size-label)",
+                  lineHeight: "var(--line-height-snug)",
+                  color: "var(--color-text-primary)",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  fontFamily: "var(--font-family-display)",
+                  display: "inline-block",
+                }}
+              >
+                {item.name}
+              </Typography>
+            )} */}
             {hasImage && (
               <Typography
                 sx={{

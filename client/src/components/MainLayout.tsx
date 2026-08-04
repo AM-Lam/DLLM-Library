@@ -41,8 +41,8 @@ import { resolveBranding } from "../utils/branding";
 const headerActionButtonSx = {
   bgcolor: "var(--color-bg-subtle)",
   color: "var(--color-text-primary)",
-  width: "40px",
-  height: "40px",
+  width: "var(--space-3xl)",
+  height: "var(--space-3xl)",
   "&:hover": { bgcolor: "var(--color-bg-subtle)" },
 };
 
@@ -51,8 +51,8 @@ const navPillSx = {
   alignItems: "center",
   justifyContent: "center",
   width: "56px",
-  height: "32px",
-  borderRadius: "16px",
+  height: "var(--space-xl)",
+  borderRadius: "var(--space-md)",
 };
 
 const GET_USER_OPEN_TRANSACTIONS_FOR_COUNT = gql`
@@ -242,14 +242,19 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       {/* Top AppBar */}
       <AppBar
         position="sticky"
-        sx={{ bgcolor: "var(--color-bg-canvas)", borderBottom: "none", pt: 0.5, px: 0.5 }}
+        sx={{
+          bgcolor: "var(--color-bg-canvas)",
+          borderBottom: "none",
+          pt: "var(--space-xs)",
+          px: "var(--space-xs)",
+        }}
       >
         <Toolbar
           sx={{
             justifyContent: "space-between",
             alignItems: "center",
-            gap: 1,
-            py: 0.5,
+            gap: "var(--space-element-gap-sm)",
+            py: "var(--space-xs)",
           }}
         >
           <Box
@@ -265,12 +270,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               component="div"
               sx={{
                 fontFamily: "var(--font-family-display)",
-                fontWeight: 900,
+                fontWeight: "var(--font-weight-bold)",
                 color: "var(--color-text-primary)",
                 cursor: "pointer",
                 letterSpacing: "-0.5px",
-                lineHeight: "1.1",
-                fontSize: { xs: "18px", sm: "24px", md: "28px" },
+                lineHeight: "var(--line-height-tight)",
+                fontSize: { xs: "var(--font-size-title-lg)", sm: "24px", md: "28px" },
               }}
             >
               {t("app.brand-title", "BookGuide")}
@@ -278,9 +283,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 component="span"
                 sx={{
                   color: "var(--color-brand-primary)",
-                  fontSize: { xs: "13px", sm: "16px", md: "20px" },
-                  fontWeight: 700,
-                  ml: 0.5,
+                  fontSize: { xs: "var(--font-size-body-sm)", sm: "var(--font-size-title)", md: "20px" },
+                  fontWeight: "var(--font-weight-bold)",
+                  ml: "var(--space-xs)",
                 }}
               >
                 {t("app.location", "Sydney, Australia")}
@@ -291,8 +296,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               sx={{
                 fontFamily: "var(--font-family-mono)",
                 color: "var(--color-text-tertiary)",
-                fontSize: { xs: "9px", sm: "11px" },
-                mt: 0.2,
+                fontSize: { xs: "var(--font-size-micro-system)", sm: "var(--font-size-caption)" },
+                mt: "var(--space-xs)",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -306,7 +311,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 0.5,
+              gap: "var(--space-xs)",
               flexShrink: 0,
             }}
           >
@@ -325,16 +330,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   sx={{
                     "& .MuiBadge-badge": {
                       backgroundColor: "var(--color-brand-primary)",
-                      width: "8px",
-                      height: "8px",
+                      width: "var(--space-sm)",
+                      height: "var(--space-sm)",
                       borderRadius: "50%",
-                      right: 2,
-                      top: 2,
+                      right: "var(--space-xs)",
+                      top: "var(--space-xs)",
                     },
                   }}
                   invisible={notificationCount === 0}
                 >
-                  <NotificationsIcon sx={{ fontSize: "20px" }} />
+                  <NotificationsIcon sx={{ fontSize: "var(--font-size-title)" }} />
                 </Badge>
               </IconButton>
             ) : (
@@ -343,7 +348,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 sx={headerActionButtonSx}
                 title={t("auth.signIn", "Sign In")}
               >
-                <PersonIcon sx={{ fontSize: "20px" }} />
+                <PersonIcon sx={{ fontSize: "var(--font-size-title)" }} />
               </IconButton>
             )}
 
@@ -429,7 +434,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         component="main"
         sx={{
           flexGrow: 1,
-          pb: 7, // Space for bottom navigation
+          pb: "72px", // Space for bottom navigation
           overflow: "auto",
         }}
       >
@@ -460,20 +465,20 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             backgroundColor: "var(--color-bg-surface)",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
-              padding: "8px 0",
+              padding: "var(--space-sm) 0",
               color: "var(--color-text-tertiary)",
               transition: "all 0.2s ease-in-out",
               "& .MuiSvgIcon-root": {
-                fontSize: "24px",
+                fontSize: "var(--font-size-display)",
                 transition: "all 0.2s ease-in-out",
               },
               "& .MuiBottomNavigationAction-label": {
                 fontFamily: "var(--font-family-body)",
-                fontSize: "12px",
-                fontWeight: "bold",
-                mt: "4px",
+                fontSize: "var(--font-size-label)",
+                fontWeight: "var(--font-weight-bold)",
+                mt: "var(--space-xs)",
                 "&.Mui-selected": {
-                  fontSize: "12px",
+                  fontSize: "var(--font-size-label)",
                   color: "var(--color-brand-primary)",
                 },
               },
