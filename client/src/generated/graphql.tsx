@@ -131,6 +131,7 @@ export type Item = {
   language: Language;
   location?: Maybe<Location>;
   name: Scalars['String']['output'];
+  originalOwnerId?: Maybe<Scalars['ID']['output']>;
   ownerId: Scalars['ID']['output'];
   publishedYear?: Maybe<Scalars['Int']['output']>;
   shadowBanned?: Maybe<Scalars['Boolean']['output']>;
@@ -246,6 +247,7 @@ export type Mutation = {
   lockNewsPost: Scalars['Boolean']['output'];
   pinItem: Scalars['Boolean']['output'];
   receiveTransaction: Transaction;
+  transferOwnership: Item;
   unlockNewsPost: Scalars['Boolean']['output'];
   unpinItem: Scalars['Boolean']['output'];
   updateHostConfig: HostConfig;
@@ -397,6 +399,11 @@ export type MutationReceiveTransactionArgs = {
 };
 
 
+export type MutationTransferOwnershipArgs = {
+  itemId: Scalars['ID']['input'];
+};
+
+
 export type MutationUnlockNewsPostArgs = {
   id: Scalars['ID']['input'];
 };
@@ -482,6 +489,7 @@ export enum NewsStatus {
 export enum NewsType {
   Announcement = 'ANNOUNCEMENT',
   Event = 'EVENT',
+  Greeting = 'GREETING',
   Topic = 'TOPIC',
   Update = 'UPDATE'
 }
@@ -806,6 +814,7 @@ export enum TransactionStatus {
   Cancelled = 'CANCELLED',
   Completed = 'COMPLETED',
   Expired = 'EXPIRED',
+  Gifted = 'GIFTED',
   Pending = 'PENDING',
   Transfered = 'TRANSFERED'
 }
@@ -836,7 +845,7 @@ export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', addres
 export type HostConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type HostConfigQuery = { __typename?: 'Query', hostConfig: { __typename?: 'HostConfig', aboutUsText: string, chatLink: string, splashScreenImageUrl?: string | null, splashScreenText?: string | null, itemShareMessageTemplates: Array<string>, itemIndexJsonUrl?: string | null } };
+export type HostConfigQuery = { __typename?: 'Query', hostConfig: { __typename?: 'HostConfig', aboutUsText: string, chatLink: string, splashScreenImageUrl?: string | null, splashScreenText?: string | null, itemShareMessageTemplates: Array<string>, itemIndexJsonUrl?: string | null, itemIndexLastBuildTime?: any | null } };
 
 export type RecentItemsWithoutClassificationsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -965,6 +974,13 @@ export type UnpinItemMutationVariables = Exact<{
 
 export type UnpinItemMutation = { __typename?: 'Mutation', unpinItem: boolean };
 
+export type TransferOwnershipMutationVariables = Exact<{
+  itemId: Scalars['ID']['input'];
+}>;
+
+
+export type TransferOwnershipMutation = { __typename?: 'Mutation', transferOwnership: { __typename?: 'Item', id: string, ownerId: string, holderId?: string | null, updatedAt: any } };
+
 export type UpdateBooklistMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   relatedItemIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
@@ -990,6 +1006,13 @@ export type BooklistRecentPostsQueryVariables = Exact<{
 
 
 export type BooklistRecentPostsQuery = { __typename?: 'Query', newsRecentPosts: Array<{ __typename?: 'NewsPost', id: string, title: string, relatedItems?: Array<{ __typename?: 'Item', id: string }> | null }> };
+
+export type ItemTransactionsQueryVariables = Exact<{
+  itemId: Scalars['ID']['input'];
+}>;
+
+
+export type ItemTransactionsQuery = { __typename?: 'Query', transactionsByItem: Array<{ __typename?: 'Transaction', id: string, status: TransactionStatus, createdAt: any, updatedAt: any, requestor: { __typename?: 'User', id: string, nickname?: string | null, email: string }, receiver?: { __typename?: 'User', id: string, nickname?: string | null, email: string } | null }> };
 
 export type CreateItemMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -1404,6 +1427,7 @@ export const HostConfigDocument = gql`
     splashScreenText
     itemShareMessageTemplates
     itemIndexJsonUrl
+    itemIndexLastBuildTime
   }
 }
     `;
@@ -2121,6 +2145,42 @@ export function useUnpinItemMutation(baseOptions?: Apollo.MutationHookOptions<Un
 export type UnpinItemMutationHookResult = ReturnType<typeof useUnpinItemMutation>;
 export type UnpinItemMutationResult = Apollo.MutationResult<UnpinItemMutation>;
 export type UnpinItemMutationOptions = Apollo.BaseMutationOptions<UnpinItemMutation, UnpinItemMutationVariables>;
+export const TransferOwnershipDocument = gql`
+    mutation TransferOwnership($itemId: ID!) {
+  transferOwnership(itemId: $itemId) {
+    id
+    ownerId
+    holderId
+    updatedAt
+  }
+}
+    `;
+export type TransferOwnershipMutationFn = Apollo.MutationFunction<TransferOwnershipMutation, TransferOwnershipMutationVariables>;
+
+/**
+ * __useTransferOwnershipMutation__
+ *
+ * To run a mutation, you first call `useTransferOwnershipMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTransferOwnershipMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [transferOwnershipMutation, { data, loading, error }] = useTransferOwnershipMutation({
+ *   variables: {
+ *      itemId: // value for 'itemId'
+ *   },
+ * });
+ */
+export function useTransferOwnershipMutation(baseOptions?: Apollo.MutationHookOptions<TransferOwnershipMutation, TransferOwnershipMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<TransferOwnershipMutation, TransferOwnershipMutationVariables>(TransferOwnershipDocument, options);
+      }
+export type TransferOwnershipMutationHookResult = ReturnType<typeof useTransferOwnershipMutation>;
+export type TransferOwnershipMutationResult = Apollo.MutationResult<TransferOwnershipMutation>;
+export type TransferOwnershipMutationOptions = Apollo.BaseMutationOptions<TransferOwnershipMutation, TransferOwnershipMutationVariables>;
 export const UpdateBooklistDocument = gql`
     mutation UpdateBooklist($id: ID!, $relatedItemIds: [ID!]) {
   updateNewsPost(id: $id, relatedItemIds: $relatedItemIds) {
@@ -2242,6 +2302,59 @@ export type BooklistRecentPostsQueryHookResult = ReturnType<typeof useBooklistRe
 export type BooklistRecentPostsLazyQueryHookResult = ReturnType<typeof useBooklistRecentPostsLazyQuery>;
 export type BooklistRecentPostsSuspenseQueryHookResult = ReturnType<typeof useBooklistRecentPostsSuspenseQuery>;
 export type BooklistRecentPostsQueryResult = Apollo.QueryResult<BooklistRecentPostsQuery, BooklistRecentPostsQueryVariables>;
+export const ItemTransactionsDocument = gql`
+    query ItemTransactions($itemId: ID!) {
+  transactionsByItem(itemId: $itemId) {
+    id
+    status
+    createdAt
+    updatedAt
+    requestor {
+      id
+      nickname
+      email
+    }
+    receiver {
+      id
+      nickname
+      email
+    }
+  }
+}
+    `;
+
+/**
+ * __useItemTransactionsQuery__
+ *
+ * To run a query within a React component, call `useItemTransactionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useItemTransactionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useItemTransactionsQuery({
+ *   variables: {
+ *      itemId: // value for 'itemId'
+ *   },
+ * });
+ */
+export function useItemTransactionsQuery(baseOptions: Apollo.QueryHookOptions<ItemTransactionsQuery, ItemTransactionsQueryVariables> & ({ variables: ItemTransactionsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ItemTransactionsQuery, ItemTransactionsQueryVariables>(ItemTransactionsDocument, options);
+      }
+export function useItemTransactionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ItemTransactionsQuery, ItemTransactionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ItemTransactionsQuery, ItemTransactionsQueryVariables>(ItemTransactionsDocument, options);
+        }
+export function useItemTransactionsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ItemTransactionsQuery, ItemTransactionsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ItemTransactionsQuery, ItemTransactionsQueryVariables>(ItemTransactionsDocument, options);
+        }
+export type ItemTransactionsQueryHookResult = ReturnType<typeof useItemTransactionsQuery>;
+export type ItemTransactionsLazyQueryHookResult = ReturnType<typeof useItemTransactionsLazyQuery>;
+export type ItemTransactionsSuspenseQueryHookResult = ReturnType<typeof useItemTransactionsSuspenseQuery>;
+export type ItemTransactionsQueryResult = Apollo.QueryResult<ItemTransactionsQuery, ItemTransactionsQueryVariables>;
 export const CreateItemDocument = gql`
     mutation CreateItem($name: String!, $category: [String!]!, $condition: ItemCondition!, $description: String, $images: [String!], $language: Language!, $publishedYear: Int, $status: ItemStatus!, $deposit: Int, $contentRating: Int) {
   createItem(
@@ -2712,6 +2825,7 @@ export const RecentItemsDocument = gql`
  *   variables: {
  *      category: // value for 'category'
  *      limit: // value for 'limit'
+ *      random: // value for 'random'
  *   },
  * });
  */

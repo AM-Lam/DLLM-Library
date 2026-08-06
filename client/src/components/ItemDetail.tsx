@@ -145,17 +145,6 @@ const CREATE_QUICK_TRANSACTION_MUTATION = gql`
   }
 `;
 
-const TRANSFER_OWNERSHIP_MUTATION = gql`
-  mutation TransferOwnership($itemId: ID!) {
-    transferOwnership(itemId: $itemId) {
-      id
-      ownerId
-      holderId
-      updatedAt
-    }
-  }
-`;
-
 const USER_QUERY = gql`
   query GetUserForItem($userId: ID!) {
     user(id: $userId) {
@@ -190,6 +179,17 @@ const PIN_ITEM_MUTATION = gql`
 const UNPIN_ITEM_MUTATION = gql`
   mutation UnpinItem($itemId: ID!) {
     unpinItem(itemId: $itemId)
+  }
+`;
+
+const TRANSFER_OWNERSHIP_MUTATION = gql`
+  mutation TransferOwnership($itemId: ID!) {
+    transferOwnership(itemId: $itemId) {
+      id
+      ownerId
+      holderId
+      updatedAt
+    }
   }
 `;
 
@@ -760,22 +760,6 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
       },
     });
 
-  const [transferOwnership, { loading: transferOwnershipLoading }] =
-    useMutation(TRANSFER_OWNERSHIP_MUTATION, {
-      onCompleted: async () => {
-        setTransferOwnershipDialogOpen(false);
-        setSuccessMessage(
-          t("item.transferOwnershipSuccess", "Ownership transferred"),
-        );
-        setSuccessSnackbarOpen(true);
-        await refetch();
-      },
-      onError: (mutationError) => {
-        setErrorMessage(mutationError.message);
-        setErrorSnackbarOpen(true);
-      },
-    });
-
   const [pinItem, { loading: pinLoading }] = useMutation(PIN_ITEM_MUTATION, {
     onCompleted: () => {
       setSuccessSnackbarOpen(true);
@@ -840,6 +824,22 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
       },
     });
 
+  const [transferOwnership, { loading: transferOwnershipLoading }] =
+    useMutation(TRANSFER_OWNERSHIP_MUTATION, {
+      onCompleted: async () => {
+        setTransferOwnershipDialogOpen(false);
+        setSuccessMessage(
+          t("item.transferOwnershipSuccess", "Ownership transferred"),
+        );
+        setSuccessSnackbarOpen(true);
+        await refetch();
+      },
+      onError: (mutationError) => {
+        setErrorMessage(mutationError.message);
+        setErrorSnackbarOpen(true);
+      },
+    });
+
   const availableBooklists = useMemo(() => {
     if (!itemId || !newsRecent.data?.newsRecentPosts) {
       return [];
@@ -856,6 +856,11 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
       (isOwner && data?.item?.holderId === null));
   const canBorrowBook = user && !isHolder;
   const canReturnBook = user && !isOwner && isHolder;
+  const canTransferOwnership = Boolean(
+    isOwner &&
+    data?.item?.holderId &&
+    data.item.holderId !== data.item.ownerId,
+  );
 
   const hasAddToBooklistButton = Boolean(user && availableBooklists.length > 0);
   const hasRequestButton = Boolean(canBorrowBook || canReturnBook || !user);
@@ -1041,7 +1046,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
     } catch (error) {
       console.error("Error transferring ownership:", error);
     }
-  };
+  }
 
   const handleConfirmRequest = async (
     location: TransactionLocation,
@@ -1818,7 +1823,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
                 {t("item.faceToFaceTransfer", "Face-to-Face Transfer")}
               </Button>
             )}
-            {isOwner && !isHolder && (
+            {canTransferOwnership && (
               <Button
                 variant="outlined"
                 color="secondary"
@@ -1852,24 +1857,24 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
                 {t("item.editItem")}
               </Button>
             )}
-          </Box>
 
-          {/* related news */}
-          {itemNewsPosts?.data?.newsRecentPosts &&
-            itemNewsPosts?.data?.newsRecentPosts.length > 0 && (
-              <List sx={relatedNewsListSx}>
-                <Typography variant="h6">
-                  {t("item.relatedNews", "Related News")}
-                </Typography>
-                {itemNewsPosts.data.newsRecentPosts.map((news: SimpleNews) => (
-                  <NewsSummary
-                    key={news.id}
-                    news={news}
-                    onClick={handleNewsItemClick}
-                  />
-                ))}
-              </List>
-            )}
+            {/* related news */}
+            {itemNewsPosts?.data?.newsRecentPosts &&
+              itemNewsPosts?.data?.newsRecentPosts.length > 0 && (
+                <List sx={relatedNewsListSx}>
+                  <Typography variant="h6">
+                    {t("item.relatedNews", "Related News")}
+                  </Typography>
+                  {itemNewsPosts.data.newsRecentPosts.map((news: SimpleNews) => (
+                    <NewsSummary
+                      key={news.id}
+                      news={news}
+                      onClick={handleNewsItemClick}
+                    />
+                  ))}
+                </List>
+              )}
+          </Box>
         </Paper>
       )}
       {/* Edit Item Dialog */}
@@ -2025,6 +2030,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
+
 
       {/* Success Snackbar */}
       <Snackbar
