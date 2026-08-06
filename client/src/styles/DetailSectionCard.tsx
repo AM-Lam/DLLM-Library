@@ -13,8 +13,8 @@ interface DetailSectionCardProps {
 }
 
 const cardSx = {
-  p: { xs: 2, sm: 3 },
-  borderRadius: 3,
+  p: { xs: "var(--space-md)", sm: "var(--space-lg)" },
+  borderRadius: "12px",
   backgroundColor: "var(--color-bg-surface)",
   border: "1px solid var(--color-border-subtle)",
 };
@@ -23,8 +23,8 @@ const headerSx = {
   display: "flex",
   alignItems: "flex-start",
   justifyContent: "space-between",
-  gap: 2,
-  mb: 4,
+  gap: "var(--space-md)",
+  mb: "var(--space-content-gap)",
 };
 
 const titleWrapSx = { flex: 1, minWidth: 0 };
@@ -49,8 +49,9 @@ const DetailSectionCard: React.FC<DetailSectionCardProps> = ({
                 sx={{
                   display: "block",
                   color: "var(--color-text-muted)",
-                  letterSpacing: "0.12em",
-                  mb: 0.5,
+                  letterSpacing: "var(--letter-spacing-wider)",
+                  fontSize: "var(--font-size-micro)",
+                  mb: "var(--space-xs)",
                 }}
               >
                 {eyebrow}
@@ -59,7 +60,12 @@ const DetailSectionCard: React.FC<DetailSectionCardProps> = ({
             {title ? (
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 700, color: "var(--color-text-primary)", ...titleSx }}
+                sx={{
+                  fontWeight: "var(--font-weight-bold)",
+                  color: "var(--color-text-primary)",
+                  fontSize: "var(--font-size-title)",
+                  ...titleSx,
+                }}
               >
                 {title}
               </Typography>
@@ -68,7 +74,7 @@ const DetailSectionCard: React.FC<DetailSectionCardProps> = ({
           {action ? <Box>{action}</Box> : null}
         </Box>
       )}
-      <Box sx={disablePadding ? undefined : { pt: 0.5 }}>{children}</Box>
+      <Box sx={disablePadding ? undefined : { pt: "var(--space-xs)" }}>{children}</Box>
     </Paper>
   );
 };

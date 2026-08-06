@@ -77,6 +77,42 @@ function normalizeFontFamily(family) {
 
 const resolved = resolveTokenRefs(tokenDoc, tokenDoc);
 
+const spacingTokens = {
+  xs: "4px",
+  sm: "8px",
+  md: "16px",
+  lg: "24px",
+  xl: "32px",
+  "2xl": "48px",
+  "3xl": "64px",
+  "4xl": "80px",
+};
+
+const typographyTokens = {
+  display: "22px",
+  titleLg: "18px",
+  title: "16px",
+  body: "14px",
+  bodySm: "13px",
+  label: "12px",
+  caption: "11px",
+  micro: "10px",
+  microSystem: "9px",
+  weightRegular: "400",
+  weightMedium: "500",
+  weightSemibold: "600",
+  weightBold: "700",
+  lineHeightNone: "1",
+  lineHeightTight: "1.2",
+  lineHeightSnug: "1.3",
+  lineHeightNormal: "1.5",
+  lineHeightRelaxed: "1.55",
+  letterSpacingNormal: "0.04em",
+  letterSpacingWide: "0.06em",
+  letterSpacingWider: "0.12em",
+  letterSpacingWidest: "0.18em",
+};
+
 const semanticRuntime = {
   color: {
     brandPrimary: resolved.semantic.color.brand.primary,
@@ -178,6 +214,45 @@ const cssOutput = `/* AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. */
   --font-family-body: ${semanticRuntime.font.body};
   --font-family-display: ${semanticRuntime.font.display};
   --font-family-mono: ${semanticRuntime.font.mono};
+
+  --space-xs: ${spacingTokens.xs};
+  --space-sm: ${spacingTokens.sm};
+  --space-md: ${spacingTokens.md};
+  --space-lg: ${spacingTokens.lg};
+  --space-xl: ${spacingTokens.xl};
+  --space-2xl: ${spacingTokens["2xl"]};
+  --space-3xl: ${spacingTokens["3xl"]};
+  --space-4xl: ${spacingTokens["4xl"]};
+  --space-section-gap: 48px;
+  --space-content-gap: 24px;
+  --space-element-gap: 16px;
+  --space-element-gap-sm: 8px;
+
+  --font-size-display: ${typographyTokens.display};
+  --font-size-title-lg: ${typographyTokens.titleLg};
+  --font-size-title: ${typographyTokens.title};
+  --font-size-body: ${typographyTokens.body};
+  --font-size-body-sm: ${typographyTokens.bodySm};
+  --font-size-label: ${typographyTokens.label};
+  --font-size-caption: ${typographyTokens.caption};
+  --font-size-micro: ${typographyTokens.micro};
+  --font-size-micro-system: ${typographyTokens.microSystem};
+
+  --font-weight-regular: ${typographyTokens.weightRegular};
+  --font-weight-medium: ${typographyTokens.weightMedium};
+  --font-weight-semibold: ${typographyTokens.weightSemibold};
+  --font-weight-bold: ${typographyTokens.weightBold};
+
+  --line-height-none: ${typographyTokens.lineHeightNone};
+  --line-height-tight: ${typographyTokens.lineHeightTight};
+  --line-height-snug: ${typographyTokens.lineHeightSnug};
+  --line-height-normal: ${typographyTokens.lineHeightNormal};
+  --line-height-relaxed: ${typographyTokens.lineHeightRelaxed};
+
+  --letter-spacing-normal: ${typographyTokens.letterSpacingNormal};
+  --letter-spacing-wide: ${typographyTokens.letterSpacingWide};
+  --letter-spacing-wider: ${typographyTokens.letterSpacingWider};
+  --letter-spacing-widest: ${typographyTokens.letterSpacingWidest};
 }
 `;
 

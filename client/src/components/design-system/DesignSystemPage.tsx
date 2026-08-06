@@ -12,11 +12,11 @@ import {
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import GoverningPrincipleSection from "./design-system/GoverningPrincipleSection";
-import ColourScalesSection from "./design-system/ColourScalesSection";
-import SemanticTokensSection from "./design-system/SemanticTokensSection";
-import TypographySection from "./design-system/TypographySection";
-import TypeTokensSection from "./design-system/TypeTokensSection";
+import GoverningPrincipleSection from "./GoverningPrincipleSection";
+import ColourScalesSection from "./ColourScalesSection";
+import SemanticTokensSection from "./SemanticTokensSection";
+import TypographySection from "./TypographySection";
+import TypeTokensSection from "./TypeTokensSection";
 
 const DRAWER_WIDTH = 220;
 
@@ -70,7 +70,7 @@ export default function DesignSystemPage() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box className="design-system-page" sx={{ display: "flex" }}>
       <LinearProgress
         variant="determinate"
         value={progress}
@@ -96,29 +96,54 @@ export default function DesignSystemPage() {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
             bgcolor: "var(--color-bg-subtle)",
-            borderRight: 1,
-            borderColor: "var(--color-border-subtle)",
+            borderRight: "1px solid var(--color-border-subtle)",
           },
         }}
       >
-        <Toolbar sx={{ flexDirection: "column", alignItems: "flex-start", pt: 3, pb: 2 }}>
-          <Typography variant="h6" sx={{ fontFamily: "var(--font-family-display)", fontWeight: 700, color: "var(--color-text-primary)" }}>
+        <Toolbar
+          sx={{
+            flexDirection: "column",
+            alignItems: "flex-start",
+            px: 2.5,
+            pt: 3,
+            pb: 2.5,
+            borderBottom: "1px solid var(--color-border-subtle)",
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: "var(--font-family-display)",
+              fontSize: "15px",
+              lineHeight: 1.2,
+              fontWeight: 700,
+              color: "var(--color-text-primary)",
+              mb: 0.5,
+            }}
+          >
             BookGuide
           </Typography>
-          <Typography variant="caption" sx={{ fontFamily: "var(--font-family-mono)", color: "var(--color-text-muted)" }}>
+          <Typography
+            sx={{
+              fontFamily: "var(--font-family-mono)",
+              fontSize: "9px",
+              lineHeight: 1.5,
+              color: "var(--color-text-muted)",
+              whiteSpace: "pre-line",
+            }}
+          >
             {t("designSystem.tagline")}
           </Typography>
           <Box
             component="span"
             sx={{
               mt: 1,
-              px: 1,
+              px: 0.875,
               py: 0.25,
-              borderRadius: 5,
-              bgcolor: "var(--color-bg-curator)",
+              borderRadius: "20px",
+              bgcolor: "#FCD4E8",
               color: "var(--color-text-link)",
               fontFamily: "var(--font-family-mono)",
-              fontSize: "10px",
+              fontSize: "8px",
               textTransform: "uppercase",
               letterSpacing: "0.1em",
             }}
@@ -127,9 +152,17 @@ export default function DesignSystemPage() {
           </Box>
         </Toolbar>
 
-        <List dense>
-          <ListItem>
-            <Typography variant="caption" sx={{ px: 2, fontFamily: "var(--font-family-mono)", textTransform: "uppercase", color: "var(--color-text-muted)" }}>
+        <List dense sx={{ px: 0, py: 1.5 }}>
+          <ListItem sx={{ px: 2.5, py: 0.5 }}>
+            <Typography
+              sx={{
+                fontFamily: "var(--font-family-mono)",
+                fontSize: "8.5px",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "var(--color-text-tertiary)",
+              }}
+            >
               {t("designSystem.nav.foundations")}
             </Typography>
           </ListItem>
@@ -139,19 +172,32 @@ export default function DesignSystemPage() {
                 selected={activeId === item.id}
                 onClick={() => scrollTo(item.id)}
                 sx={{
+                  py: 0.875,
+                  px: 2.5,
                   borderLeft: 2,
                   borderColor: activeId === item.id ? "var(--color-text-link)" : "transparent",
-                  bgcolor: activeId === item.id ? "rgba(219, 3, 107, 0.06)" : "transparent",
-                  pl: 2,
+                  bgcolor: activeId === item.id ? "#FFF0F6" : "transparent",
+                  color: activeId === item.id ? "var(--color-text-link)" : "var(--color-text-body)",
+                  "&:hover": {
+                    bgcolor: "var(--color-bg-curator)",
+                  },
                 }}
               >
                 <ListItemIcon sx={{ minWidth: 28 }}>
-                  <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: item.color }} />
+                  <Box
+                    sx={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      bgcolor: item.color,
+                      border: item.id === "type-tokens" ? "1px solid var(--color-border-default)" : "none",
+                    }}
+                  />
                 </ListItemIcon>
                 <ListItemText
                   primary={t(item.labelKey)}
                   primaryTypographyProps={{
-                    fontSize: "14px",
+                    fontSize: "12px",
                     fontWeight: activeId === item.id ? 500 : 400,
                     color: activeId === item.id ? "var(--color-text-link)" : "var(--color-text-secondary)",
                   }}
@@ -174,31 +220,49 @@ export default function DesignSystemPage() {
       >
         <Box
           sx={{
-            px: { xs: 3, sm: 5, md: 7 },
-            py: { xs: 4, sm: 6 },
+            px: { xs: 3, sm: 6, md: 7 },
+            pt: { xs: 4.5, sm: 6 },
+            pb: { xs: 4, sm: 5 },
             bgcolor: "var(--color-bg-subtle)",
-            borderBottom: 1,
-            borderColor: "var(--color-border-subtle)",
+            borderBottom: "1px solid var(--color-border-subtle)",
           }}
         >
-          <Typography variant="overline" sx={{ fontFamily: "var(--font-family-mono)", color: "var(--color-brand-primary-hover)", letterSpacing: "0.18em" }}>
+          <Typography
+            variant="overline"
+            sx={{
+              display: "block",
+              mb: 1.5,
+              fontFamily: "var(--font-family-mono)",
+              fontSize: "9px",
+              color: "var(--color-brand-primary-hover)",
+              letterSpacing: "0.18em",
+            }}
+          >
             {t("designSystem.eyebrow")}
           </Typography>
-          <Typography variant="h2" sx={{ fontFamily: "var(--font-family-display)", fontWeight: 700, color: "var(--color-text-primary)", lineHeight: 1.1 }}>
+          <Typography
+            sx={{
+              fontFamily: "var(--font-family-display)",
+              fontSize: { xs: "30px", sm: "38px" },
+              letterSpacing: "-0.01em",
+              fontWeight: 700,
+              color: "var(--color-text-primary)",
+              lineHeight: 1.1,
+              mb: 0.75,
+            }}
+          >
             BookGuide{" "}
             <Box component="em" sx={{ color: "var(--color-text-link)", fontStyle: "normal" }}>
               Sydney
             </Box>
           </Typography>
-          <Typography variant="body2" sx={{ fontFamily: "var(--font-family-mono)", color: "var(--color-text-muted)", mt: 1 }}>
+          <Typography sx={{ fontFamily: "var(--font-family-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "var(--color-text-muted)" }}>
             {t("designSystem.tagline")}
           </Typography>
         </Box>
 
-        <Box sx={{ px: { xs: 3, sm: 5, md: 7 }, pb: 10 }}>
-          <Box sx={{ pt: 6 }}>
-            <GoverningPrincipleSection />
-          </Box>
+        <Box sx={{ px: { xs: 3, sm: 6, md: 7 }, pb: 10 }}>
+          <GoverningPrincipleSection first />
           <ColourScalesSection />
           <SemanticTokensSection />
           <TypographySection />

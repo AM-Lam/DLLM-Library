@@ -231,21 +231,21 @@ const TransactionsPage: React.FC = () => {
           <Typography variant="h6" color="text.secondary" gutterBottom>
             {activeTab === 0
               ? t(
-                  "transactions.noOpenTransactions",
-                  "No open transactions found.",
-                )
+                "transactions.noOpenTransactions",
+                "No open transactions found.",
+              )
               : t("transactions.noTransactions", "No transactions found.")}
           </Typography>
           <Typography variant="body2" color="text.disabled">
             {activeTab === 0
               ? t(
-                  "transactions.noOpenTransactionsHint",
-                  "All your transactions are completed or cancelled.",
-                )
+                "transactions.noOpenTransactionsHint",
+                "All your transactions are completed or cancelled.",
+              )
               : t(
-                  "transactions.noTransactionsHint",
-                  "Start by borrowing or lending items in the community.",
-                )}
+                "transactions.noTransactionsHint",
+                "Start by borrowing or lending items in the community.",
+              )}
           </Typography>
         </Box>
       );
@@ -325,10 +325,15 @@ const TransactionsPage: React.FC = () => {
                       color="text.primary"
                       sx={{ mb: 0.5 }}
                     >
-                      {t("transactions.requestedBy", "Requested by")}:{" "}
+                      {transaction.requestor?.id === user?.id
+                        ? t("transactions.youRequested", "You requested this")
+                        : t("transactions.requestedBy", "Requested by")}
+                      :{" "}
                       <strong>
-                        {transaction.requestor?.nickname ||
-                          transaction.requestor?.email}
+                        {transaction.requestor?.id === user?.id
+                          ? t("common.you", "You")
+                          : (transaction.requestor?.nickname ||
+                            transaction.requestor?.email)}
                       </strong>
                     </Typography>
                     <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>

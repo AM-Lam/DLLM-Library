@@ -53,6 +53,7 @@ import { calculateDistance, formatDistance } from "../utils/geoProcessor";
 import RequestConfirmationDialog from "./RequestConfirmationDialog";
 import ItemForm from "./ItemForm";
 import FaceToFaceConfirmDialog from "./FaceToFaceConfirmDialog";
+import TransferOwnershipConfirmDialog from "./TransferOwnershipConfirmDialog";
 import ItemComments from "./ItemComments";
 import { convertLinksToClickable } from "../utils/helpers";
 import { AuthDialog } from "./Auth";
@@ -646,6 +647,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
 
   // Add state for Face-to-Face dialog
   const [faceToFaceDialogOpen, setFaceToFaceDialogOpen] = useState(false);
+  const [transferOwnershipDialogOpen, setTransferOwnershipDialogOpen] = useState(false);
 
   // Add state for news form dialog
   const [newsFormOpen, setNewsFormOpen] = useState(false);
@@ -653,8 +655,6 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
   const [booklistDialogOpen, setBooklistDialogOpen] = useState(false);
   const [selectedNewsPostId, setSelectedNewsPostId] = useState("");
   const [comment, setComment] = useState("");
-  const [transferOwnershipDialogOpen, setTransferOwnershipDialogOpen] =
-    useState(false);
 
   // State for location prompt dialog
   const [locationPromptOpen, setLocationPromptOpen] = useState(false);
@@ -858,8 +858,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
   const canReturnBook = user && !isOwner && isHolder;
   const canTransferOwnership = Boolean(
     isOwner &&
-      data?.item?.holderId &&
-      data.item.holderId !== data.item.ownerId,
+    data?.item?.holderId &&
+    data.item.holderId !== data.item.ownerId,
   );
 
   const hasAddToBooklistButton = Boolean(user && availableBooklists.length > 0);
@@ -1033,30 +1033,20 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
     setNewsFormOpen(true);
   };
 
-  const handleOpenTransferOwnershipDialog = () => {
+  const handleTransferOwnershipClick = async () => {
+    if (!itemId) return;
     setTransferOwnershipDialogOpen(true);
   };
 
-  const handleCloseTransferOwnershipDialog = () => {
-    if (transferOwnershipLoading) {
-      return;
-    }
-    setTransferOwnershipDialogOpen(false);
-  };
-
   const handleConfirmTransferOwnership = async () => {
-    if (!itemId) {
-      return;
-    }
+    if (!itemId) return;
 
     try {
-      await transferOwnership({
-        variables: { itemId },
-      });
-    } catch (mutationError) {
-      console.error("Error transferring ownership:", mutationError);
+      await transferOwnership({ variables: { itemId } });
+    } catch (error) {
+      console.error("Error transferring ownership:", error);
     }
-  };
+  }
 
   const handleConfirmRequest = async (
     location: TransactionLocation,
@@ -1106,6 +1096,11 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
 
   const handleCloseFaceToFaceDialog = () => {
     setFaceToFaceDialogOpen(false);
+  };
+
+  const handleCloseTransferOwnershipDialog = () => {
+    if (transferOwnershipLoading) return;
+    setTransferOwnershipDialogOpen(false);
   };
 
   const handleCloseSuccessSnackbar = () => {
@@ -1675,31 +1670,31 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
           {/* IMAGES — visual first */}
           {((data.item.thumbnails && data.item.thumbnails.length > 0) ||
             (data.item.images && data.item.images.length > 0)) && (
-            <Box sx={mb4Sx}>
-              <Box sx={sectionMb4Sx}>
-                <Grid container spacing={2}>
-                  {(data.item.thumbnails && data.item.thumbnails.length > 0
-                    ? data.item.thumbnails
-                    : data.item.images || []
-                  ).map((image, index) => (
-                    <Grid key={index} size={{ xs: 6, sm: 4, md: 3 }}>
-                      <Paper
-                        elevation={2}
-                        sx={thumbnailPaperSx}
-                        onClick={() => handleThumbnailClick(index)}
-                      >
-                        <img
-                          src={image}
-                          alt={`${data.item.name} - Thumbnail ${index + 1} `}
-                          style={thumbnailImageStyle}
-                        />
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
+              <Box sx={mb4Sx}>
+                <Box sx={sectionMb4Sx}>
+                  <Grid container spacing={2}>
+                    {(data.item.thumbnails && data.item.thumbnails.length > 0
+                      ? data.item.thumbnails
+                      : data.item.images || []
+                    ).map((image, index) => (
+                      <Grid key={index} size={{ xs: 6, sm: 4, md: 3 }}>
+                        <Paper
+                          elevation={2}
+                          sx={thumbnailPaperSx}
+                          onClick={() => handleThumbnailClick(index)}
+                        >
+                          <img
+                            src={image}
+                            alt={`${data.item.name} - Thumbnail ${index + 1} `}
+                            style={thumbnailImageStyle}
+                          />
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
               </Box>
-            </Box>
-          )}
+            )}
 
           {/* ITEM INFO GRID */}
           <Card elevation={0} sx={infoCardSx}>
@@ -1828,6 +1823,18 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
                 {t("item.faceToFaceTransfer", "Face-to-Face Transfer")}
               </Button>
             )}
+            {canTransferOwnership && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                size="small"
+                onClick={handleTransferOwnershipClick}
+                disabled={transferOwnershipLoading}
+                startIcon={<TransferIcon />}
+              >
+                {t("item.transferOwnership.title", "Transfer Ownership")}
+              </Button>
+            )}
             {isAdmin && (
               <Button
                 variant="outlined"
@@ -1851,33 +1858,23 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
               </Button>
             )}
 
-            {canTransferOwnership && (
-              <Button
-                variant="outlined"
-                color="secondary"
-                size="small"
-                onClick={handleOpenTransferOwnershipDialog}
-                disabled={transferOwnershipLoading}
-                startIcon={<TransferIcon />}
-              >
-                {t("item.transferOwnership", "Transfer Ownership")}
-              </Button>
-            )}
+            {/* related news */}
+            {itemNewsPosts?.data?.newsRecentPosts &&
+              itemNewsPosts?.data?.newsRecentPosts.length > 0 && (
+                <List sx={relatedNewsListSx}>
+                  <Typography variant="h6">
+                    {t("item.relatedNews", "Related News")}
+                  </Typography>
+                  {itemNewsPosts.data.newsRecentPosts.map((news: SimpleNews) => (
+                    <NewsSummary
+                      key={news.id}
+                      news={news}
+                      onClick={handleNewsItemClick}
+                    />
+                  ))}
+                </List>
+              )}
           </Box>
-
-          {/* related news */}
-          {itemNewsPosts?.data?.newsRecentPosts &&
-            itemNewsPosts?.data?.newsRecentPosts.length > 0 && (
-              <List sx={relatedNewsListSx}>
-                {itemNewsPosts.data.newsRecentPosts.map((news: SimpleNews) => (
-                  <NewsSummary
-                    key={news.id}
-                    news={news}
-                    onClick={handleNewsItemClick}
-                  />
-                ))}
-              </List>
-            )}
         </Paper>
       )}
       {/* Edit Item Dialog */}
@@ -1963,6 +1960,14 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
         itemName={data?.item?.name || ""}
       />
 
+      <TransferOwnershipConfirmDialog
+        open={transferOwnershipDialogOpen}
+        onClose={handleCloseTransferOwnershipDialog}
+        onConfirm={handleConfirmTransferOwnership}
+        loading={transferOwnershipLoading}
+        itemName={data?.item?.name || ""}
+      />
+
       <Dialog
         open={booklistDialogOpen}
         onClose={handleCloseBooklistDialog}
@@ -2026,42 +2031,6 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={transferOwnershipDialogOpen}
-        onClose={handleCloseTransferOwnershipDialog}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>
-          {t("item.transferOwnershipTitle", "Transfer Ownership")}
-        </DialogTitle>
-        <DialogContent>
-          <Typography>
-            {t(
-              "item.transferOwnershipDescription",
-              "Are you sure you want to transfer ownership of this item to the current holder?",
-            )}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={handleCloseTransferOwnershipDialog}
-            disabled={transferOwnershipLoading}
-          >
-            {t("common.cancel", "Cancel")}
-          </Button>
-          <Button
-            onClick={handleConfirmTransferOwnership}
-            variant="contained"
-            disabled={transferOwnershipLoading}
-          >
-            {transferOwnershipLoading ? (
-              <CircularProgress size={20} sx={progressMr1Sx} />
-            ) : null}
-            {t("item.transferOwnershipConfirm", "Confirm Transfer")}
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       {/* Success Snackbar */}
       <Snackbar

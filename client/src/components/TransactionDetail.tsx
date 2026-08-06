@@ -64,6 +64,10 @@ import ShareTransactionDialog from "./ShareTransactionDialog";
 import { QRCodeSVG } from "qrcode.react";
 import { semanticTokens } from "../styles/semanticTokens";
 import DetailSectionCard from "../styles/DetailSectionCard";
+import {
+  buildTransactionWorkflowState,
+  type TransactionWorkflowState,
+} from "../utils/transactionWorkflow";
 
 // Create a custom icon using Leaflet's default marker
 const customIcon = new L.Icon({
@@ -250,203 +254,38 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data, level = 0 }) => {
   );
 };
 
-// Add this helper function before the TransactionDetailPage component
-const getRoleInstructions = (
-  t: any,
-  status: TransactionStatus,
-  isOwner: boolean,
-  isHolder: boolean,
-  isRequestor: boolean,
-  isReceiver: boolean,
-  isQuickExchange: boolean,
-): {
-  role: string;
-  instruction: string;
-  severity: "info" | "warning" | "success";
-} | null => {
-  // Owner instructions
-  if (isOwner) {
-    switch (status) {
-      case TransactionStatus.Pending:
-        return {
-          role: t("transactions.roleOwner", "Owner"),
-          instruction: t(
-            "transactions.ownerInstructionPending",
-            "You have received a request for this item. Please review the requestor's information and decide whether to approve or cancel this transaction.",
-          ),
-          severity: "warning",
-        };
-      case TransactionStatus.Approved:
-        return {
-          role: t("transactions.roleOwner", "Owner"),
-          instruction: t(
-            "transactions.ownerInstructionApproved",
-            "You have approved this transaction. Please arrange a meeting with the requestor at the exchange location shown below. Once you have handed over the item, click 'Mark as Transferred'.",
-          ),
-          severity: "info",
-        };
-      case TransactionStatus.Transfered:
-        return {
-          role: t("transactions.roleOwner", "Owner"),
-          instruction: t(
-            "transactions.ownerInstructionTransferred",
-            "You have marked the item as transferred. Waiting for the receiver to confirm receipt.",
-          ),
-          severity: "info",
-        };
-      case TransactionStatus.Completed:
-        return {
-          role: t("transactions.roleOwner", "Owner"),
-          instruction: t(
-            "transactions.ownerInstructionCompleted",
-            "This transaction is complete. The item has been successfully transferred to the new holder.",
-          ),
-          severity: "success",
-        };
-      case TransactionStatus.Cancelled:
-        return {
-          role: t("transactions.roleOwner", "Owner"),
-          instruction: t(
-            "transactions.ownerInstructionCancelled",
-            "This transaction has been cancelled. The item remains in your possession.",
-          ),
-          severity: "info",
-        };
-    }
-  }
-  // Holder instructions
-  if (isHolder) {
-    switch (status) {
-      case TransactionStatus.Approved:
-        return {
-          role: t("transactions.roleHolder", "Holder"),
-          instruction: t(
-            "transactions.ownerInstructionApproved",
-            "You have approved this transaction. Please arrange a meeting with the requestor at the exchange location shown below. Once you have handed over the item, click 'Mark as Transferred'.",
-          ),
-          severity: "info",
-        };
-    }
-  }
-  // Requestor instructions
-  if (isRequestor) {
-    switch (status) {
-      case TransactionStatus.Pending:
-        return {
-          role: t("transactions.roleRequestor", "Requestor"),
-          instruction: t(
-            "transactions.requestorInstructionPending",
-            "Your request has been submitted. Please wait for the owner to review and approve your request. You can cancel this request if needed.",
-          ),
-          severity: "warning",
-        };
-      case TransactionStatus.Approved:
-        return {
-          role: t("transactions.roleRequestor", "Requestor"),
-          instruction: t(
-            "transactions.requestorInstructionApproved",
-            "Your request has been approved! Please coordinate with the owner to meet at the exchange location shown below. Wait for the owner to hand over the item.",
-          ),
-          severity: "success",
-        };
-      case TransactionStatus.Transfered:
-        return {
-          role: t("transactions.roleRequestor", "Requestor"),
-          instruction: isQuickExchange
-            ? t(
-              "transactions.requestorInstructionTransferredQuick",
-              "The item has been marked as transferred to you. Please inspect the item and take photos if needed, then click 'Confirm Received' to complete the transaction.",
-            )
-            : t(
-              "transactions.requestorInstructionTransferred",
-              "The item has been marked as transferred. Waiting for the designated receiver to confirm receipt.",
-            ),
-          severity: isQuickExchange ? "warning" : "info",
-        };
-      case TransactionStatus.Completed:
-        return {
-          role: t("transactions.roleRequestor", "Requestor"),
-          instruction: t(
-            "transactions.requestorInstructionCompleted",
-            "This transaction is complete. You are now the holder of this item and can manage it from your items page.",
-          ),
-          severity: "success",
-        };
-      case TransactionStatus.Cancelled:
-        return {
-          role: t("transactions.roleRequestor", "Requestor"),
-          instruction: t(
-            "transactions.requestorInstructionCancelled",
-            "This transaction has been cancelled. You may submit a new request if still interested.",
-          ),
-          severity: "info",
-        };
-    }
-  }
-
-  // Receiver instructions (if different from requestor)
-  if (isReceiver && !isRequestor) {
-    switch (status) {
-      case TransactionStatus.Transfered:
-        return {
-          role: t("transactions.roleReceiver", "Receiver"),
-          instruction: t(
-            "transactions.receiverInstructionTransferred",
-            "The item has been marked as transferred to you. Please inspect the item and take photos if needed, then click 'Confirm Received' to complete the transaction.",
-          ),
-          severity: "warning",
-        };
-      case TransactionStatus.Completed:
-        return {
-          role: t("transactions.roleReceiver", "Receiver"),
-          instruction: t(
-            "transactions.receiverInstructionCompleted",
-            "You have confirmed receipt of this item. You are now the holder and can manage it from your items page.",
-          ),
-          severity: "success",
-        };
-    }
-  }
-
-  return null;
-};
-
 // Add this helper function for action button descriptions
 const getActionButtonDescription = (
   t: any,
   action: string,
   status: TransactionStatus,
 ): string => {
-  switch (action) {
-    case "approve":
-      return t(
-        "transactions.actionApproveDescription",
-        "Click this after reviewing the requestor's information and deciding to proceed with the exchange.",
-      );
-    case "transfer":
-      return t(
-        "transactions.actionTransferDescription",
-        "Click this only AFTER you have physically handed over the item to the requestor at the exchange location.",
-      );
-    case "receive":
-      return t(
-        "transactions.actionReceiveDescription",
-        "Click this after inspecting the item's condition. You can optionally take photos to document the item's state at receipt.",
-      );
-    case "cancel":
-      if (status === TransactionStatus.Pending) {
-        return t(
+  const actionDescriptionMap: Record<string, string> = {
+    approve: t(
+      "transactions.actionApproveDescription",
+      "Click this after reviewing the requestor's information and deciding to proceed with the exchange.",
+    ),
+    transfer: t(
+      "transactions.actionTransferDescription",
+      "Click this only AFTER you have physically handed over the item to the requestor at the exchange location.",
+    ),
+    receive: t(
+      "transactions.actionReceiveDescription",
+      "Click this after inspecting the item's condition. You can optionally take photos to document the item's state at receipt.",
+    ),
+    cancel:
+      status === TransactionStatus.Pending
+        ? t(
           "transactions.actionCancelPendingDescription",
           "Cancel this transaction request. The item will remain with the current holder.",
-        );
-      }
-      return t(
-        "transactions.actionCancelApprovedDescription",
-        "Cancel this approved transaction. Use this if you can no longer proceed with the exchange.",
-      );
-    default:
-      return "";
-  }
+        )
+        : t(
+          "transactions.actionCancelApprovedDescription",
+          "Cancel this approved transaction. Use this if you can no longer proceed with the exchange.",
+        ),
+  };
+
+  return actionDescriptionMap[action] || "";
 };
 
 const pageContainerSx = { py: 4 };
@@ -600,38 +439,30 @@ const TransactionDetailPage: React.FC = () => {
     navigate(path);
   };
 
-  const getStatusIcon = (status: TransactionStatus) => {
-    switch (status) {
-      case TransactionStatus.Pending:
-        return <ScheduleIcon color="warning" />;
-      case TransactionStatus.Approved:
-        return <CheckCircleIcon color="success" />;
-      case TransactionStatus.Transfered:
-        return <LocalShippingIcon color="primary" />;
-      case TransactionStatus.Completed:
-        return <DoneIcon color="success" />;
-      case TransactionStatus.Cancelled:
-        return <CancelIcon color="error" />;
-      default:
-        return <SwapHorizIcon />;
-    }
+  const getStatusIcon = (status: TransactionStatus): React.ReactElement => {
+    const statusIconMap: Partial<
+      Record<TransactionStatus, React.ReactElement>
+    > = {
+      [TransactionStatus.Pending]: <ScheduleIcon color="warning" />,
+      [TransactionStatus.Approved]: <CheckCircleIcon color="success" />,
+      [TransactionStatus.Transfered]: <LocalShippingIcon color="primary" />,
+      [TransactionStatus.Completed]: <DoneIcon color="success" />,
+      [TransactionStatus.Cancelled]: <CancelIcon color="error" />,
+    };
+
+    return statusIconMap[status] || <SwapHorizIcon />;
   };
 
   const getStatusColor = (status: TransactionStatus) => {
-    switch (status) {
-      case TransactionStatus.Pending:
-        return "warning";
-      case TransactionStatus.Approved:
-        return "success";
-      case TransactionStatus.Transfered:
-        return "primary";
-      case TransactionStatus.Completed:
-        return "success";
-      case TransactionStatus.Cancelled:
-        return "error";
-      default:
-        return "default";
-    }
+    const statusColorMap: Partial<Record<TransactionStatus, string>> = {
+      [TransactionStatus.Pending]: "warning",
+      [TransactionStatus.Approved]: "success",
+      [TransactionStatus.Transfered]: "primary",
+      [TransactionStatus.Completed]: "success",
+      [TransactionStatus.Cancelled]: "error",
+    };
+
+    return statusColorMap[status] || "default";
   };
 
   const formatDate = (dateString: string) => {
@@ -661,6 +492,10 @@ const TransactionDetailPage: React.FC = () => {
     (data?.transaction?.receiver === null ||
       data?.transaction?.receiver === undefined) &&
     (ownerId === requestorId || holderId === requestorId);
+  const isAdmin =
+    user?.role === Role.Admin ||
+    user?.role === Role.Moderator ||
+    user?.role === Role.ExchangePointAdmin;
 
   if (loading) {
     return (
@@ -776,16 +611,16 @@ const TransactionDetailPage: React.FC = () => {
   // Generate the full transaction URL
   const transactionUrl = `${window.location.origin}/transaction/${transactionId}`;
 
-  // Get role-specific instructions
-  const roleInstructions = getRoleInstructions(
-    t,
-    transaction.status,
-    isOwner || false,
-    isHolder || false,
-    isRequestor || false,
-    isReceiver || false,
-    isQuickExchange || false,
-  );
+  const workflowState: TransactionWorkflowState = buildTransactionWorkflowState({
+    status: transaction.status,
+    isOwner: isOwner || false,
+    isHolder: isHolder || false,
+    isRequestor: isRequestor || false,
+    isReceiver: isReceiver || false,
+    isQuickExchange: isQuickExchange || false,
+    isAdmin,
+    translate: (key, fallback) => t(key, fallback),
+  });
 
   // Determine transaction type
   const getTransactionType = ():
@@ -793,17 +628,14 @@ const TransactionDetailPage: React.FC = () => {
     | "directExchange"
     | "exchangePoint"
     | null => {
+
     if (!transaction) return null;
 
     // Check if it's an exchange point transaction
-    if (isExchangePointTransaction) {
-      return "exchangePoint";
-    }
+    if (isExchangePointTransaction) return "exchangePoint";
 
     // Check if it's a face-to-face quick exchange
-    if (isQuickExchange) {
-      return "faceToFace";
-    }
+    if (isQuickExchange) return "faceToFace";
 
     // Default to direct exchange
     return "directExchange";
@@ -843,6 +675,22 @@ const TransactionDetailPage: React.FC = () => {
         />
       </Box>
 
+      <Alert
+        severity={workflowState.severity}
+        icon={<PersonIcon />}
+        sx={sectionTitleSx}
+      >
+        <Typography variant="subtitle2" sx={boldSubtitleSx}>
+          {t(
+            `transactions.workflow.${workflowState.role}Heading`,
+            workflowState.heading,
+          )}
+        </Typography>
+        <Typography variant="body2">
+          {workflowState.description}
+        </Typography>
+      </Alert>
+
       <Box sx={qrWrapperSx}>
         <QRCodeSVG
           value={transactionUrl}
@@ -851,22 +699,6 @@ const TransactionDetailPage: React.FC = () => {
           includeMargin={true}
         />
       </Box>
-
-      {/* Role-specific Instructions Alert - Add this before Transaction Info */}
-      {roleInstructions && (
-        <Alert
-          severity={roleInstructions.severity}
-          icon={<PersonIcon />}
-          sx={sectionTitleSx}
-        >
-          <Typography variant="subtitle2" sx={boldSubtitleSx}>
-            {roleInstructions.role}
-          </Typography>
-          <Typography variant="body2">
-            {roleInstructions.instruction}
-          </Typography>
-        </Alert>
-      )}
 
       {/* Action Buttons - Enhanced with descriptions */}
       <Paper elevation={1} sx={sectionPaperSx}>
@@ -888,17 +720,33 @@ const TransactionDetailPage: React.FC = () => {
               )}
             </Typography>
           </Box>
-          {roleInstructions && (
-            <Typography variant="body2" color="text.secondary" sx={mt1Sx}>
-              {roleInstructions.instruction}
-            </Typography>
-          )}
+          <Typography variant="body2" color="text.secondary" sx={mt1Sx}>
+            {workflowState.description}
+          </Typography>
         </Box>
 
         <Box sx={actionsColumnSx}>
-          {/* Owner Actions - Pending */}
+          {workflowState.primaryAction === "approve" && (isOwner || isRequestor) && (
+            <Alert severity="info" icon={<CheckCircleIcon />}>
+              {t(
+                "transactions.workflow.approveHint",
+                "Approval is current next step. Use transaction workflow controls available in your current release.",
+              )}
+            </Alert>
+          )}
+
+          {workflowState.primaryAction === "handoff" && (isOwner || isHolder) && (
+            <Alert severity="info" icon={<LocalShippingIcon />}>
+              {t(
+                "transactions.workflow.handoffHint",
+                "Handoff is current next step. Record transfer with workflow controls available in your current release.",
+              )}
+            </Alert>
+          )}
+
           {(isOwner || isRequestor) &&
-            transaction.status === TransactionStatus.Pending && (
+            (transaction.status === TransactionStatus.Pending ||
+              transaction.status === TransactionStatus.Approved) && (
               <Box>
                 <Button
                   variant="outlined"
@@ -926,43 +774,6 @@ const TransactionDetailPage: React.FC = () => {
               </Box>
             )}
 
-          {/* Owner and Requestor Actions - Approved */}
-          {transaction.status === TransactionStatus.Approved && (
-            <>
-              {(isOwner || isRequestor) && (
-                <Box>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleAction("cancel", cancelTransaction)}
-                    disabled={actionLoading === "cancel"}
-                    startIcon={
-                      actionLoading === "cancel" ? (
-                        <CircularProgress size={20} />
-                      ) : (
-                        <CancelIcon />
-                      )
-                    }
-                    fullWidth
-                  >
-                    {t("transactions.cancel", "Cancel")}
-                  </Button>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={actionHintSx}
-                  >
-                    {getActionButtonDescription(
-                      t,
-                      "cancel",
-                      transaction.status,
-                    )}
-                  </Typography>
-                </Box>
-              )}
-            </>
-          )}
-
           {/* Receive Button - Transferred */}
           {!isHolder &&
             (isRequestor || isReceiver || isQuickExchange) &&
@@ -974,36 +785,24 @@ const TransactionDetailPage: React.FC = () => {
                     color="success"
                     onClick={handleReceiveClick}
                     disabled={actionLoading === "receive"}
-                    startIcon={
-                      actionLoading === "receive" ? (
-                        <CircularProgress size={20} />
-                      ) : (
-                        <DoneIcon />
-                      )
-                    }
+                    startIcon={actionLoading === "receive" ? (<CircularProgress size={20} />) : (<DoneIcon />)}
                     fullWidth
                   >
-                    {t("transactions.receive", "Confirm Received")}
+                    {t("transactions.receive", "Confirm and document condition photos")}
                   </Button>
                   <Typography
                     variant="caption"
                     color="text.secondary"
                     sx={actionHintSx}
                   >
-                    {getActionButtonDescription(
-                      t,
-                      "receive",
-                      transaction.status,
-                    )}
+                    {getActionButtonDescription(t, "receive", transaction.status)}
                   </Typography>
                 </Box>
 
                 {isQuickExchange && !user && (
                   <Alert severity="info">
-                    {t(
-                      "transactions.signInToConfirm",
-                      "Please sign in or create an account to confirm receipt of this item.",
-                    )}
+                    {t("transactions.signInToConfirm",
+                      "Please sign in or create an account to confirm receipt of this item.")}
                   </Alert>
                 )}
               </>
@@ -1024,10 +823,7 @@ const TransactionDetailPage: React.FC = () => {
               transaction.status === TransactionStatus.Transfered)
           ) && (
               <Alert severity="info">
-                {t(
-                  "transactions.noActionsAvailable",
-                  "No actions available for this transaction.",
-                )}
+                {t("transactions.noActionsAvailable", "No actions available for this transaction.")}
               </Alert>
             )}
 
@@ -1130,7 +926,13 @@ const TransactionDetailPage: React.FC = () => {
                   variant="subtitle1"
                   sx={participantTitlePrimarySx}
                 >
-                  {t("transactions.requestorInfo", "Requestor")}
+                  {t("transactions.requestorInfo", "Requested by")}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  {t(
+                    "transactions.requestorRelationship",
+                    "This person initiated the exchange request.",
+                  )}
                 </Typography>
                 <ListItem sx={{ px: 0 }}>
                   <ListItemIcon>
@@ -1150,10 +952,14 @@ const TransactionDetailPage: React.FC = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={t("user.email", "Email")}
-                    secondary={transaction.requestor?.email}
+                    secondary={
+                      workflowState.showSensitiveDetails
+                        ? transaction.requestor?.email
+                        : t("transactions.privateContact", "Private contact")
+                    }
                   />
                 </ListItem>
-                {transaction.requestor?.address && (
+                {workflowState.showSensitiveDetails && transaction.requestor?.address && (
                   <ListItem sx={{ px: 0 }}>
                     <ListItemIcon>
                       <HomeIcon color="primary" />
@@ -1185,7 +991,13 @@ const TransactionDetailPage: React.FC = () => {
                       variant="subtitle1"
                       sx={participantTitleSecondarySx}
                     >
-                      {t("transactions.receiverInfo", "Receiver")}
+                      {t("transactions.receiverInfo", "Will receive the item")}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {t(
+                        "transactions.receiverRelationship",
+                        "This person is the intended recipient of the handoff.",
+                      )}
                     </Typography>
                     <ListItem sx={{ px: 0 }}>
                       <ListItemIcon>
@@ -1205,10 +1017,14 @@ const TransactionDetailPage: React.FC = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={t("user.email", "Email")}
-                        secondary={transaction.receiver?.email}
+                        secondary={
+                          workflowState.showSensitiveDetails
+                            ? transaction.receiver?.email
+                            : t("transactions.privateContact", "Private contact")
+                        }
                       />
                     </ListItem>
-                    {transaction.receiver?.address && (
+                    {workflowState.showSensitiveDetails && transaction.receiver?.address && (
                       <ListItem sx={{ px: 0 }}>
                         <ListItemIcon>
                           <HomeIcon color="secondary" />
@@ -1239,29 +1055,21 @@ const TransactionDetailPage: React.FC = () => {
                   variant="subtitle1"
                   sx={participantTitleInfoSx}
                 >
-                  {t("transactions.holderInfo", "Current Holder")}
+                  {t("transactions.holderInfo", "Currently holding the item")}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  {t(
+                    "transactions.holderRelationship",
+                    "This person is currently responsible for the item until the exchange progresses.",
+                  )}
                 </Typography>
                 <ListItem sx={{ px: 0 }}>
                   <ListItemIcon>
                     <AccountBoxIcon color="info" />
                   </ListItemIcon>
                   <ListItemText
-                    primary={
-                      holder
-                        ? t("item.holder", "Holder")
-                        : t("item.owner", "Owner")
-                    }
-                    secondary={
-                      holder
-                        ? t(
-                          "transactions.holderIsRequestor",
-                          "Requestor has the item",
-                        )
-                        : t(
-                          "transactions.ownerHasItem",
-                          "Owner is holding the item",
-                        )
-                    }
+                    primary={holder ? t("item.holder", "Holder") : t("item.owner", "Owner")}
+                    secondary={holder ? t("transactions.holderIsRequestor", "Requestor has the item") : t("transactions.ownerHasItem", "Owner is holding the item")}
                   />
                 </ListItem>
               </CardContent>
@@ -1269,78 +1077,6 @@ const TransactionDetailPage: React.FC = () => {
           </Grid>
         </Grid>
       </Paper>
-
-      {/* Transaction Details Section - Add this new section */}
-      {/* {transactionDetails && (
-        <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ display: "flex", alignItems: "center" }}
-            >
-              <AccountBoxIcon sx={{ mr: 1 }} />
-              {t("transactions.details", "Transaction Details")}
-            </Typography>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setShowRawJson(!showRawJson)}
-            >
-              {showRawJson
-                ? t("transactions.showFormatted", "Show Formatted")
-                : t("transactions.showRaw", "Show Raw JSON")}
-            </Button>
-          </Box>
-
-          <Divider sx={{ mb: 2 }} />
-
-          {showRawJson ? (
-            <Box
-              sx={{
-                bgcolor: "grey.100",
-                p: 2,
-                borderRadius: 1,
-                overflow: "auto",
-                maxHeight: 400,
-              }}
-            >
-              <Typography
-                component="pre"
-                variant="body2"
-                sx={{
-                  fontFamily: "monospace",
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  m: 0,
-                }}
-              >
-                {JSON.stringify(transactionDetails, null, 2)}
-              </Typography>
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                bgcolor: "background.default",
-                p: 2,
-                borderRadius: 1,
-                border: 1,
-                borderColor: "divider",
-                maxHeight: 400,
-                overflow: "auto",
-              }}
-            >
-              <JsonViewer data={transactionDetails} />
-            </Box>
-          )}
-        </Paper>
-      )} */}
 
       {/* Item Info */}
       <Paper elevation={1} sx={sectionPaperSx}>
@@ -1421,10 +1157,7 @@ const TransactionDetailPage: React.FC = () => {
             sx={headingWithIconSx}
           >
             <LocationOnIcon sx={iconStartSx} />
-            {t(
-              "transactions.proposedExchangeLocation",
-              "Proposed Exchange Location",
-            )}
+            {t("transactions.proposedExchangeLocation", "Proposed Exchange Location")}
           </Typography>
 
           <Box sx={mapContainerBoxSx}>
@@ -1531,10 +1264,7 @@ const TransactionDetailPage: React.FC = () => {
             </Typography>
 
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {t(
-                "transactions.receiptImagesDescription",
-                "Photos taken when the item was received, documenting its condition.",
-              )}
+              {t("transactions.receiptImagesDescription", "Photos taken when the item was received, documenting its condition.")}
             </Typography>
 
             <ImageList
@@ -1555,9 +1285,7 @@ const TransactionDetailPage: React.FC = () => {
                     title={t(
                       "transactions.receiptImage",
                       "Receipt Image {{number}}",
-                      {
-                        number: index + 1,
-                      },
+                      { number: index + 1 },
                     )}
                     subtitle={t("common.clickToEnlarge", "Click to enlarge")}
                   />
@@ -1573,12 +1301,7 @@ const TransactionDetailPage: React.FC = () => {
         onClose={handleCloseAuthDialog}
         onSuccess={handleAuthSuccess}
         onForgotPassword={() => {
-          alert(
-            t(
-              "auth.resetPasswordInfo",
-              "Please contact support to reset your password.",
-            ),
-          );
+          alert(t("auth.resetPasswordInfo", "Please contact support to reset your password."));
         }}
         defaultIsSignUp={authDefaultSignUp}
       />
