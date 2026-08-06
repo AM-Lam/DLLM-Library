@@ -107,8 +107,17 @@ const categoryTagSx = {
   borderRadius: "4px",
   px: "6px",
   py: "2px",
-  fontSize: "12px",
+  fontSize: "11px",
+  bgcolor: "#f9f5f6",
+  fontWeight: "var(--font-weight-semibold)",
   fontFamily: "var(--font-family-body)",
+};
+
+const categoryTagEllipsisSx = {
+  ...categoryTagSx,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 };
 
 const ItemPreview: React.FC<ItemPreviewProps> = ({ item, onClick }) => {
@@ -119,11 +128,11 @@ const ItemPreview: React.FC<ItemPreviewProps> = ({ item, onClick }) => {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "AVAILABLE":
-        return "可借";
+        return t("shortStatus.AVAILABLE", "可借");
       case "EXCHANGEABLE":
-        return "可換";
+        return t("shortStatus.EXCHANGEABLE", "可換");
       case "GIFT":
-        return "贈送";
+        return t("shortStatus.GIFT", "贈送");
       default:
         return t(`shortStatus.${status}`, status);
     }
@@ -134,13 +143,13 @@ const ItemPreview: React.FC<ItemPreviewProps> = ({ item, onClick }) => {
     switch (cond) {
       case "NEW":
       case "AS_NEW":
-        return "全新";
+        return t("item.conditions.NEW", "全新");
       case "NEAR_NEW":
-        return "近全新";
+        return t("item.conditions.NEAR_NEW", "近全新");
       case "GOOD":
-        return "良好";
+        return t("item.conditions.GOOD", "良好");
       case "FAIR":
-        return "一般";
+        return t("item.conditions.FAIR", "一般");
       default:
         return t(`item.conditions.${cond}`, cond);
     }
@@ -258,22 +267,22 @@ const ItemPreview: React.FC<ItemPreviewProps> = ({ item, onClick }) => {
                 {item.name}
               </Typography>
             )} */}
-            {hasImage && (
-              <Typography
-                sx={{
-                  fontWeight: "bold",
-                  fontSize: "12px",
-                  lineHeight: "1.3",
-                  color: "var(--color-text-primary)",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  fontFamily: "var(--font-family-display)",
-                  display: "inline-block",
-                }}
-              >
-                {item.name}
-              </Typography>
-            )}
+            {/* {hasImage && ( */}
+            <Typography
+              sx={{
+                fontWeight: "bold",
+                fontSize: "12px",
+                lineHeight: "1.3",
+                color: "var(--color-text-primary)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                fontFamily: "var(--font-family-display)",
+                display: "inline-block",
+              }}
+            >
+              {item.name}
+            </Typography>
+            {/* )} */}
             <Typography
               sx={{
                 fontSize: "12px",
@@ -296,17 +305,11 @@ const ItemPreview: React.FC<ItemPreviewProps> = ({ item, onClick }) => {
                 alignItems: "center",
               }}
             >
-              <Box
-                sx={categoryTagSx}
-              >
-                {item.category[0].includes(" ")
-                  ? item.category[0].split(" ")[0] + "..."
-                  : item.category[0]}
+              <Box component="span" sx={categoryTagEllipsisSx}>
+                {item.category[0]}
               </Box>
               {item.category.length > 1 && (
-                <Box
-                  sx={categoryTagSx}
-                >
+                <Box sx={categoryTagSx}>
                   +{item.category.length - 1}
                 </Box>
               )}

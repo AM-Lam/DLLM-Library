@@ -655,8 +655,6 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
   const [booklistDialogOpen, setBooklistDialogOpen] = useState(false);
   const [selectedNewsPostId, setSelectedNewsPostId] = useState("");
   const [comment, setComment] = useState("");
-  const [transferOwnershipDialogOpen, setTransferOwnershipDialogOpen] =
-    useState(false);
 
   // State for location prompt dialog
   const [locationPromptOpen, setLocationPromptOpen] = useState(false);
