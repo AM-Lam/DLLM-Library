@@ -655,6 +655,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
   const [booklistDialogOpen, setBooklistDialogOpen] = useState(false);
   const [selectedNewsPostId, setSelectedNewsPostId] = useState("");
   const [comment, setComment] = useState("");
+  const [transferOwnershipDialogOpen, setTransferOwnershipDialogOpen] =
+    useState(false);
 
   // State for location prompt dialog
   const [locationPromptOpen, setLocationPromptOpen] = useState(false);
@@ -826,13 +828,13 @@ const ItemDetail: React.FC<ItemDetailProps> = ({
 
   const [transferOwnership, { loading: transferOwnershipLoading }] =
     useMutation(TRANSFER_OWNERSHIP_MUTATION, {
-      onCompleted: async () => {
+      onCompleted: () => {
         setTransferOwnershipDialogOpen(false);
         setSuccessMessage(
           t("item.transferOwnershipSuccess", "Ownership transferred"),
         );
         setSuccessSnackbarOpen(true);
-        await refetch();
+        refetch();
       },
       onError: (mutationError) => {
         setErrorMessage(mutationError.message);
