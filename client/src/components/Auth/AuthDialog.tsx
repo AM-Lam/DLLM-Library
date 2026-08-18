@@ -84,7 +84,12 @@ const AuthDialog: React.FC<AuthDialogProps> = ({
         await sendEmailVerification(userCredential.user);
         console.log("Verification email sent");
 
-        alert(t("auth.verificationEmailSent"));
+        alert(
+          `${t("auth.verificationEmailSent")} ${t(
+            "auth.verificationSupportHint",
+            "If you don't receive the verification email, please check your spam or junk mailbox. If you still need help, click the chat button in the bottom-right corner to contact the user group for support.",
+          )}`,
+        );
       } else {
         // Sign In
         await signInWithEmailAndPassword(auth, email, password);

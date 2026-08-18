@@ -18,6 +18,8 @@ import {
   DialogContentText,
   DialogActions,
   Grid,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { Chat as ChatIcon } from "@mui/icons-material";
 import {
@@ -90,6 +92,8 @@ const HomePage: React.FC = () => {
 
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [showAddressReminder, setShowAddressReminder] = useState(false);
+  const [showNewUserVillageDialog, setShowNewUserVillageDialog] =
+    useState(false);
 
   const handleItemCreated = () => {
     setShowItemForm(false);
@@ -168,6 +172,50 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const isProfileIncomplete = (() => {
+    if (!user) return false;
+
+    const normalizedNickname = user.nickname?.trim().toLowerCase() ?? "";
+    const normalizedEmail = user.email?.trim().toLowerCase() ?? "";
+    const normalizedAddress = user.address?.trim() ?? "";
+
+    return (
+      !normalizedNickname ||
+      normalizedNickname === normalizedEmail ||
+      !normalizedAddress
+    );
+  })();
+
+  const [profileSetupChecklist, setProfileSetupChecklist] = useState({
+    nickname: false,
+    address: false,
+  });
+
+  useEffect(() => {
+    if (!user) return;
+
+    const nicknameValue = user.nickname?.trim() ?? "";
+    const emailValue = user.email?.trim().toLowerCase() ?? "";
+    const nicknameDone =
+      Boolean(nicknameValue) && nicknameValue.toLowerCase() !== emailValue;
+    const addressDone = Boolean(user.address?.trim());
+
+    setProfileSetupChecklist({
+      nickname: nicknameDone,
+      address: addressDone,
+    });
+  }, [user?.nickname, user?.address, user?.email]);
+
+  const handleProfileChecklistChange = (
+    key: "nickname" | "address",
+    checked: boolean,
+  ) => {
+    setProfileSetupChecklist((prev) => ({
+      ...prev,
+      [key]: checked,
+    }));
+  };
+
   return (
     <>
       <List
@@ -183,28 +231,124 @@ const HomePage: React.FC = () => {
               <Box>
                 <Grid container alignItems="center">
                   <Grid size={{ xs: 12, md: 12 }}>
-                    <Typography
+                    <Box
                       sx={{
-                        fontFamily: "var(--font-family-display)",
-                        fontWeight: 900,
-                        color: "var(--color-text-primary)",
-                        cursor: "pointer",
-                        letterSpacing: "-0.5px",
-                        lineHeight: "1.1",
-                        fontSize: { xs: "18px", sm: "24px", md: "28px" },
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                        flexWrap: "wrap",
+                        mb: 1,
                       }}
                     >
-                      {t("home.welcome", { nickname: user.nickname })}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        color: "var(--color-text-tertiary)",
-                        fontFamily: "var(--font-family-body)",
-                        fontSize: "13px",
-                      }}
-                    >
-                      {t("app.description", "Greetings from the Library! We are Librarians, and we are here to help you discover your next great read. Whether you're searching for resources, reliable information, or something entirely unexpected, we're here to guide you every step of the way. Explore our collection today and find your new favorites!")}
-                    </Typography>
+                      <Typography
+                        sx={{
+                          fontFamily: "var(--font-family-display)",
+                          fontWeight: 900,
+                          color: "var(--color-text-primary)",
+                          cursor: "pointer",
+                          letterSpacing: "-0.5px",
+                          lineHeight: "1.1",
+                          fontSize: { xs: "18px", sm: "24px", md: "28px" },
+                        }}
+                      >
+                        {t("home.welcome", { nickname: user.nickname })}
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setShowNewUserVillageDialog(true)}
+                      >
+                        {t("home.newUserVillage.button", "新手村")}
+                      </Button>
+                    </Box>
+                    {isProfileIncomplete ? (
+                      <Box
+                        sx={{
+                          mt: 2,
+                          p: 2,
+                          borderRadius: 2,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          backgroundColor: "rgba(0, 0, 0, 0.02)",
+                        }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            mb: 1,
+                            fontWeight: 700,
+                          }}
+                        >
+                          {t(
+                            "home.profileSetupTitle",
+                            "Complete your profile",
+                          )}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            color: "var(--color-text-tertiary)",
+                            fontFamily: "var(--font-family-body)",
+                            fontSize: "13px",
+                            mb: 2,
+                          }}
+                        >
+                          {t(
+                            "home.profileSetupDescription",
+                            "Click the Profile button in the navigation bar, edit your profile, and fill in a nickname and your address before continuing.",
+                          )}
+                        </Typography>
+                        <Box sx={{ display: "grid", gap: 1 }}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={profileSetupChecklist.nickname}
+                                onChange={(event) =>
+                                  handleProfileChecklistChange(
+                                    "nickname",
+                                    event.target.checked,
+                                  )
+                                }
+                              />
+                            }
+                            label={t(
+                              "home.profileSetupNickname",
+                              "Set a nickname that is not the same as my email",
+                            )}
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={profileSetupChecklist.address}
+                                onChange={(event) =>
+                                  handleProfileChecklistChange(
+                                    "address",
+                                    event.target.checked,
+                                  )
+                                }
+                              />
+                            }
+                            label={t(
+                              "home.profileSetupAddress",
+                              "Add my address in the profile settings",
+                            )}
+                          />
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Typography
+                        sx={{
+                          color: "var(--color-text-tertiary)",
+                          fontFamily: "var(--font-family-body)",
+                          fontSize: "13px",
+                        }}
+                      >
+                        {t(
+                          "app.description",
+                          "Greetings from the Library! We are Librarians, and we are here to help you discover your next great read. Whether you're searching for resources, reliable information, or something entirely unexpected, we're here to guide you every step of the way. Explore our collection today and find your new favorites!",
+                        )}
+                      </Typography>
+                    )}
                   </Grid>
                 </Grid>
                 {!user.isActive && (
@@ -224,19 +368,36 @@ const HomePage: React.FC = () => {
                   </Typography>
                   <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                     {!emailVerified && (
-                      <Button
-                        variant="outlined"
-                        onClick={async () => {
-                          await sendVerificationEmail();
-                          alert(t("auth.verificationEmailSent"));
-                        }}
-                        size="large"
-                      >
-                        {t(
-                          "auth.resendVerification",
-                          "Resend Verification Email",
-                        )}
-                      </Button>
+                      <>
+                        <Button
+                          variant="outlined"
+                          onClick={async () => {
+                            await sendVerificationEmail();
+                            alert(
+                              `${t("auth.verificationEmailSent")} ${t(
+                                "auth.verificationSupportHint",
+                                "If you don't receive the verification email, please check your spam or junk mailbox. If you still need help, click the chat button in the bottom-right corner to contact the user group for support.",
+                              )}`,
+                            );
+                          }}
+                          size="large"
+                        >
+                          {t(
+                            "auth.resendVerification",
+                            "Resend Verification Email",
+                          )}
+                        </Button>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: "block", mt: 0.5, maxWidth: 440 }}
+                        >
+                          {t(
+                            "auth.verificationSupportHint",
+                            "If you don't receive the verification email, please check your spam or junk mailbox. If you still need help, click the chat button in the bottom-right corner to contact the user group for support.",
+                          )}
+                        </Typography>
+                      </>
                     )}
                     <Button
                       variant="outlined"
@@ -396,6 +557,68 @@ const HomePage: React.FC = () => {
           />
         )}
       </List>
+
+      <Dialog
+        open={showNewUserVillageDialog}
+        onClose={() => setShowNewUserVillageDialog(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>{t("home.newUserVillage.button", "新手村")}</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ display: "grid", gap: 3 }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                {t(
+                  "home.newUserVillage.step1Title",
+                  "A0仔：X，見到本書想睇，但在 Ba打 手上",
+                )}
+              </Typography>
+              <Typography sx={{ whiteSpace: "pre-line" }}>
+                {t(
+                  "home.newUserVillage.step1Body",
+                  "A0仔 見到本書：「呢本正喎，但係而家有人借緊。」\n\n唔使嬲，直接撳 申請借閱。\n\n然後 Ba打 同 A0仔 都會收到 BookGuide Email：\n「喂，有人想接你本書喎。」\n之後兩邊自己傾點交收就得——約邊度、幾時拎，自己搞掂。",
+                )}
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                {t(
+                  "home.newUserVillage.step2Title",
+                  "Ba打 → A0仔：面交交書",
+                )}
+              </Typography>
+              <Typography sx={{ whiteSpace: "pre-line" }}>
+                {t(
+                  "home.newUserVillage.step2Body",
+                  "終於約到時間。\n\nBa打 見到 A0仔，交低本書。\n\nBa打 撳 面對面交收。\n\nA0仔：\n「掃 QR code。」\n掃完之後，再影一張相記錄 交收當刻本書嘅狀況。\n\n咁就完成交接，冇得之後拗：\n「你整花本書㗎喎 😡」\n「吓？我拎到嗰陣已經係咁啦喎。」\n有相為證，大家開心晒。",
+                )}
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                {t(
+                  "home.newUserVillage.step3Title",
+                  "C姐：X，原來我都想睇",
+                )}
+              </Typography>
+              <Typography sx={{ whiteSpace: "pre-line" }}>
+                {t(
+                  "home.newUserVillage.step3Body",
+                  "C姐 之後見到：\n\n「喎屌，呢本我都想睇。」\n可以再 申請借閱。\n\n等 A0仔 睇完之後，A0仔 可以直接聯絡 C姐：\n「我睇完喇，你要唔要？」\n兩個人再約時間交換。\n\n於是本書就繼續流轉：\n\nBa打 → A0仔 → C姐 → D露霧 → ……\n\n一本書唔使困死喺一個人手上，睇完就俾下一個巴絲。",
+                )}
+              </Typography>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowNewUserVillageDialog(false)}>
+            {t("common.close", "Close")}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Floating Chat Button */}
       {hostConfig?.chatLink && (
