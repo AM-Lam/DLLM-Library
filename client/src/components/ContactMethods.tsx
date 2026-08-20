@@ -63,9 +63,12 @@ interface ContactMethodsProps {
   contactMethods: ContactMethod[] | ContactMethodForm[];
   onContactMethodsChange?: (methods: ContactMethodForm[]) => void;
   readOnly?: boolean;
+  canViewPrivateMethods?: boolean;
   title?: string;
   showTitle?: boolean;
   showAddButton?: boolean;
+  addButtonLabel?: string;
+  addButtonSx?: any;
   showPublicPrivateFilter?: boolean;
   maxHeight?: number;
 }
@@ -74,9 +77,12 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
   contactMethods = [],
   onContactMethodsChange,
   readOnly = false,
+  canViewPrivateMethods = false,
   title,
   showTitle = true,
   showAddButton = true,
+  addButtonLabel,
+  addButtonSx,
   showPublicPrivateFilter = false,
   maxHeight = 400,
 }) => {
@@ -98,11 +104,17 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
     isPublic: method.isPublic,
   }));
 
+  // Hide private methods in read-only mode unless explicitly permitted.
+  const visibleMethods =
+    readOnly && !canViewPrivateMethods
+      ? methods.filter((method) => method.isPublic)
+      : methods;
+
   // Filter methods based on public/private preference
   const filteredMethods =
     showPublicPrivateFilter && showPublicOnly
-      ? methods.filter((method) => method.isPublic)
-      : methods;
+      ? visibleMethods.filter((method) => method.isPublic)
+      : visibleMethods;
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -121,7 +133,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
 
   const validateContactMethod = (
     type: ContactMethodType,
-    value: string
+    value: string,
   ): { isValid: boolean; error?: string } => {
     const trimmedValue = value.trim();
 
@@ -130,7 +142,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
         isValid: false,
         error: t(
           "contactMethods.validation.required",
-          "This field is required"
+          "This field is required",
         ),
       };
     }
@@ -142,7 +154,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
             isValid: false,
             error: t(
               "userProfile.contactMethods.validation.invalidEmail",
-              "Please enter a valid email address"
+              "Please enter a valid email address",
             ),
           };
         }
@@ -154,7 +166,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
             isValid: false,
             error: t(
               "contactMethods.validation.invalidWhatsappUrl",
-              "Please enter a valid WhatsApp HTTPS link"
+              "Please enter a valid WhatsApp HTTPS link",
             ),
           };
         }
@@ -166,7 +178,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
             isValid: false,
             error: t(
               "contactMethods.validation.whatsappFormat",
-              "Please use a WhatsApp link format (wa.me or whatsapp.com)"
+              "Please use a WhatsApp link format (wa.me or whatsapp.com)",
             ),
           };
         }
@@ -178,18 +190,16 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
             isValid: false,
             error: t(
               "contactMethods.validation.invalidSignalUrl",
-              "Please enter a valid Signal HTTPS link"
+              "Please enter a valid Signal HTTPS link",
             ),
           };
         }
-        if (
-          !trimmedValue.includes("signal.me")
-        ) {
+        if (!trimmedValue.includes("signal.me")) {
           return {
             isValid: false,
             error: t(
               "contactMethods.validation.signalFormat",
-              "Please use a Signal link format"
+              "Please use a Signal link format",
             ),
           };
         }
@@ -201,7 +211,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
             isValid: false,
             error: t(
               "contactMethods.validation.invalidTelegramUrl",
-              "Please enter a valid Telegram HTTPS link"
+              "Please enter a valid Telegram HTTPS link",
             ),
           };
         }
@@ -213,7 +223,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
             isValid: false,
             error: t(
               "contactMethods.validation.telegramFormat",
-              "Please use a Telegram link format"
+              "Please use a Telegram link format",
             ),
           };
         }
@@ -245,26 +255,29 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
   const getContactMethodPlaceholder = (type: ContactMethodType): string => {
     switch (type) {
       case ContactMethodType.Email:
-        return t("userProfile.contactMethods.emailPlaceholder", "e.g., user@example.com");
+        return t(
+          "userProfile.contactMethods.emailPlaceholder",
+          "e.g., user@example.com",
+        );
       case ContactMethodType.Whatsapp:
         return t(
           "userProfile.contactMethods.whatsappPlaceholder",
-          "e.g., https://wa.me/1234567890"
+          "e.g., https://wa.me/1234567890",
         );
       case ContactMethodType.Signal:
         return t(
           "userProfile.contactMethods.signalPlaceholder",
-          "e.g., https://signal.me/#p/+1234567890"
+          "e.g., https://signal.me/#p/+1234567890",
         );
       case ContactMethodType.Telegram:
         return t(
           "userProfile.contactMethods.telegramPlaceholder",
-          "e.g., https://t.me/username"
+          "e.g., https://t.me/username",
         );
       default:
         return t(
           "userProfile.contactMethods.socialPlaceholder",
-          "Enter contact information"
+          "Enter contact information",
         );
     }
   };
@@ -272,17 +285,29 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
   const getContactMethodHelper = (type: ContactMethodType): string => {
     switch (type) {
       case ContactMethodType.Email:
-        return t("userProfile.contactMethods.emailHelper", "Enter a valid email address");
+        return t(
+          "userProfile.contactMethods.emailHelper",
+          "Enter a valid email address",
+        );
       case ContactMethodType.Whatsapp:
-        return t("userProfile.contactMethods.whatsappHelper", "Enter your WhatsApp link");
+        return t(
+          "userProfile.contactMethods.whatsappHelper",
+          "Enter your WhatsApp link",
+        );
       case ContactMethodType.Signal:
-        return t("userProfile.contactMethods.signalHelper", "Enter your Signal link");
+        return t(
+          "userProfile.contactMethods.signalHelper",
+          "Enter your Signal link",
+        );
       case ContactMethodType.Telegram:
-        return t("userProfile.contactMethods.telegramHelper", "Enter your Telegram link");
+        return t(
+          "userProfile.contactMethods.telegramHelper",
+          "Enter your Telegram link",
+        );
       default:
         return t(
           "userProfile.contactMethods.socialHelper",
-          "Enter your contact information"
+          "Enter your contact information",
         );
     }
   };
@@ -348,7 +373,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
   const handleSave = () => {
     const validation = validateContactMethod(
       currentMethod.type,
-      currentMethod.value
+      currentMethod.value,
     );
 
     if (!validation.isValid) {
@@ -362,15 +387,15 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
         index !== editingIndex &&
         method.type === currentMethod.type &&
         method.value.trim().toLowerCase() ===
-        currentMethod.value.trim().toLowerCase()
+          currentMethod.value.trim().toLowerCase(),
     );
 
     if (isDuplicate) {
       setError(
         t(
           "contactMethods.validation.duplicate",
-          "This contact method already exists"
-        )
+          "This contact method already exists",
+        ),
       );
       return;
     }
@@ -382,7 +407,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
       updatedMethods = methods.map((method, index) =>
         index === editingIndex
           ? { ...currentMethod, value: currentMethod.value.trim() }
-          : method
+          : method,
       );
     } else {
       // Adding new method
@@ -416,7 +441,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
     if (!currentMethod.value.trim()) return true;
     const validation = validateContactMethod(
       currentMethod.type,
-      currentMethod.value
+      currentMethod.value,
     );
     return !validation.isValid;
   };
@@ -424,7 +449,7 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
   return (
     <Box>
       {/* Header */}
-      {showTitle && (
+      {(showTitle || (!readOnly && showAddButton)) && (
         <Box
           sx={{
             display: "flex",
@@ -433,21 +458,28 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
             mb: 2,
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
-          >
-            <EmailIcon />
-            {title || t("userProfile.contactMethods.title", "Contact Methods")}
-          </Typography>
+          {showTitle ? (
+            <Typography
+              variant="h6"
+              sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            >
+              <EmailIcon />
+              {title ||
+                t("userProfile.contactMethods.title", "Contact Methods")}
+            </Typography>
+          ) : (
+            <Box />
+          )}
           {!readOnly && showAddButton && (
             <Button
               startIcon={<AddIcon />}
               onClick={handleAdd}
               variant="outlined"
               size="small"
+              sx={addButtonSx}
             >
-              {t("userProfile.contactMethods.add", "Add Contact Method")}
+              {addButtonLabel ||
+                t("userProfile.contactMethods.add", "Add Contact Method")}
             </Button>
           )}
         </Box>
@@ -474,23 +506,36 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {t(
             "userProfile.contactMethods.helper",
-            "Add contact methods for other users to reach you when needed"
+            "Add contact methods for other users to reach you when needed",
           )}
         </Typography>
       )}
 
       {/* Contact Methods List */}
+      {readOnly && !canViewPrivateMethods && filteredMethods.length > 0 && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mb: 1, display: "block" }}
+        >
+          {t(
+            "userProfile.contactMethods.publicOnlyHint",
+            "Public methods only",
+          )}
+        </Typography>
+      )}
+
       {filteredMethods.length === 0 ? (
         <Alert severity="info" sx={{ mb: 2 }}>
           {readOnly
             ? t(
-              "userProfile.contactMethods.noContactMethodsRead",
-              "No contact methods available"
-            )
+                "userProfile.contactMethods.noContactMethodsRead",
+                "No contact methods available",
+              )
             : t(
-              "userProfile.contactMethods.noContactMethods",
-              "No contact methods added yet. Add some to help others contact you."
-            )}
+                "userProfile.contactMethods.noContactMethods",
+                "No contact methods added yet. Add some to help others contact you.",
+              )}
         </Alert>
       ) : (
         <List sx={{ maxHeight: maxHeight, overflow: "auto" }}>
@@ -511,7 +556,10 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     {getContactMethodIcon(method.type)}
                     <Typography variant="body1" fontWeight="medium">
-                      {t(`userProfile.contactMethods.type.${method.type}`, method.type)}
+                      {t(
+                        `userProfile.contactMethods.type.${method.type}`,
+                        method.type,
+                      )}
                     </Typography>
                     <Chip
                       icon={method.isPublic ? <PublicIcon /> : <PrivateIcon />}
@@ -593,7 +641,9 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
         </DialogTitle>
         <DialogContent>
           <FormControl fullWidth margin="normal">
-            <InputLabel>{t("userProfile.contactMethods.typeLabel", "Type")}</InputLabel>
+            <InputLabel>
+              {t("userProfile.contactMethods.typeLabel", "Type")}
+            </InputLabel>
             <Select
               value={currentMethod.type}
               label={t("userProfile.contactMethods.typeLabel", "Type")}
@@ -644,13 +694,13 @@ const ContactMethods: React.FC<ContactMethodsProps> = ({
                 <Typography variant="caption" color="text.secondary">
                   {currentMethod.isPublic
                     ? t(
-                      "userProfile.contactMethods.publicHelp",
-                      "This contact method will be visible to all users"
-                    )
+                        "userProfile.contactMethods.publicHelp",
+                        "This contact method will be visible to all users",
+                      )
                     : t(
-                      "userProfile.contactMethods.privateHelp",
-                      "This contact method will only be shared during transactions"
-                    )}
+                        "userProfile.contactMethods.privateHelp",
+                        "This contact method will only be shared during transactions",
+                      )}
                 </Typography>
               </Box>
             }

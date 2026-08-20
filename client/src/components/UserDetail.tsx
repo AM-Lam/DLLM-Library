@@ -691,20 +691,22 @@ const UserDetail: React.FC<UserDetailProps> = ({
                   >
                     {t("user.exchangeInformation", "EXCHANGE INFORMATION")}
                   </Typography>
-                  <Button
-                    variant="text"
-                    size="small"
-                    sx={{
-                      p: 0,
-                      minWidth: 0,
-                      color: "#b14c7b",
-                      textTransform: "none",
-                      fontWeight: 600,
-                    }}
-                    onClick={() => setShowUpdateUser(true)}
-                  >
-                    {t("common.edit", "Edit")}
-                  </Button>
+                  {isCurrentUser && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      sx={{
+                        p: 0,
+                        minWidth: 0,
+                        color: "#b14c7b",
+                        textTransform: "none",
+                        fontWeight: 600,
+                      }}
+                      onClick={() => setShowUpdateUser(true)}
+                    >
+                      {t("common.edit", "Edit")}
+                    </Button>
+                  )}
                 </Box>
                 <Box
                   sx={{
@@ -748,6 +750,24 @@ const UserDetail: React.FC<UserDetailProps> = ({
                       : t("user.notSet", "None added yet")}
                   </Typography>
                 </Box>
+
+                {userData.user.contactMethods &&
+                  userData.user.contactMethods.length > 0 && (
+                    <Box sx={{ mt: 1.5 }}>
+                      <ContactMethods
+                        contactMethods={userData.user.contactMethods}
+                        readOnly={true}
+                        canViewPrivateMethods={Boolean(isCurrentUser)}
+                        title={t(
+                          "userProfile.contactMethods.title",
+                          "Contact Methods",
+                        )}
+                        showTitle={true}
+                        showAddButton={false}
+                        maxHeight={320}
+                      />
+                    </Box>
+                  )}
               </Box>
 
               <Box sx={{ bgcolor: "#f5f3f2", borderRadius: 2, p: 1.5 }}>
@@ -769,20 +789,22 @@ const UserDetail: React.FC<UserDetailProps> = ({
                   >
                     {t("user.exchangePoints", "EXCHANGE POINTS")}
                   </Typography>
-                  <Button
-                    variant="text"
-                    size="small"
-                    sx={{
-                      p: 0,
-                      minWidth: 0,
-                      color: "#b14c7b",
-                      textTransform: "none",
-                      fontWeight: 600,
-                    }}
-                    onClick={() => setShowUpdateUser(true)}
-                  >
-                    {t("common.edit", "Edit")}
-                  </Button>
+                  {isCurrentUser && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      sx={{
+                        p: 0,
+                        minWidth: 0,
+                        color: "#b14c7b",
+                        textTransform: "none",
+                        fontWeight: 600,
+                      }}
+                      onClick={() => setShowUpdateUser(true)}
+                    >
+                      {t("common.edit", "Edit")}
+                    </Button>
+                  )}
                 </Box>
                 <Box
                   sx={{
@@ -823,20 +845,22 @@ const UserDetail: React.FC<UserDetailProps> = ({
                   >
                     {t("user.contentFilter", "CONTENT FILTER")}
                   </Typography>
-                  <Button
-                    variant="text"
-                    size="small"
-                    sx={{
-                      p: 0,
-                      minWidth: 0,
-                      color: "#b14c7b",
-                      textTransform: "none",
-                      fontWeight: 600,
-                    }}
-                    onClick={() => setShowUpdateUser(true)}
-                  >
-                    {t("common.edit", "Edit")}
-                  </Button>
+                  {isCurrentUser && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      sx={{
+                        p: 0,
+                        minWidth: 0,
+                        color: "#b14c7b",
+                        textTransform: "none",
+                        fontWeight: 600,
+                      }}
+                      onClick={() => setShowUpdateUser(true)}
+                    >
+                      {t("common.edit", "Edit")}
+                    </Button>
+                  )}
                 </Box>
                 <Box
                   sx={{
@@ -1083,7 +1107,7 @@ const UserDetail: React.FC<UserDetailProps> = ({
         />
       )}
 
-      {showUpdateUser && userData?.user && (
+      {isCurrentUser && showUpdateUser && userData?.user && (
         <UpdateUser
           email={userData.user.email}
           onUserCreated={handleUserCreated}

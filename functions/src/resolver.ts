@@ -45,6 +45,22 @@ const commentService = new CommentService(userService);
 const recommendService = new RecommendService(itemService);
 //const binderService = new BinderService(itemService, userService);
 
+const canViewPrivateContactMethods = async (
+  targetUserId: string,
+  loginUser: LoginUser | null,
+): Promise<boolean> => {
+  if (!loginUser) {
+    return false;
+  }
+
+  if (loginUser.uid === targetUserId) {
+    return true;
+  }
+
+  const currentUser = await userService.userById(loginUser.uid);
+  return currentUser?.role === Role.Admin;
+};
+
 export const DateScalar = new GraphQLScalarType({
   name: "Date",
   description: "Date custom scalar type",
@@ -89,6 +105,25 @@ export const DateScalar = new GraphQLScalarType({
 
 export const resolvers: Resolvers = {
   Date: DateScalar,
+  User: {
+    contactMethods: async (parent: User, _: any, { loginUser }: Context) => {
+      const methods = parent.contactMethods ?? null;
+      if (!methods || methods.length === 0) {
+        return methods;
+      }
+
+      const canViewPrivate = await canViewPrivateContactMethods(
+        parent.id,
+        loginUser,
+      );
+
+      if (canViewPrivate) {
+        return methods;
+      }
+
+      return methods.filter((method) => method.isPublic);
+    },
+  },
   Query: {
     hostConfig: async (_: any, __: any, ___: any): Promise<HostConfig> => {
       const config = await systemService.getHostConfig();
