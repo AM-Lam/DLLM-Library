@@ -728,6 +728,54 @@ Let me know if that works for you. No rush at all!`;
     return rv;
   }
 
+  private async processTransactionImages(images: string[]): Promise<{
+    gsImageUrls: string[] | null;
+    publicImageUrls: string[] | null;
+  }> {
+    let gsImageUrls: string[] | null = null;
+    let publicImageUrls: string[] | null = null;
+
+    for (const image of images ?? []) {
+      console.debug(`Processing image: ${image}`);
+      if (image.startsWith("gs://")) {
+        try {
+          const publicUrl = await GetPublicUrlForGSFile(image);
+          console.debug(`Public URL for image ${image}: ${publicUrl}`);
+          if (!gsImageUrls) gsImageUrls = [];
+          if (!publicImageUrls) publicImageUrls = [];
+          publicImageUrls.push(publicUrl);
+          gsImageUrls.push(image);
+        } catch (error) {
+          console.error(
+            `Failed to get public URL for image ${image}:`,
+            error,
+          );
+        }
+      } else {
+        if (!publicImageUrls) publicImageUrls = [];
+        publicImageUrls.push(image);
+      }
+    }
+
+    return { gsImageUrls, publicImageUrls };
+  }
+
+  private async updateItemHolderAndReload(
+    item: Item,
+    newHolder: User,
+  ): Promise<Item> {
+    const updated = await this.itemService.updateItemHolder(item.id, newHolder);
+    if (!updated) {
+      throw new Error(`Failed to update item holder for item with id ${item.id}`);
+    }
+
+    const updatedItem = await this.itemService.itemById(null, item.id, true);
+    if (!updatedItem) {
+      throw new Error(`Failed to fetch updated item with id ${item.id}`);
+    }
+    return updatedItem;
+  }
+
   async receiveTransaction(
     receiver: User,
     id: string,
@@ -759,32 +807,8 @@ Let me know if that works for you. No rush at all!`;
       throw new Error(`Item with id ${data.itemId} not found`);
     }
 
-    let gsImageUrls: string[] | null = null;
-    let publicImageUrls: string[] | null = null;
-
-    if (images && images.length > 0) {
-      for (const image of images) {
-        console.debug(`Processing image: ${image}`);
-        if (image.startsWith("gs://")) {
-          try {
-            const publicUrl = await GetPublicUrlForGSFile(image);
-            console.debug(`Public URL for image ${image}: ${publicUrl}`);
-            if (!gsImageUrls) gsImageUrls = [];
-            if (!publicImageUrls) publicImageUrls = [];
-            publicImageUrls.push(publicUrl);
-            gsImageUrls.push(image);
-          } catch (error) {
-            console.error(
-              `Failed to get public URL for image ${image}:`,
-              error,
-            );
-          }
-        } else {
-          if (!publicImageUrls) publicImageUrls = [];
-          publicImageUrls.push(image);
-        }
-      }
-    }
+    const { gsImageUrls, publicImageUrls } =
+      await this.processTransactionImages(images);
 
     let owner: User = receiver;
     if (item.ownerId !== receiver.id) {
@@ -795,12 +819,7 @@ Let me know if that works for you. No rush at all!`;
       owner = ownerRv;
     }
 
-    const updated = await this.itemService.updateItemHolder(item.id, receiver);
-    if (!updated) {
-      throw new Error(
-        `Failed to update item holder for item with id ${item.id}`,
-      );
-    }
+    const updatedItem = await this.updateItemHolderAndReload(item, receiver);
     const emailDetail: EmailDetail = {
       subject: `Transaction Received for Item: ${item.name}`,
       body: `Your transaction request for item ${item.name} has been received.`,
@@ -818,13 +837,96 @@ Let me know if that works for you. No rush at all!`;
       id,
       TransactionStatus.Completed,
       owner,
-      item,
+      updatedItem,
       data,
       emailDetail,
     );
     if (!rv) {
       throw new Error(`Failed to complete transaction with id ${id}`);
     }
+    return rv;
+  }
+
+  async confirmReturn(
+    owner: User,
+    itemId: string,
+    images: string[],
+    details?: string,
+  ): Promise<Transaction> {
+    // Logic to confirm return of an item by owner
+    const item = await this.itemService.itemById(null, itemId, true);
+    if (!item) {
+      throw new Error(`Item with id ${itemId} not found`);
+    }
+    if (item.ownerId !== owner.id) {
+      throw new Error(`User with id ${owner.id} is not the owner of item with id ${itemId}`);
+    }
+    if (!item.holderId || item.holderId === owner.id) {
+      throw new Error(`Item with id ${itemId} is not currently lent out`);
+    }
+
+    const { gsImageUrls, publicImageUrls } =
+      await this.processTransactionImages(images);
+
+    const oldHolderId = item.holderId;
+    const oldHolder = await this.userService.userById(oldHolderId);
+    if (!oldHolder) {
+      throw new Error(`Holder with id ${oldHolderId} not found`);
+    }
+
+    const returnedItem = await this.updateItemHolderAndReload(item, owner);
+
+    const emailDetail: EmailDetail = {
+      subject: `Item Returned: ${item.name}`,
+      body: `The item ${item.name} has been marked as returned by owner ${owner.nickname}.`,
+    };
+
+    const now = Timestamp.now();
+    const normalizedDetails = details ?? "RETURNED";
+    const transactionModel: TransactionModel = {
+      requestorId: oldHolderId,
+      receiverId: owner.id,
+      itemId: item.id,
+      participants: [owner.id, oldHolderId],
+      created: now,
+      updated: now,
+      status: TransactionStatus.Completed,
+      locationType: TransactionLocation.FaceToFace,
+      details: normalizedDetails,
+    };
+    if (publicImageUrls && publicImageUrls.length > 0) {
+      (transactionModel as any).images = publicImageUrls;
+    }
+    if (gsImageUrls && gsImageUrls.length > 0) {
+      transactionModel.gsImageUrls = gsImageUrls;
+    }
+
+    const transactionRef = await db.collection("transactions").add(transactionModel);
+    if (!transactionRef.id) {
+      throw new Error("Failed to create return transaction");
+    }
+
+    // Notify participants
+    const toList = [owner.email, oldHolder.email];
+    await sendNotificationViaEmail(
+      toList,
+      [],
+      emailDetail.subject,
+      emailDetail.body,
+      "transaction/" + transactionRef.id,
+    );
+
+    const rv: Transaction = {
+      id: transactionRef.id,
+      item: returnedItem,
+      requestor: oldHolder,
+      receiver: owner,
+      status: TransactionStatus.Completed,
+      details: normalizedDetails,
+      createdAt: transactionModel.created.seconds * 1000,
+      updatedAt: transactionModel.updated.seconds * 1000,
+      images: publicImageUrls || undefined,
+    };
     return rv;
   }
 }
