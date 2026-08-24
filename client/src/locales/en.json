@@ -140,6 +140,28 @@
     "next": "Next",
     "prev": "Back",
     "finish": "Got it!",
+    "signup": {
+      "stepLabel": "Step {{step}} of 3",
+      "continue": "Continue",
+      "addAddress": "Add exchange address",
+      "browseBooks": "Browse books",
+      "step1": {
+        "title": "Sign up with your email",
+        "body": "We'll use it to keep you updated on your book requests, so you can borrow and exchange securely."
+      },
+      "step2": {
+        "title": "Verify your email",
+        "body": "Confirms it's really you, so other members can trust you with their books. Check your inbox, and your spam folder if it's not there."
+      },
+      "step3": {
+        "title": "Add your address to start exchanging books",
+        "body": "This helps you and the other member agree on a specific, convenient spot to meet."
+      },
+      "complete": {
+        "title": "You're all set. 3 of 3 done.",
+        "body": "Start browsing and send your first book request. Run into an issue? Our Signal group is always there to help."
+      }
+    },
     "guest": {
       "signIn": {
         "title": "Sign In or Sign Up",
