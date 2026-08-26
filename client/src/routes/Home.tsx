@@ -280,17 +280,35 @@ const HomePage: React.FC = () => {
                             fontWeight: 700,
                           }}
                         >
-                          {t(
-                            "home.profileSetupTitle",
-                            "Complete your profile",
-                          )}
+                          {t("home.profileSetupTitle", "Complete your profile")}
                         </Typography>
                         <Typography
+                          component="button"
+                          type="button"
+                          onClick={handleGoToProfile}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              handleGoToProfile();
+                            }
+                          }}
                           sx={{
                             color: "var(--color-text-tertiary)",
                             fontFamily: "var(--font-family-body)",
                             fontSize: "13px",
                             mb: 2,
+                            display: "block",
+                            width: "100%",
+                            textAlign: "left",
+                            background: "transparent",
+                            border: "none",
+                            padding: 0,
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                            textUnderlineOffset: "2px",
+                            "&:hover": {
+                              color: "var(--color-text-primary)",
+                            },
                           }}
                         >
                           {t(
@@ -302,6 +320,7 @@ const HomePage: React.FC = () => {
                           <FormControlLabel
                             control={
                               <Checkbox
+                                disabled={true}
                                 checked={profileSetupChecklist.nickname}
                                 onChange={(event) =>
                                   handleProfileChecklistChange(
@@ -319,6 +338,7 @@ const HomePage: React.FC = () => {
                           <FormControlLabel
                             control={
                               <Checkbox
+                                disabled={true}
                                 checked={profileSetupChecklist.address}
                                 onChange={(event) =>
                                   handleProfileChecklistChange(
@@ -584,10 +604,7 @@ const HomePage: React.FC = () => {
 
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                {t(
-                  "home.newUserVillage.step2Title",
-                  "Ba打 → A0仔：面交交書",
-                )}
+                {t("home.newUserVillage.step2Title", "Ba打 → A0仔：面交交書")}
               </Typography>
               <Typography sx={{ whiteSpace: "pre-line" }}>
                 {t(
@@ -599,10 +616,7 @@ const HomePage: React.FC = () => {
 
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                {t(
-                  "home.newUserVillage.step3Title",
-                  "C姐：X，原來我都想睇",
-                )}
+                {t("home.newUserVillage.step3Title", "C姐：X，原來我都想睇")}
               </Typography>
               <Typography sx={{ whiteSpace: "pre-line" }}>
                 {t(
