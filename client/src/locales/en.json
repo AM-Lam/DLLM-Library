@@ -64,6 +64,7 @@
     "resetPassword": "Reset Password",
     "sendResetEmail": "Send Reset Email",
     "verificationEmailSent": "Verification email sent.",
+    "verificationSupportHint": "If you don't receive the verification email, please check your spam or junk mailbox. If you still need help, click the chat button in the bottom-right corner to contact the user group for support.",
     "resendVerification": "Resend Verification Email",
     "createProfile": "Create Profile",
     "cancel": "Cancel",
@@ -111,6 +112,19 @@
     "userPickedDescription": "Based on your interests and activity",
     "newArrivalsDescription": "Recently added items you might like",
     "popularDescription": "Items trending in the community",
+    "profileSetupTitle": "Haven't added an exchange address and updated your nickname yet?",
+    "profileSetupDescription": "Please fill in your nickname and add an exchange address",
+    "profileSetupNickname": "Set a nickname different from your email for easier recognition.",
+    "profileSetupAddress": "Arrange a convenient handover location with the other party.",
+    "newUserVillage": {
+      "button": "Newcomer Village",
+      "step1Title": "A0仔: X, I want to borrow this book, but it is currently checked out",
+      "step1Body": "A0仔 sees the book: \"This is a good one, but someone is borrowing it right now.\"\n\nNo need to get upset. Just tap Request to Borrow.\n\nThen both Ba打 and A0仔 will receive a BookGuide email:\n\"Hey, someone wants to borrow your book.\"\nAfter that, both sides can work out the handover themselves — where and when to meet, who brings it, and how to coordinate.",
+      "step2Title": "Ba打 → A0仔: Face-to-face handover",
+      "step2Body": "Finally the time is set.\n\nBa打 sees A0仔 and passes over the book.\n\nBa打 taps Face-to-face Handover.\n\nA0仔: \n\"Scan the QR code.\"\nAfter scanning, take a photo to record the book condition at the moment of handover.\n\nThat completes the transfer and avoids future arguments:\n\"You damaged this book!\"\n\"What? It was already like that when I received it.\"\nWith photos as proof, everyone stays happy.",
+      "step3Title": "C姐: X, turns out I want to read it too",
+      "step3Body": "Later, C姐 sees: \n\n\"Oh wow, I want to read this too.\"\nShe can tap Request to Borrow again.\n\nAfter A0仔 finishes reading it, A0仔 can contact C姐 directly:\n\"I have finished it. Do you want it?\"\nThen they arrange another handover time.\n\nAnd so the book continues circulating:\n\nBa打 → A0仔 → C姐 → D露霧 → ……\n\nA book does not have to sit trapped in one person's hands forever. Once it is read, pass it to the next person."
+    },
     "loadingRecommendations": "Loading recommendations...",
     "recommendationsError": "Unable to load some recommendations",
     "noRecommendations": "No recommendations available at the moment. Browse items to help us learn your preferences!",
@@ -126,6 +140,28 @@
     "next": "Next",
     "prev": "Back",
     "finish": "Got it!",
+    "signup": {
+      "stepLabel": "Step {{step}} of 3",
+      "continue": "Continue",
+      "addAddress": "Add exchange address",
+      "browseBooks": "Browse books",
+      "step1": {
+        "title": "Sign up with your email",
+        "body": "We'll use it to keep you updated on your book requests, so you can borrow and exchange securely."
+      },
+      "step2": {
+        "title": "Verify your email",
+        "body": "Confirms it's really you, so other members can trust you with their books. Check your inbox, and your spam folder if it's not there."
+      },
+      "step3": {
+        "title": "Add your address to start exchanging books",
+        "body": "This helps you and the other member agree on a specific, convenient spot to meet."
+      },
+      "complete": {
+        "title": "You're all set. 3 of 3 done.",
+        "body": "Start browsing and send your first book request. Run into an issue? Our Signal group is always there to help."
+      }
+    },
     "guest": {
       "signIn": {
         "title": "Sign In or Sign Up",
@@ -535,6 +571,16 @@
     "resolvingAddress": "Resolving address...",
     "currentAddress": "Current Address",
     "updateProfile": "Update Profile",
+    "saveChanges": "Save changes",
+    "exchangeInformation": "Exchange Information",
+    "exchangeAddressLabel": "Exchange address",
+    "exchangeAddressPlaceholder": "e.g., Eastwood, Ashfield, Hurstville",
+    "meetupContact": "Meetup contact (optional)",
+    "meetupContactPlaceholder": "Add your preferred contact details",
+    "addContactMethod": "Add contact method",
+    "profileUpdated": "Profile updated",
+    "changesSaved": "Your changes have been saved.",
+    "done": "Done",
     "createSuccess": "User profile created successfully!",
     "updateSuccess": "User profile updated successfully!",
     "exchangePoints": "Exchange Points",
@@ -642,6 +688,21 @@
     "notSet": "Not Set",
     "shareProfile": "Share profile",
     "shareProfileTitle": "Share profile",
+    "otherUsersBookshelf": "{{name}}'s Bookshelf",
+    "editMemberName": "Edit member name",
+    "accountProfile": "Account Profile",
+    "yourBookshelf": "Your Bookshelf",
+    "memberInformation": "MEMBER INFORMATION",
+    "exchangeInformation": "EXCHANGE INFORMATION",
+    "exchangeAddress": "Exchange address",
+    "meetupContact": "Meetup contact",
+    "exchangePoints": "EXCHANGE POINTS",
+    "selected": "Selected",
+    "contentFilter": "CONTENT FILTER",
+    "currentSetting": "Current setting",
+    "bookshelfEmpty": "Your shelf will grow here as you add Hong Kong books to share.",
+    "bookshelfHint": "This becomes your shelf, once you've pinned a few favourites.",
+    "goodreadsImport": "Already have a Goodreads list? Import it here.",
     "sharePreviewLabel": "Message",
     "shareProfileShareTitle": "Book Guide",
     "shareProfileShareText": "See @{{displayName}}'s profile on Book Guide",
