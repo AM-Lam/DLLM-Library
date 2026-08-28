@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookGuide — Radius Tokens</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink-950:#190609;--ink-900:#321519;--ink-800:#502b30;--ink-700:#70484d;
+  --ink-600:#956a70;--ink-500:#b19599;--ink-400:#cebbbd;--ink-300:#e4d8da;
+  --ink-200:#f1e9ea;--ink-100:#f9f5f6;
+  --brand-500:#db036b;--brand-600:#b3005a;--brand-700:#8a0047;
+  --mem-64:#890604;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'IBM Plex Sans',-apple-system,sans-serif;
+  background:var(--ink-100);color:var(--ink-800);
+  min-height:100vh;padding:0;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Shell */
+.page{max-width:720px;margin:0 auto;padding:48px 28px 64px;}
+
+/* Header */
+.page-header{margin-bottom:40px;}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-600);margin-bottom:6px;}
+.page-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:28px;color:var(--ink-950);line-height:1.2;}
+.page-intro{font-size:14px;color:var(--ink-700);line-height:1.6;margin-top:10px;max-width:560px;}
+
+/* Section */
+.section{margin-top:40px;}
+.section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-600);margin-bottom:8px;}
+.section-intro{font-size:13px;color:var(--ink-700);line-height:1.6;margin-bottom:18px;}
+
+/* Token rows */
+.token-row{
+  background:#fff;border:1px solid var(--ink-300);
+  border-radius:12px;padding:18px 20px;margin-bottom:10px;
+  display:flex;align-items:flex-start;gap:20px;
+}
+.token-shape{flex-shrink:0;display:flex;align-items:center;gap:4px;}
+.token-info{flex:1;min-width:0;}
+.token-name{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-950);font-weight:500;}
+.token-value{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-600);margin-left:8px;}
+.token-value.fluid{color:var(--brand-700);font-weight:500;}
+.token-desc{font-size:13px;color:var(--ink-700);margin-top:4px;line-height:1.5;}
+.token-specimens{display:flex;gap:6px;margin-top:10px;align-items:center;flex-wrap:wrap;}
+
+/* Table */
+.spec-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px;}
+.spec-table th{
+  text-align:left;font-weight:500;font-size:11px;letter-spacing:.04em;
+  color:var(--ink-600);padding:8px 12px;border-bottom:2px solid var(--ink-300);
+}
+.spec-table td{padding:10px 12px;border-bottom:1px solid var(--ink-200);color:var(--ink-800);}
+.spec-table td:first-child{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-950);font-weight:500;}
+.spec-table .val-fluid{color:var(--brand-700);font-weight:500;}
+.spec-table .val-fixed{color:var(--ink-500);}
+
+/* Notes */
+.note{
+  font-size:13px;color:var(--ink-700);line-height:1.6;
+  padding:12px 16px;background:var(--ink-100);border-radius:8px;
+  margin-top:10px;border-left:3px solid var(--ink-300);
+}
+.note strong{color:var(--ink-950);}
+.note code{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--ink-200);padding:1px 5px;border-radius:3px;}
+
+/* Fluid bar */
+.fluid-bar{
+  margin-top:12px;border-radius:8px;overflow:hidden;
+  border:1px solid var(--ink-300);height:36px;display:flex;
+}
+.fluid-bar .seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;}
+.fluid-bar .seg-start{background:var(--ink-200);color:var(--ink-800);flex:1;}
+.fluid-bar .seg-mid{background:var(--ink-100);color:var(--ink-600);flex:1.2;}
+.fluid-bar .seg-end{background:rgba(138,0,71,.06);color:var(--brand-700);flex:1;}
+.fluid-formula{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-600);
+  margin-top:8px;padding:6px 10px;background:#fff;border:1px solid var(--ink-300);
+  border-radius:6px;display:inline-block;
+}
+
+@media(max-width:600px){
+  .page{padding:32px 18px 48px;}
+  .page-title{font-size:24px;}
+  .token-row{flex-direction:column;gap:12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="page-header">
+    <div class="eyebrow">BookGuide Design System · Foundations</div>
+    <h1 class="page-title">Radius Tokens</h1>
+    <p class="page-intro">Four named steps. Each serves a different signal: sharper = data label, softer = container, considered = action, circle = signal point. Colour, position, and icons distinguish elements <em>within</em> a radius step — the radius itself distinguishes <em>between</em> classes of element.</p>
+  </div>
+
+  <!-- ── Primitive Scale ── -->
+  <div class="section">
+    <div class="section-label">1 · Primitive Scale</div>
+
+    <div class="token-row">
+      <div class="token-shape">
+        <div style="width:56px;height:38px;border-radius:4px;background:var(--ink-950);"></div>
+      </div>
+      <div class="token-info">
+        <div><span class="token-name">--radius-sm</span><span class="token-value">4px · fixed</span></div>
+        <div class="token-desc">All small labels — category chips, status badges, structural indicators. Colour and icons distinguish roles within this shape.</div>
+        <div class="token-specimens">
+          <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 6px;border-radius:4px;">禁書</span>
+          <span style="font-size:10px;font-weight:500;color:#890604;background:rgba(137,6,4,.12);padding:1px 6px;border-radius:4px;">六四</span>
+          <span style="font-size:11px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 7px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>可借閱</span>
+          <span style="font-size:11px;font-weight:500;color:#7a5000;background:rgba(254,243,216,.94);padding:2px 7px;border-radius:4px;">借出中</span>
+          <span style="font-size:11px;font-weight:500;color:#1a4a7a;background:rgba(224,236,247,.94);padding:2px 7px;border-radius:4px;">可交換</span>
+          <span style="font-size:11px;font-weight:500;color:#5a2a6b;background:rgba(240,232,245,.94);padding:2px 7px;border-radius:4px;">可贈予</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="token-row">
+      <div class="token-shape">
+        <div style="width:26px;height:38px;border-radius:10px;background:var(--ink-950);"></div>
+        <div style="width:26px;height:38px;border-radius:12px;background:var(--ink-950);opacity:.55;"></div>
+        <div style="width:26px;height:38px;border-radius:14px;background:var(--ink-950);opacity:.25;"></div>
+      </div>
+      <div class="token-info">
+        <div><span class="token-name">--radius-lg</span><span class="token-value fluid">10–14px · fluid</span></div>
+        <div class="token-desc">Containers — book cards, curator strip card, photo frames, section panels. Scales with card width to maintain visual proportion.</div>
+        <div class="fluid-bar">
+          <div class="seg seg-start">10px</div>
+          <div class="seg seg-mid">↗ growing</div>
+          <div class="seg seg-end">14px</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-500);margin-top:4px;padding:0 2px;">
+          <span>375px phone</span><span>768px tablet</span><span>1024px+ desktop</span>
+        </div>
+        <div class="fluid-formula">border-radius: clamp(10px, 2vw + 4px, 14px);</div>
+      </div>
+    </div>
+
+    <div class="token-row">
+      <div class="token-shape">
+        <div style="width:56px;height:38px;border-radius:12px;background:var(--ink-950);"></div>
+      </div>
+      <div class="token-info">
+        <div><span class="token-name">--radius-button</span><span class="token-value">12px · fixed</span></div>
+        <div class="token-desc">Interactive controls — CTA buttons, submit, confirm. Considered and editorial, not playful. Matches the gravity of an app whose subject matter includes 六四 and 國安法.</div>
+        <div class="token-specimens">
+          <span style="font-size:13px;font-weight:500;color:#fff;background:#b3005a;padding:8px 20px;border-radius:12px;">借閱</span>
+          <span style="font-size:13px;font-weight:500;color:#190609;background:#fff;padding:8px 20px;border-radius:12px;border:1px solid #cebbbd;">取消</span>
+          <span style="font-size:13px;font-weight:500;color:#fff;background:#190609;padding:8px 20px;border-radius:12px;">確認</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="token-row">
+      <div class="token-shape">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--ink-950);"></div>
+      </div>
+      <div class="token-info">
+        <div><span class="token-name">--radius-full</span><span class="token-value">50% · fixed</span></div>
+        <div class="token-desc">Signal points — FAB, notification pip, nav active pill, avatars. A circle is the strongest attractor shape. Reserved for elements that demand immediate attention.</div>
+        <div class="token-specimens">
+          <div style="width:40px;height:40px;border-radius:50%;background:#b3005a;display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#db036b;"></div>
+          <div style="width:46px;height:28px;border-radius:50vh;background:#190609;display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f9f5f6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg>
+          </div>
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--ink-200);border:1px solid var(--ink-300);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Responsive Behaviour ── -->
+  <div class="section">
+    <div class="section-label">2 · Responsive Behaviour</div>
+    <div class="section-intro">Only <code>--radius-lg</code> scales, because only containers change size across breakpoints. Everything else is either too small for responsive radius to be perceptible or shape-defined.</div>
+
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th>≤ 480px</th>
+          <th>481–767px</th>
+          <th>≥ 768px</th>
+          <th>Rule</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>--radius-sm</td>
+          <td>4px</td>
+          <td class="val-fixed" colspan="2" style="text-align:center;">— no change —</td>
+          <td>Fixed. Element doesn't resize.</td>
+        </tr>
+        <tr>
+          <td>--radius-lg</td>
+          <td>10px</td>
+          <td class="val-fluid">↗ fluid</td>
+          <td class="val-fluid">14px</td>
+          <td>Fluid. Tracks card width.</td>
+        </tr>
+        <tr>
+          <td>--radius-button</td>
+          <td>12px</td>
+          <td class="val-fixed" colspan="2" style="text-align:center;">— no change —</td>
+          <td>Fixed. Shape = identity.</td>
+        </tr>
+        <tr>
+          <td>--radius-full</td>
+          <td>50%</td>
+          <td class="val-fixed" colspan="2" style="text-align:center;">— always 50% —</td>
+          <td>Fixed by definition.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">The nav active pill resolves into <code>--radius-full</code> — 50% of its 30px height = 15px. It's a circle-family element that happens to live in an oblong container.</div>
+  </div>
+
+  <!-- ── Shape Language ── -->
+  <div class="section">
+    <div class="section-label">3 · Shape Language</div>
+    <div class="section-intro">The radius communicates what <em>class</em> of element you're looking at. Colour, icons, and position handle the distinctions within each class.</div>
+
+    <div class="note"><strong>4px (sm)</strong> = "this is a label." Chips classify, badges state, indicators mark. A 六四 chip is red; a 可借閱 badge is green with a checkmark. Same radius, different signals carried by colour and icon.</div>
+    <div class="note"><strong>10–14px (lg)</strong> = "this is a container." Something you browse, scroll, or tap into. The softness invites entry — you're looking at a place, not a label.</div>
+    <div class="note"><strong>12px (button)</strong> = "this is an action." Considered, editorial, deliberate. Not bouncy or playful. The corner says "this matters" — appropriate for an app whose subject matter carries weight.</div>
+    <div class="note"><strong>50% (full)</strong> = "look here." A circle is the strongest attractor shape. Reserved for the elements that demand immediate attention: the create action, the notification, the active state.</div>
+  </div>
+
+  <!-- ── Engineering Reference ── -->
+  <div class="section">
+    <div class="section-label">4 · Engineering Reference</div>
+
+    <table class="spec-table">
+      <thead>
+        <tr><th>Token</th><th>CSS value</th><th>Usage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>--radius-sm</td><td><code>4px</code></td><td>Category chips, status badges, structural indicators, grid card sub-elements</td></tr>
+        <tr><td>--radius-lg</td><td><code>clamp(10px, 2vw + 4px, 14px)</code></td><td>Book cards (horizontal + grid), curator strip card, section containers, photo frames</td></tr>
+        <tr><td>--radius-button</td><td><code>12px</code></td><td>Primary CTA, secondary CTA, submit buttons, confirm dialogs, form actions</td></tr>
+        <tr><td>--radius-full</td><td><code>50%</code></td><td>FAB, notification pip, nav active pill, user avatars</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">On desktop, <code>--radius-lg</code> reaches 14px while <code>--radius-button</code> is fixed at 12px. Cards and buttons will have similar corner softness — this is acceptable because they're already distinguished by fill, size, and text. Nobody compares a book card's corner to a borrow button's corner.</div>
+  </div>
+
+</div>
+
+</body>
+</html>

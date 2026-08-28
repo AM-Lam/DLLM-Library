@@ -33,7 +33,7 @@ export const semanticTokens = {
     "warning": "#7A5000",
     "warningBg": "#FEF3D8",
     "error": "#8A1A1A",
-    "errorBg": "#FDECea",
+    "errorBg": "#FDECEA",
     "info": "#1A4A7A",
     "infoBg": "#E0ECF7",
     "special": "#0F6B56",
@@ -43,7 +43,7 @@ export const semanticTokens = {
   "font": {
     "body": "\"IBM Plex Sans\", \"Noto Serif TC\", \"PingFang HK\", \"PingFang TC\", \"Microsoft JhengHei\", sans-serif",
     "display": "\"Noto Serif TC\", \"Playfair Display\", serif",
-    "mono": "\"Roboto Mono\", Menlo, Monaco, Consolas, monospace"
+    "mono": "\"IBM Plex Mono\", Menlo, Monaco, Consolas, monospace"
   },
   "shadow": {
     "appBar": "0 1px 4px #1906090F",
@@ -57,5 +57,85 @@ export const semanticTokens = {
     "#202538",
     "#3B2B35",
     "#2A3B40"
-  ]
+  ],
+  "modes": {
+    "light": {
+      "color": {
+        "brandPrimary": "#DB036B",
+        "brandPrimaryHover": "#B3005A",
+        "brandAccent": "#8A0047",
+        "textPrimary": "#190609",
+        "textBody": "#502B30",
+        "textSecondary": "#70484D",
+        "textTertiary": "#B19599",
+        "textMuted": "#956A70",
+        "textTagline": "#956A70",
+        "textInverse": "#FFFFFF",
+        "textLink": "#8A0047",
+        "textAccent": "#8A0047",
+        "bgCanvas": "#F9F5F6",
+        "bgSurface": "#FFFFFF",
+        "bgSubtle": "#F1E9EA",
+        "bgElevated": "#FFFFFF",
+        "bgCurator": "#F1E9EA",
+        "borderDefault": "#CEBBBD",
+        "borderSubtle": "#E4D8DA",
+        "borderSoft": "#F1E9EA",
+        "borderStrong": "#B19599",
+        "tagSurface": "#F5EEDC",
+        "navSelectedBg": "#190609",
+        "navSelectedColor": "#FFFFFF",
+        "success": "#1A5C30",
+        "successBg": "#E6F4EC",
+        "warning": "#7A5000",
+        "warningBg": "#FEF3D8",
+        "error": "#8A1A1A",
+        "errorBg": "#FDECEA",
+        "info": "#1A4A7A",
+        "infoBg": "#E0ECF7",
+        "special": "#0F6B56",
+        "specialBg": "#E0F4F0",
+        "chipBg": "#F1E9EA"
+      }
+    },
+    "dark": {
+      "color": {
+        "brandPrimary": "#DB036B",
+        "brandPrimaryHover": "#B3005A",
+        "brandAccent": "#8A0047",
+        "textPrimary": "#F9F5F6",
+        "textBody": "#F1E9EA",
+        "textSecondary": "#E4D8DA",
+        "textTertiary": "#CEBBBD",
+        "textMuted": "#B19599",
+        "textTagline": "#B19599",
+        "textInverse": "#FFFFFF",
+        "textLink": "#F07AB5",
+        "textAccent": "#F07AB5",
+        "bgCanvas": "#190609",
+        "bgSurface": "#321519",
+        "bgSubtle": "#502B30",
+        "bgElevated": "#321519",
+        "bgCurator": "#502B30",
+        "borderDefault": "#70484D",
+        "borderSubtle": "#502B30",
+        "borderSoft": "#70484D",
+        "borderStrong": "#956A70",
+        "tagSurface": "#502B30",
+        "navSelectedBg": "#FFFFFF",
+        "navSelectedColor": "#190609",
+        "success": "#1A5C30",
+        "successBg": "#E6F4EC",
+        "warning": "#7A5000",
+        "warningBg": "#FEF3D8",
+        "error": "#8A1A1A",
+        "errorBg": "#FDECEA",
+        "info": "#1A4A7A",
+        "infoBg": "#E0ECF7",
+        "special": "#0F6B56",
+        "specialBg": "#E0F4F0",
+        "chipBg": "#502B30"
+      }
+    }
+  }
 } as const;

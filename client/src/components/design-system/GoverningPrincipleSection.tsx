@@ -1,32 +1,36 @@
 import { Box, Grid, Paper, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { governingPrinciples, inkScale } from "../../styles/designSystemTokens";
+import DesignSystemSection from "./DesignSystemSection";
+import DesignSystemNote from "./DesignSystemNote";
 
-export default function GoverningPrincipleSection() {
+const principleIcons = ["✓", "→", "◷", "!", "⇄", "★"] as const;
+
+interface GoverningPrincipleSectionProps {
+  first?: boolean;
+}
+
+export default function GoverningPrincipleSection({ first = false }: GoverningPrincipleSectionProps) {
   const { t } = useTranslation();
 
   return (
-    <Box component="section" id="governing" sx={{ scrollMarginTop: 3 }}>
-      <Typography variant="overline" color="text.secondary">
-        {t("designSystem.foundations")} — 01
-      </Typography>
-      <Typography variant="h4" component="h2" sx={{ fontFamily: "var(--font-family-display)", mb: 1 }}>
-        {t("designSystem.governing.title")}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 640, mb: 4 }}>
-        {t("designSystem.governing.description")}
-      </Typography>
-
+    <DesignSystemSection
+      id="governing"
+      first={first}
+      eyebrow={`${t("designSystem.foundations")} — 01`}
+      title={t("designSystem.governing.title")}
+      description={t("designSystem.governing.description")}
+    >
       <Grid container spacing={1}>
-        {governingPrinciples.map((p) => (
+        {governingPrinciples.map((p, index) => (
           <Grid size={{ xs: 6, sm: 4, md: 2 }} key={p.name}>
             <Paper
               elevation={0}
               sx={{
-                p: 2,
+                p: "16px 12px",
                 textAlign: "center",
-                border: 1,
-                borderColor: "var(--color-border-subtle)",
+                borderRadius: "10px",
+                border: "1px solid var(--color-border-subtle)",
                 bgcolor: "var(--color-bg-surface)",
               }}
             >
@@ -41,16 +45,18 @@ export default function GoverningPrincipleSection() {
                   alignItems: "center",
                   justifyContent: "center",
                   mx: "auto",
-                  mb: 1,
-                  fontSize: 16,
+                  mb: "10px",
+                  fontSize: "16px",
+                  fontFamily: "var(--font-family-mono)",
+                  fontWeight: 500,
                 }}
               >
-                ●
+                {principleIcons[index]}
               </Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+              <Typography sx={{ fontSize: "13px", lineHeight: 1.3, fontWeight: 600, color: p.color, mb: "3px" }}>
                 {p.name}
               </Typography>
-              <Typography variant="caption" color="text.secondary" display="block">
+              <Typography sx={{ fontSize: "11px", lineHeight: 1.45, color: "var(--color-text-muted)" }}>
                 {p.rule}
               </Typography>
             </Paper>
@@ -58,21 +64,11 @@ export default function GoverningPrincipleSection() {
         ))}
       </Grid>
 
-      <Box
-        component="aside"
-        sx={{
-          mt: 2,
-          p: 1.5,
-          borderRadius: 1,
-          borderLeft: 2,
-          borderColor: "var(--color-brand-primary-hover)",
-          bgcolor: "var(--color-bg-subtle)",
-        }}
-      >
-        <Typography variant="caption" color={inkScale[600]}>
+      <DesignSystemNote warn>
+        <Box component="span" sx={{ color: inkScale[600] }}>
           {t("designSystem.governing.note")}
-        </Typography>
-      </Box>
-    </Box>
+        </Box>
+      </DesignSystemNote>
+    </DesignSystemSection>
   );
 }

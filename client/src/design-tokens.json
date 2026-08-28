@@ -39,7 +39,7 @@
       "status-wait-fg": "#7A5000",
       "status-wait2-bg": "#FEF8EC",
       "status-wait2-fg": "#8A6010",
-      "status-stop-bg": "#FDECea",
+      "status-stop-bg": "#FDECEA",
       "status-stop-fg": "#8A1A1A",
       "status-spec-bg": "#E0F4F0",
       "status-spec-fg": "#0F6B56",
@@ -69,7 +69,7 @@
     "fontFamily": {
       "body": "IBM Plex Sans, Noto Serif TC, PingFang HK, PingFang TC, Microsoft JhengHei, sans-serif",
       "display": "Noto Serif TC, Playfair Display, serif",
-      "mono": "Roboto Mono, Menlo, Monaco, Consolas, monospace"
+      "mono": "IBM Plex Mono, Menlo, Monaco, Consolas, monospace"
     },
     "fontSize": {
       "xs": 12,

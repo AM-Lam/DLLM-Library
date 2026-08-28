@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookGuide — Spacing &amp; Core Components</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink-950:#190609;--ink-900:#321519;--ink-800:#502b30;--ink-700:#70484d;
+  --ink-600:#956a70;--ink-500:#b19599;--ink-400:#cebbbd;--ink-300:#e4d8da;
+  --ink-200:#f1e9ea;--ink-100:#f9f5f6;
+  --brand-500:#db036b;--brand-600:#b3005a;--brand-700:#8a0047;
+  --mem-64:#890604;--mem-umb:#140928;--mem-nsl:#200630;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+body{
+  font-family:'IBM Plex Sans',-apple-system,sans-serif;
+  background:var(--ink-100);color:var(--ink-800);
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:760px;margin:0 auto;padding:48px 28px 80px;}
+
+/* Header */
+.page-header{margin-bottom:44px;}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--ink-600);margin-bottom:6px;}
+.page-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:28px;color:var(--ink-950);line-height:1.2;}
+.page-intro{font-size:14px;color:var(--ink-700);line-height:1.6;margin-top:10px;max-width:580px;}
+
+/* Section */
+.section{margin-top:56px;padding-top:36px;border-top:1px solid var(--ink-300);}
+.section:first-of-type{border-top:none;padding-top:0;}
+.section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--brand-700);margin-bottom:6px;}
+.section-title{font-family:'Noto Serif TC',serif;font-weight:700;font-size:22px;color:var(--ink-950);line-height:1.2;}
+.section-intro{font-size:13px;color:var(--ink-700);line-height:1.6;margin-top:8px;margin-bottom:8px;}
+.section-intro code{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--ink-200);padding:1px 5px;border-radius:3px;}
+
+/* Sub-section */
+.sub-section{margin-top:28px;}
+.sub-label{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:13px;color:var(--ink-800);margin-bottom:12px;letter-spacing:.01em;}
+
+/* Table */
+.token-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px;}
+.token-table th{
+  text-align:left;font-weight:500;font-size:11px;letter-spacing:.04em;
+  color:var(--ink-600);padding:8px 12px;border-bottom:2px solid var(--ink-300);
+}
+.token-table td{padding:9px 12px;border-bottom:1px solid var(--ink-200);color:var(--ink-800);vertical-align:top;}
+.t-name{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-950);font-weight:500;white-space:nowrap;}
+.t-val{color:var(--ink-700);}
+.t-use{color:var(--ink-600);font-size:12px;}
+
+/* Notes */
+.note{
+  font-size:13px;color:var(--ink-700);line-height:1.6;
+  padding:12px 16px;background:var(--ink-100);border-radius:8px;
+  margin-top:10px;border-left:3px solid var(--ink-300);
+}
+.note.warn{border-left-color:var(--brand-600);background:#fdf2f7;}
+.note strong{color:var(--ink-950);}
+.note code{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--ink-200);padding:1px 5px;border-radius:3px;}
+
+/* Spacing specimens */
+.space-row{background:#fff;border:1px solid var(--ink-300);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;margin-bottom:2px;}
+.space-name{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-950);font-weight:500;width:64px;flex-shrink:0;}
+.space-val{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-600);width:44px;flex-shrink:0;}
+.space-bar-wrap{flex:1;}
+.space-bar{height:16px;background:var(--brand-700);border-radius:1px;}
+.space-use{font-size:11px;color:var(--ink-700);width:200px;flex-shrink:0;text-align:right;}
+
+/* Chip specimen rows */
+.chip-row{background:#fff;border:1px solid var(--ink-300);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:14px;margin-bottom:2px;}
+.chip-enum{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-950);font-weight:500;width:120px;flex-shrink:0;}
+.chip-note{font-size:11px;color:var(--ink-600);margin-left:auto;}
+
+/* Status chip */
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;}
+.badge svg{width:11px;height:11px;}
+.b-go{color:#0f6b56;background:rgba(224,244,240,.94);}
+.b-ex{color:#1a4a7a;background:rgba(224,236,247,.94);}
+.b-gift{color:#5a2a6b;background:rgba(240,232,245,.94);}
+.b-res{color:#7a5000;background:rgba(254,243,216,.94);}
+.b-trans{color:#70484d;background:#e4d8da;}
+
+/* Category chip */
+.cat{font-size:10px;font-weight:500;padding:1px 6px;border-radius:4px;white-space:nowrap;}
+.cat-neutral{color:var(--ink-800);background:var(--ink-300);}
+.cat-64{color:#890604;background:rgba(137,6,4,.12);}
+.cat-umb{color:#140928;background:rgba(20,9,40,.12);}
+.cat-nsl{color:#200630;background:rgba(32,6,48,.12);}
+.cat-more{font-size:10px;color:var(--ink-600);}
+
+/* Book card demos */
+.demo-stage{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;padding:20px;background:var(--ink-100);border-radius:10px;}
+.bc{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(25,6,9,.06);}
+.bc-cover{position:relative;width:100%;overflow:hidden;}
+.bc-badge{position:absolute;top:8px;right:8px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.bc-frame{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(249,245,246,.97) 48%,rgba(249,245,246,.6) 78%,transparent);}
+.bc-title{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--ink-950);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.bc-chips{display:flex;align-items:center;gap:4px;margin-top:6px;}
+.demo-cap{text-align:center;margin-top:8px;font-size:11px;color:var(--ink-700);}
+.demo-cap.mono{font-family:'IBM Plex Mono',monospace;}
+
+@media(max-width:600px){
+  .page{padding:32px 18px 60px;}
+  .page-title{font-size:24px;}
+  .space-use,.chip-note{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="page-header">
+    <div class="eyebrow">BookGuide Design System · Spacing &amp; Core Components</div>
+    <h1 class="page-title">Spacing &amp; Core Components</h1>
+    <p class="page-intro">The spacing foundation and the three essential components built on it — status chip, category chip, and book card. Each component is assembled entirely from tokens: colour, typography, radius, and the spacing scale below.</p>
+  </div>
+
+  <!-- ══ SPACING TOKENS ══ -->
+  <div class="section" id="spacing">
+    <div class="section-label">Foundations</div>
+    <div class="section-title">Spacing Tokens</div>
+    <div class="section-intro">Eight steps on a 4px base unit. Every gap, margin, and padding snaps to one of these. The scale governs <em>layout</em> — space between elements the user perceives as separate. Sub-4px values (chip internal padding) are component anatomy, defined within each component, not global spacing.</div>
+
+    <div class="sub-section">
+      <div class="sub-label">Primitive Scale — 8 steps · 4px base</div>
+      <div class="space-row"><span class="space-name">--space-1</span><span class="space-val">4px</span><div class="space-bar-wrap"><div class="space-bar" style="width:4px;"></div></div><span class="space-use">chip-to-chip, icon-to-text</span></div>
+      <div class="space-row"><span class="space-name">--space-2</span><span class="space-val">8px</span><div class="space-bar-wrap"><div class="space-bar" style="width:8px;"></div></div><span class="space-use">title-to-chips, tight stacks</span></div>
+      <div class="space-row"><span class="space-name">--space-3</span><span class="space-val">12px</span><div class="space-bar-wrap"><div class="space-bar" style="width:12px;"></div></div><span class="space-use">card gaps, grid gutters</span></div>
+      <div class="space-row"><span class="space-name">--space-4</span><span class="space-val">16px</span><div class="space-bar-wrap"><div class="space-bar" style="width:16px;"></div></div><span class="space-use">card padding, component internal</span></div>
+      <div class="space-row"><span class="space-name">--space-5</span><span class="space-val">20px</span><div class="space-bar-wrap"><div class="space-bar" style="width:20px;"></div></div><span class="space-use">screen edge padding (mobile)</span></div>
+      <div class="space-row"><span class="space-name">--space-6</span><span class="space-val">24px</span><div class="space-bar-wrap"><div class="space-bar" style="width:24px;"></div></div><span class="space-use">section gaps, welcome padding</span></div>
+      <div class="space-row"><span class="space-name">--space-7</span><span class="space-val">28px</span><div class="space-bar-wrap"><div class="space-bar" style="width:28px;"></div></div><span class="space-use">screen edge (desktop), big gaps</span></div>
+      <div class="space-row"><span class="space-name">--space-8</span><span class="space-val">32px</span><div class="space-bar-wrap"><div class="space-bar" style="width:32px;"></div></div><span class="space-use">major section breaks</span></div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-label">Collapse Map — 18 drifting values → 8 steps</div>
+      <table class="token-table">
+        <thead><tr><th>Raw values found</th><th>Snaps to</th><th>Token</th></tr></thead>
+        <tbody>
+          <tr><td class="t-name">4, 5px</td><td class="t-val">4px</td><td class="t-use">--space-1</td></tr>
+          <tr><td class="t-name">6, 7, 8px</td><td class="t-val">8px</td><td class="t-use">--space-2</td></tr>
+          <tr><td class="t-name">10, 12px</td><td class="t-val">12px</td><td class="t-use">--space-3</td></tr>
+          <tr><td class="t-name">14, 16px</td><td class="t-val">16px</td><td class="t-use">--space-4</td></tr>
+          <tr><td class="t-name">18, 20px</td><td class="t-val">20px</td><td class="t-use">--space-5</td></tr>
+          <tr><td class="t-name">22, 24px</td><td class="t-val">24px</td><td class="t-use">--space-6</td></tr>
+          <tr><td class="t-name">28px</td><td class="t-val">28px</td><td class="t-use">--space-7</td></tr>
+          <tr><td class="t-name">32px</td><td class="t-val">32px</td><td class="t-use">--space-8</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-label">Layout Spacing vs Component Anatomy</div>
+      <div class="note"><strong>Layout spacing (this scale):</strong> space <em>between</em> elements the user perceives as separate — gap between cards, screen-edge padding, title-to-grid. These recur across contexts, risk drift if not centralised, and belong in the global scale.</div>
+      <div class="note"><strong>Component anatomy (not this scale):</strong> space <em>inside</em> a single perceived unit — the 2px between a checkmark and its label inside one badge, a chip's vertical padding. Sub-4px values (1–3px) are always anatomy, never layout.</div>
+      <div class="note"><strong>The test:</strong> a value belongs in the scale when it is (1) layout space between separate elements, (2) recurring across contexts, and (3) at risk of drift if not centralised. It stays local when it is internal construction of one unit, used in one place, already enforced by that component.</div>
+    </div>
+  </div>
+
+  <!-- ══ STATUS CHIP ══ -->
+  <div class="section" id="status-chip">
+    <div class="section-label">Components — 01</div>
+    <div class="section-title">Status Chip</div>
+    <div class="section-intro">Renders a book's <code>ItemStatus</code> — one of five production enum values. Sits top-right of the cover photo overlay on every book card. Built from tokens: <code>--radius-sm</code> (4px), <code>--type-caption</code> (11px), plus internal anatomy padding. Each state carries a distinct colour + icon so it reads without relying on text alone.</div>
+
+    <div class="sub-section">
+      <div class="sub-label">States — 5 production enum values · bilingual</div>
+      <div class="chip-row">
+        <span class="chip-enum">AVAILABLE</span>
+        <span class="badge b-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>可借用</span>
+        <span class="badge b-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Available</span>
+        <span class="chip-note">green</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip-enum">EXCHANGEABLE</span>
+        <span class="badge b-ex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>可交換</span>
+        <span class="badge b-ex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Exchangeable</span>
+        <span class="chip-note">blue</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip-enum">GIFT</span>
+        <span class="badge b-gift"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>贈送物</span>
+        <span class="badge b-gift"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Gift</span>
+        <span class="chip-note">violet</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip-enum">RESERVED</span>
+        <span class="badge b-res"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>已預留</span>
+        <span class="badge b-res"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Reserved</span>
+        <span class="chip-note">amber</span>
+      </div>
+      <div class="chip-row">
+        <span class="chip-enum">TRANSFERRED</span>
+        <span class="badge b-trans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>已轉讓</span>
+        <span class="badge b-trans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>Transferred</span>
+        <span class="chip-note">neutral ink</span>
+      </div>
+      <div class="note"><strong>Colour logic:</strong> The three "active" states (AVAILABLE, EXCHANGEABLE, GIFT) use distinct functional hues so a user scanning a grid can tell borrow from swap from free at a glance. RESERVED (amber) signals "wait." TRANSFERRED (neutral ink) is deliberately muted — the book is gone, so its chip recedes. <strong>Memorial colours are never used for status.</strong></div>
+      <div class="note"><strong>Bilingual:</strong> The chip renders in the active app language. CJK from <code>zh-HK.json</code>, English from <code>en.json</code>, both keyed to the same <code>ItemStatus</code> enum. English labels run longer, so the chip is content-width, never fixed.</div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-label">Engineering — enum mapping</div>
+      <table class="token-table">
+        <thead><tr><th>ItemStatus</th><th>zh-HK</th><th>en</th><th>Colour</th><th>Icon</th></tr></thead>
+        <tbody>
+          <tr><td class="t-name">AVAILABLE</td><td class="t-val">可借用</td><td class="t-val">Available</td><td class="t-val">green #0f6b56</td><td class="t-use">check-circle</td></tr>
+          <tr><td class="t-name">EXCHANGEABLE</td><td class="t-val">可交換</td><td class="t-val">Exchangeable</td><td class="t-val">blue #1a4a7a</td><td class="t-use">swap arrows</td></tr>
+          <tr><td class="t-name">GIFT</td><td class="t-val">贈送物</td><td class="t-val">Gift</td><td class="t-val">violet #5a2a6b</td><td class="t-use">gift box</td></tr>
+          <tr><td class="t-name">RESERVED</td><td class="t-val">已預留</td><td class="t-val">Reserved</td><td class="t-val">amber #7a5000</td><td class="t-use">clock</td></tr>
+          <tr><td class="t-name">TRANSFERRED</td><td class="t-val">已轉讓</td><td class="t-val">Transferred</td><td class="t-val">ink #70484d</td><td class="t-use">arrow-right</td></tr>
+        </tbody>
+      </table>
+      <div class="note warn"><strong>Enum spelling:</strong> <code>TRANSFERRED</code> — two Rs. Wire the chip directly to the <code>ItemStatus</code> enum; labels come from locale files. A lent-out book stays <code>AVAILABLE</code> in the data — lending is a separate transaction concern, not a status.</div>
+    </div>
+  </div>
+
+  <!-- ══ CATEGORY CHIP ══ -->
+  <div class="section" id="category-chip">
+    <div class="section-label">Components — 02</div>
+    <div class="section-title">Category Chip</div>
+    <div class="section-intro">Renders a book's category — a free-form string from the <code>category</code> field. Two visual modes: <strong>neutral</strong> for ordinary categories, <strong>memorial-tinted</strong> for categories that match a known collective-memory event. The memorial tint is a presentation-layer lookup, not data.</div>
+
+    <div class="sub-section">
+      <div class="sub-label">Modes — neutral vs memorial</div>
+      <div style="background:#fff;border:1px solid var(--ink-300);border-radius:8px;padding:14px 16px;margin-bottom:2px;">
+        <div style="font-size:12px;color:var(--ink-700);margin-bottom:8px;">Neutral — the default for any category string</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="cat cat-neutral">禁書</span><span class="cat cat-neutral">政治</span><span class="cat cat-neutral">散文</span><span class="cat cat-neutral">紀實</span><span class="cat cat-neutral">Hong Kong</span>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--ink-300);border-radius:8px;padding:14px 16px;">
+        <div style="font-size:12px;color:var(--ink-700);margin-bottom:8px;">Memorial-tinted — only for categories matching a known event</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="cat cat-64">六四</span><span class="cat cat-umb">雨傘</span><span class="cat cat-nsl">國安法</span>
+        </div>
+      </div>
+      <div class="note"><strong>Why a lookup, not data:</strong> Categories are free-form strings (<code>category: String!</code>). The memorial tint is applied client-side: if the string matches an entry in a small memorial-events map, render the tinted variant; otherwise neutral.</div>
+      <div class="note"><strong>Tags don't translate.</strong> A category is content, not UI copy. One fixed display form — whatever the curator entered — renders identically regardless of app language. 六四 stays 六四; "Hong Kong" stays "Hong Kong"; tags can be mixed-script. Only the surrounding UI swaps with the language toggle.</div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-label">Memorial Event Map — the client-side lookup</div>
+      <table class="token-table">
+        <thead><tr><th>Category string</th><th>Event</th><th>Memorial HEX</th></tr></thead>
+        <tbody>
+          <tr><td class="t-name">六四</td><td class="t-val">1989 Tiananmen</td><td class="t-val"><span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:2px;background:#890604;"></span>#890604</span></td></tr>
+          <tr><td class="t-name">雨傘</td><td class="t-val">2014 Umbrella</td><td class="t-val"><span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:2px;background:#140928;"></span>#140928</span></td></tr>
+          <tr><td class="t-name">國安法</td><td class="t-val">2020 NSL</td><td class="t-val"><span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:2px;background:#200630;"></span>#200630</span></td></tr>
+        </tbody>
+      </table>
+      <div class="note warn"><strong>CJK floor watch:</strong> Category chips use 10px — safe only for 1–2 simple characters (六四, 禁書). A longer or stroke-dense category must render at 12px or truncate. The 10px floor is the exception the type system explicitly allows for chips.</div>
+    </div>
+  </div>
+
+  <!-- ══ BOOK CARD ══ -->
+  <div class="section" id="book-card">
+    <div class="section-label">Components — 03</div>
+    <div class="section-title">Book Card</div>
+    <div class="section-intro">The core browse unit. Assembled from a cover image, a 2-line name, one status chip, and up to two category chips (memorial-first, +N overflow). One component with three size variants — horizontal, grid, compact — sharing anatomy but differing in width and responsive behaviour.</div>
+
+    <div class="sub-section">
+      <div class="sub-label">Three Variants</div>
+      <div class="demo-stage">
+        <div>
+          <div class="bc" style="width:140px;">
+            <div class="bc-cover" style="height:194px;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#2f6d5a,#3b7d8a 55%,#7a8a4a);"></div>
+              <span class="badge b-go bc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>可借用</span>
+              <div class="bc-frame" style="padding:16px 8px 7px;">
+                <div class="bc-title" style="font-size:12px;line-height:1.35;">5月35日－創作・記憶・抗爭</div>
+                <div class="bc-chips"><span class="cat cat-64">六四</span><span class="cat cat-neutral">禁書</span><span class="cat-more">+2</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-cap">Horizontal · 140px fixed</div>
+        </div>
+        <div>
+          <div class="bc" style="width:112px;border-radius:11px;">
+            <div class="bc-cover" style="aspect-ratio:1/1.46;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#4a5a8a,#3a4a7a 55%,#2a3a6a);"></div>
+              <span class="badge b-go bc-badge" style="font-size:10px;padding:2px 6px;top:5px;right:5px;">可借用</span>
+              <div class="bc-frame" style="padding:14px 6px 5px;">
+                <div class="bc-title" style="font-size:11px;line-height:1.3;">異鄉人的十年</div>
+                <div class="bc-chips" style="margin-top:3px;gap:3px;"><span class="cat cat-neutral" style="font-size:9px;">海外</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-cap">Grid · fluid width</div>
+        </div>
+        <div>
+          <div class="bc" style="width:88px;border-radius:10px;">
+            <div class="bc-cover" style="aspect-ratio:1/1.46;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#8a6a5a,#7a5a4a 55%,#5a3a2a);"></div>
+              <span class="badge b-go bc-badge" style="font-size:9px;padding:1px 5px;top:4px;right:4px;">可借用</span>
+              <div class="bc-frame" style="padding:12px 5px 5px;">
+                <div class="bc-title" style="font-size:10px;line-height:1.3;">無悔的征程</div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-cap">Compact · no chips</div>
+        </div>
+      </div>
+      <div class="note"><strong>What differs:</strong> width (140px fixed / fluid / small), cover height, title size (12 / 11 / 10px), and category chips (2+overflow / 1 / hidden). <strong>What stays constant:</strong> the cover-title-chips stacking order, the frosted-light gradient frame, the status chip top-right, and the card radius token.</div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-label">Bilingual Behaviour — UI translates, content doesn't</div>
+      <div class="section-intro">The same card in both language modes. Only the <strong>status chip</strong> swaps. The <strong>book name</strong> and <strong>category tags</strong> are content — one fixed form each, identical in both modes.</div>
+      <div class="demo-stage">
+        <div>
+          <div class="bc" style="width:150px;">
+            <div class="bc-cover" style="height:208px;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#2f6d5a,#3b7d8a 55%,#7a8a4a);"></div>
+              <span class="badge b-go bc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>可借用</span>
+              <div class="bc-frame" style="padding:18px 9px 8px;">
+                <div class="bc-title" style="font-size:12px;line-height:1.35;">5月35日－創作・記憶・抗爭</div>
+                <div class="bc-chips"><span class="cat cat-64">六四</span><span class="cat cat-neutral">禁書</span><span class="cat-more">+2</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-cap mono">正體中文 mode</div>
+        </div>
+        <div>
+          <div class="bc" style="width:150px;">
+            <div class="bc-cover" style="height:208px;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#2f6d5a,#3b7d8a 55%,#7a8a4a);"></div>
+              <span class="badge b-go bc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Available</span>
+              <div class="bc-frame" style="padding:18px 9px 8px;">
+                <div class="bc-title" style="font-size:12px;line-height:1.35;">5月35日－創作・記憶・抗爭</div>
+                <div class="bc-chips"><span class="cat cat-64">六四</span><span class="cat cat-neutral">禁書</span><span class="cat-more">+2</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-cap mono">English mode</div>
+        </div>
+        <div>
+          <div class="bc" style="width:150px;">
+            <div class="bc-cover" style="height:208px;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#4a5a8a,#3a4a7a 55%,#2a3a6a);"></div>
+              <span class="badge b-ex bc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Exchangeable</span>
+              <div class="bc-frame" style="padding:18px 9px 8px;">
+                <div class="bc-title" style="font-size:12px;line-height:1.35;">重慶大廈：世界中心的邊緣</div>
+                <div class="bc-chips"><span class="cat cat-neutral">Hong Kong</span><span class="cat cat-neutral">紀實</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-cap mono">mixed tags · either mode</div>
+        </div>
+      </div>
+      <div class="note"><strong>Read the difference:</strong> Between the first two cards, only the status chip changed (可借用 → Available). The name and both tags are untouched. The third card shows tags can be mixed-script: "Hong Kong" and 紀實 sit side by side, and neither swaps when the app language changes.</div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-label">Anatomy — internal spacing regulated to tokens</div>
+      <table class="token-table">
+        <thead><tr><th>Zone</th><th>Token / value</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td class="t-name">Card radius</td><td class="t-val">--radius-lg · clamp(10–14px)</td><td class="t-use">Fluid — the only responsive radius</td></tr>
+          <tr><td class="t-name">Cover aspect</td><td class="t-val">1 : 1.46</td><td class="t-use">Book-cover proportion, all variants</td></tr>
+          <tr><td class="t-name">Frame padding</td><td class="t-val">16px 8px 7px</td><td class="t-use">Component anatomy — gradient frame</td></tr>
+          <tr><td class="t-name">Title → chips gap</td><td class="t-val">--space-2 · 8px (horiz)</td><td class="t-use">Grid uses anatomy 3px (tighter)</td></tr>
+          <tr><td class="t-name">Chip → chip gap</td><td class="t-val">--space-1 · 4px</td><td class="t-use">Between category chips</td></tr>
+          <tr><td class="t-name">Status chip inset</td><td class="t-val">7px / 5px / 4px</td><td class="t-use">Scales down with variant</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-label">Responsive Sizing — per variant</div>
+      <table class="token-table">
+        <thead><tr><th>Variant</th><th>Width</th><th>Cover</th><th>Title</th><th>Chips</th></tr></thead>
+        <tbody>
+          <tr><td class="t-name">Horizontal</td><td class="t-val">140px fixed (155/160 at ≥481/768)</td><td class="t-val">194px height</td><td class="t-val">12px</td><td class="t-use">2 + overflow</td></tr>
+          <tr><td class="t-name">Grid</td><td class="t-val">fluid (3-col ≤599, 4-col 600+, 5-col 900+)</td><td class="t-val">aspect 1:1.46</td><td class="t-val">11–12px</td><td class="t-use">1</td></tr>
+          <tr><td class="t-name">Compact</td><td class="t-val">small fixed (~88px)</td><td class="t-val">aspect 1:1.46</td><td class="t-val">10px</td><td class="t-use">hidden</td></tr>
+        </tbody>
+      </table>
+      <div class="note"><strong>Horizontal</strong> lives in a scroll row — fixed width so cards line up, snap-aligned. <strong>Grid</strong> flexes to fill columns — width grows with column count across breakpoints. <strong>Compact</strong> is for the related-books row on the item detail page — small, chip-free, just cover + name. The card radius scales fluidly in all three via <code>--radius-lg</code>.</div>
+    </div>
+
+    <div class="sub-section">
+      <div class="sub-label">Composition Rules</div>
+      <div class="note"><strong>Category overflow:</strong> Show up to 2 chips. Memorial categories claim slots first (六四 before 散文), so the culturally significant tag always wins limited space. Remaining categories collapse to a <code>+N</code> count.</div>
+      <div class="note"><strong>Status is singular, top-right.</strong> Exactly one status chip, always over the cover's top-right, backdrop-blurred for legibility on any image.</div>
+      <div class="note"><strong>UI translates, content doesn't:</strong> The status chip swaps with app language. The book name and category tags do not — one fixed display form each. Because English UI labels run longer, the card never fixes chip width.</div>
+      <div class="note"><strong>Title clamps to 2 lines.</strong> Noto Serif TC, weight 700. Longer names truncate — the full name lives on the detail page.</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookGuide — Component Library v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ================================================================
+   BOOKGUIDE DESIGN SYSTEM — Component Library v1.0
+   "Hong Kong books. Keep them moving."
+   ================================================================ */
+
+:root {
+  /* ── Brand Primary Scale — Resistance Magenta ── */
+  --brand-50:  #fff0f6;
+  --brand-100: #fcd4e8;
+  --brand-200: #f8a8d0;
+  --brand-300: #f07ab5;
+  --brand-400: #e34a97;
+  --brand-500: #db036b;   /* ★ BRAND PRIMARY — notification pip */
+  --brand-600: #b3005a;   /* ★ FAB background */
+  --brand-700: #8a0047;   /* ★ City label, View All, links */
+  --brand-800: #5e0031;
+  --brand-900: #33001a;
+
+  /* ── Warm Paper Neutrals — LEGACY (--paper-*), retiring ── */
+  --paper-0:   #ffffff;     /* card surface */
+  --paper-50:  #faf7f4;     /* app background */
+  --paper-100: #f2ece5;     /* header surface */
+  --paper-150: #e6ddd3;     /* card borders, nav border */
+  --paper-200: #d4c8bc;     /* input borders */
+  --paper-300: #b8a89a;     /* tagline, placeholder */
+  --paper-400: #8f7b6e;     /* secondary text, metadata */
+  --paper-500: #6b5c50;     /* body text */
+  --paper-600: #4a3c32;     /* primary text */
+  --paper-700: #2e2420;     /* headings, book titles */
+  --paper-800: #1a1410;     /* deep dark */
+
+  /* ── Rosy Ink Scale — NEW primary neutral · anchored on #190609 (2019·06·09) ── */
+  --ink-950: #190609;   /* primary text, titles, gradient frame */
+  --ink-900: #321519;   /* secondary headings */
+  --ink-800: #502b30;   /* body text */
+  --ink-700: #70484d;   /* muted text, active icons */
+  --ink-600: #956a70;   /* captions, placeholder (large/non-critical) */
+  --ink-500: #b19599;   /* disabled text, strong border */
+  --ink-400: #cebbbd;   /* borders, dividers */
+  --ink-300: #e4d8da;   /* hairlines */
+  --ink-200: #f1e9ea;   /* hover, surface tint */
+  --ink-100: #f9f5f6;   /* faint wash, card surface, app background */
+
+  /* ── Semantic Tokens — revamp · ink-100 surface · white chrome · magenta = clickable ── */
+  --surface-app:     var(--ink-100);   /* #f9f5f6 — lighter body */
+  --surface-card:    #ffffff;
+  --surface-header:  #ffffff;          /* white chrome */
+  --surface-curator: var(--ink-200);   /* curator wrap band */
+  --header-border:   none;             /* shadow replaces stroke */
+  --nav-bg:          #ffffff;
+  --nav-border:      none;             /* shadow replaces stroke */
+  --nav-active:      var(--ink-950);   /* filled dark pill */
+  --nav-active-pill: var(--ink-950);
+  --nav-inactive:    var(--ink-600);    /* #956a70 — alive, tappable */
+  --fab-bg:          var(--brand-600);
+  --text-heading:    var(--ink-950);    /* #190609 */
+  --text-body:       var(--ink-800);    /* #502b30 */
+  --text-secondary:  var(--ink-700);    /* #70484d */
+  --text-tagline:    var(--ink-600);    /* #956a70 */
+  --text-link:       var(--brand-700);  /* magenta = clickable text */
+  --text-accent:     var(--brand-700);  /* city name, View All, links */
+  --border-subtle:   var(--ink-300);    /* #e4d8da */
+  --border-default:  var(--ink-400);    /* #cebbbd */
+
+  /* ── Status Colour Tokens ── */
+  /* Go — available / positive terminal */
+  --go-bg:    #e6f4ec; --go-fg:    #1a5c30;
+  /* Go2 — pass on (lighter green) */
+  --go2-bg:   #eef7f2; --go2-fg:   #2a7a48;
+  /* Act — action required (blue) */
+  --act-bg:   #e0ecf7; --act-fg:   #1a4a7a; --act-bd:   #b8d4f0;
+  /* Wait — amber */
+  --wait-bg:  #fef3d8; --wait-fg:  #7a5000;
+  /* Wait2 — softer amber */
+  --wait2-bg: #fef8ec; --wait2-fg: #8a6010;
+  /* Stop — red */
+  --stop-bg:  #fdecea; --stop-fg:  #8a1a1a;
+  /* Spec — teal (exchange) */
+  --spec-bg:  #e0f4f0; --spec-fg:  #0f6b56;
+  /* Spec2 — light teal (conditional) */
+  --spec2-bg: #eaf7f4; --spec2-fg: #1a7a62;
+  /* Gift — purple */
+  --gift-bg:  #f0e8f5; --gift-fg:  #5a2a6b;
+  /* Hot — orange (time-sensitive) */
+  --hot-bg:   #fef0e0; --hot-fg:   #8a4000;
+  /* Neu — neutral / grey */
+  --neu-bg:   #f2ece5; --neu-fg:   #6b5c50;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--paper-50);
+  color: var(--paper-600);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ================================================================
+   PAGE CHROME
+   ================================================================ */
+
+/* ── Fixed sidebar nav ── */
+.sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 220px;
+  background: var(--paper-100);
+  border-right: 1px solid var(--paper-150);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 100;
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--paper-200); border-radius: 2px; }
+
+.sidebar-brand {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--paper-150);
+  flex-shrink: 0;
+}
+.sidebar-brand h1 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--paper-700);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.sidebar-brand .tagline {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--paper-400);
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+}
+.sidebar-brand .version {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  padding: 2px 7px;
+  background: var(--brand-100);
+  color: var(--brand-700);
+  border-radius: 20px;
+}
+
+.sidebar-nav { padding: 12px 0; flex: 1; }
+.nav-group-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper-300);
+  padding: 10px 20px 4px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 20px;
+  font-size: 12px;
+  color: var(--paper-500);
+  text-decoration: none;
+  transition: color 0.12s, background 0.12s;
+  border-left: 2px solid transparent;
+}
+.nav-link:hover {
+  color: var(--paper-700);
+  background: var(--paper-150);
+}
+.nav-link.active {
+  color: var(--brand-700);
+  border-left-color: var(--brand-700);
+  background: var(--brand-50);
+  font-weight: 500;
+}
+.nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Main content ── */
+.main {
+  margin-left: 220px;
+  min-height: 100vh;
+}
+
+/* ── Page header ── */
+.page-header {
+  background: var(--paper-100);
+  border-bottom: 1px solid var(--paper-150);
+  padding: 48px 56px 40px;
+}
+.page-header .eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-600);
+  margin-bottom: 12px;
+}
+.page-header h1 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--paper-700);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.page-header h1 em {
+  font-style: normal;
+  color: var(--brand-700);
+}
+.page-header .tagline {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--paper-400);
+  letter-spacing: 0.06em;
+}
+
+/* ── Sections ── */
+.content { padding: 0 56px 80px; }
+
+.section {
+  padding-top: 56px;
+  border-top: 1px solid var(--paper-150);
+  margin-top: 56px;
+}
+.section:first-child { border-top: none; margin-top: 0; padding-top: 48px; }
+
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--paper-300);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  width: 14px; height: 1.5px;
+  background: var(--brand-600);
+  flex-shrink: 0;
+}
+.section-label::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: var(--paper-150);
+}
+
+.section-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--paper-700);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.section-intro {
+  font-size: 13px;
+  color: var(--paper-400);
+  line-height: 1.75;
+  max-width: 640px;
+  margin-bottom: 28px;
+}
+.section-intro strong { color: var(--paper-600); font-weight: 500; }
+.section-intro code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  background: var(--paper-150);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--brand-700);
+}
+
+/* ── Sub-section ── */
+.sub-section { margin-bottom: 36px; }
+.sub-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--paper-400);
+  margin-bottom: 14px;
+}
+
+/* ================================================================
+   COLOUR SYSTEM
+   ================================================================ */
+
+/* Principle bar */
+.principle-bar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 32px;
+}
+.p-block {
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+  border: 1px solid var(--paper-150);
+  background: var(--paper-0);
+}
+.p-swatch {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.p-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.p-rule { font-size: 11px; color: var(--paper-400); line-height: 1.45; }
+
+/* Swatch rows */
+.swatch-row {
+  display: grid;
+  gap: 4px;
+}
+.scale-10 { grid-template-columns: repeat(10, 1fr); }
+.scale-11 { grid-template-columns: repeat(11, 1fr); }
+
+.swatch {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  position: relative;
+  border: 1px solid rgba(0,0,0,0.05);
+  cursor: default;
+  transition: transform 0.12s;
+}
+.swatch:hover { transform: scale(1.08); z-index: 2; }
+.swatch.star { outline: 2px solid var(--paper-600); outline-offset: 2px; }
+.swatch-val {
+  position: absolute;
+  bottom: 5px; left: 0; right: 0;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px;
+  font-weight: 500;
+}
+.tooltip-sw {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%; transform: translateX(-50%);
+  background: var(--paper-700);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+  z-index: 20;
+  color: var(--paper-50);
+  line-height: 1.5;
+  text-align: center;
+}
+.swatch:hover .tooltip-sw { opacity: 1; }
+/* ================================================================
+   TOKEN TABLE
+   ================================================================ */
+.token-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.token-table th {
+  text-align: left;
+  padding: 8px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--paper-400);
+  border-bottom: 1px solid var(--paper-150);
+  background: var(--paper-50);
+}
+.token-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--paper-100);
+  vertical-align: middle;
+  background: var(--paper-0);
+}
+.token-table tr:last-child td { border-bottom: none; }
+.token-table tr:hover td { background: var(--paper-50); }
+.t-name { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--brand-700); }
+.t-val  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--paper-600); }
+.t-use  { font-size: 11px; color: var(--paper-400); }
+.t-chip { display: flex; align-items: center; gap: 8px; }
+.t-dot  { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.06); }
+
+/* ================================================================
+   TYPOGRAPHY SPECIMENS
+   ================================================================ */
+.type-specimen {
+  background: var(--paper-0);
+  border: 1px solid var(--paper-150);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.type-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 160px;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--paper-100);
+}
+.type-row:last-child { border-bottom: none; }
+.type-meta .tm-role {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand-600);
+  margin-bottom: 4px;
+}
+.type-meta .tm-spec {
+  font-size: 10px;
+  color: var(--paper-400);
+  line-height: 1.5;
+}
+.type-spec-right {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--paper-300);
+  text-align: right;
+  line-height: 1.7;
+}
+/* ================================================================
+   NOTES & ANNOTATIONS
+   ================================================================ */
+.note {
+  font-size: 11px;
+  color: var(--paper-400);
+  line-height: 1.7;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--paper-50);
+  border: 1px solid var(--paper-150);
+  border-left: 2px solid var(--paper-200);
+  border-radius: 0 8px 8px 0;
+}
+.note code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  background: var(--paper-150);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--brand-700);
+}
+.note strong { color: var(--paper-600); font-weight: 500; }
+.warn { border-left-color: var(--brand-600); }
+.warn code { color: var(--brand-700); }
+/* ================================================================
+   UTILITY
+   ================================================================ */
+.divider { height: 1px; background: var(--paper-150); margin: 32px 0; }
+
+/* Scroll progress indicator */
+.scroll-line {
+  position: fixed;
+  top: 0; left: 220px; right: 0;
+  height: 2px;
+  background: var(--brand-600);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.1s;
+  z-index: 200;
+}
+
+/* Active section highlight */
+.section { scroll-margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div class="scroll-line" id="scrollLine"></div>
+
+<!-- ══════════════════════════════════
+     SIDEBAR
+══════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <h1>BookGuide</h1>
+    <div class="tagline">Hong Kong books.<br>Keep them moving.</div>
+    <div class="version">Component Library v2.0</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group-label">Foundations</div>
+    <a href="#governing" class="nav-link active">
+      <div class="nav-dot" style="background:var(--brand-500);"></div>
+      Governing Principle
+    </a>
+    <a href="#colours" class="nav-link">
+      <div class="nav-dot" style="background:#db036b;"></div>
+      Colour Scales
+    </a>
+    <a href="#tokens" class="nav-link">
+      <div class="nav-dot" style="background:#8f7b6e;"></div>
+      Semantic Tokens
+    </a>
+    <a href="#typography" class="nav-link">
+      <div class="nav-dot" style="background:#2e2420;"></div>
+      Typography
+    </a>
+    <a href="#type-tokens" class="nav-link">
+      <div class="nav-dot" style="background:#190609;border:1px solid #cebbbd;"></div>
+      Type Tokens
+    </a>
+    <a href="#radius-tokens" class="nav-link">
+      <div class="nav-dot" style="background:#190609;border-radius:4px;width:10px;height:10px;"></div>
+      Radius Tokens
+    </a>
+    <a href="#spacing-tokens" class="nav-link">
+      <div class="nav-dot" style="background:#8a0047;"></div>
+      Spacing Tokens
+    </a>
+
+    <div class="nav-group-label" style="margin-top:8px;">Components</div>
+    <a href="#status-chip" class="nav-link">
+      <div class="nav-dot" style="background:#0f6b56;"></div>
+      Status Chip
+    </a>
+    <a href="#category-chip" class="nav-link">
+      <div class="nav-dot" style="background:#890604;"></div>
+      Category Chip
+    </a>
+    <a href="#book-card" class="nav-link">
+      <div class="nav-dot" style="background:#190609;border-radius:3px;width:11px;height:11px;"></div>
+      Book Card
+    </a>
+
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════ -->
+<div class="main">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="eyebrow">Design System · Component Library · v2.0</div>
+    <h1>BookGuide <em>Sydney</em></h1>
+    <div class="tagline">Hong Kong books. Keep them moving.</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ GOVERNING PRINCIPLE ══ -->
+    <div class="section" id="governing">
+      <div class="section-label">Foundations — 01</div>
+      <div class="section-title">Governing Colour Principle</div>
+      <div class="section-intro">One rule across all badge systems: colour tells users whether they can act. Build one mental model — users learn it once and it works everywhere in the app.</div>
+
+      <div class="principle-bar">
+        <div class="p-block">
+          <div class="p-swatch" style="background:#e6f4ec;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a5c30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="p-name" style="color:#1a5c30;">Green</div>
+          <div class="p-rule">Go — available or positively complete</div>
+        </div>
+        <div class="p-block">
+          <div class="p-swatch" style="background:#e0ecf7;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a4a7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+          <div class="p-name" style="color:#1a4a7a;">Blue</div>
+          <div class="p-rule">Act — coordination or action required now</div>
+        </div>
+        <div class="p-block">
+          <div class="p-swatch" style="background:#fef3d8;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7a5000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="p-name" style="color:#7a5000;">Amber</div>
+          <div class="p-rule">Wait — in motion, pending, or approaching limit</div>
+        </div>
+        <div class="p-block">
+          <div class="p-swatch" style="background:#fdecea;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <div class="p-name" style="color:#8a1a1a;">Red</div>
+          <div class="p-rule">Stop — blocked, overdue, expired or failed</div>
+        </div>
+        <div class="p-block">
+          <div class="p-swatch" style="background:#e0f4f0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0f6b56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="p-name" style="color:#0f6b56;">Teal · Purple</div>
+          <div class="p-rule">Special — exchange offer, gift, or conditional access</div>
+        </div>
+        <div class="p-block">
+          <div class="p-swatch" style="background:#f2ece5;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b5c50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="p-name">Grey</div>
+          <div class="p-rule">Neutral — inactive, terminal, or holding</div>
+        </div>
+      </div>
+
+      <div class="note warn">Always pair a badge with a role-specific action prompt. The badge tells users the <strong>state</strong>; the prompt tells them <strong>who acts next</strong>. Three amber transaction states look identical — only the prompt disambiguates them.</div>
+    </div>
+
+    <!-- ══ COLOUR SCALES ══ -->
+    <div class="section" id="colours">
+      <div class="section-label">Foundations — 02</div>
+      <div class="section-title">Colour Scales</div>
+
+      <div class="sub-section">
+        <div class="sub-label">Brand Primary — Resistance Magenta · 10 stops</div>
+        <div class="swatch-row scale-10">
+          <div class="swatch" style="background:#fff0f6;"><span class="swatch-val" style="color:#db036b;">50</span><div class="tooltip-sw">brand-50<br>#fff0f6<br>Background tints</div></div>
+          <div class="swatch" style="background:#fcd4e8;"><span class="swatch-val" style="color:#8a0047;">100</span><div class="tooltip-sw">brand-100<br>#fcd4e8<br>★ Active nav pill</div></div>
+          <div class="swatch" style="background:#f8a8d0;"><span class="swatch-val" style="color:#5e0031;">200</span><div class="tooltip-sw">brand-200<br>#f8a8d0<br>Disabled states</div></div>
+          <div class="swatch" style="background:#f07ab5;"><span class="swatch-val" style="color:#5e0031;">300</span><div class="tooltip-sw">brand-300<br>#f07ab5<br>Accents</div></div>
+          <div class="swatch" style="background:#e34a97;"><span class="swatch-val" style="color:white;">400</span><div class="tooltip-sw">brand-400<br>#e34a97<br>Highlights</div></div>
+          <div class="swatch star" style="background:#db036b;"><span class="swatch-val" style="color:white;">★500</span><div class="tooltip-sw">brand-500<br>#db036b<br>★ Notification pip</div></div>
+          <div class="swatch star" style="background:#b3005a;"><span class="swatch-val" style="color:white;">★600</span><div class="tooltip-sw">brand-600<br>#b3005a<br>★ FAB background</div></div>
+          <div class="swatch star" style="background:#8a0047;"><span class="swatch-val" style="color:rgba(255,255,255,0.8);">★700</span><div class="tooltip-sw">brand-700<br>#8a0047<br>★ Active nav, city label,<br>View All, accent text</div></div>
+          <div class="swatch" style="background:#5e0031;"><span class="swatch-val" style="color:rgba(255,255,255,0.7);">800</span><div class="tooltip-sw">brand-800<br>#5e0031<br>Deep emphasis</div></div>
+          <div class="swatch" style="background:#33001a;"><span class="swatch-val" style="color:rgba(255,255,255,0.5);">900</span><div class="tooltip-sw">brand-900<br>#33001a<br>Max depth</div></div>
+        </div>
+        <div class="note">★ Three active stops. Brand-500 = notification pip only. Brand-600 = FAB. Brand-700 = active nav + city label + interactive text. Pink appears in exactly these three roles. Nowhere else.</div>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">Warm Paper Neutrals · LEGACY --paper-* (retiring) · 11 stops</div>
+        <div class="swatch-row scale-11">
+          <div class="swatch star" style="background:#ffffff;border:1px solid #e6ddd3;"><span class="swatch-val" style="color:#b8a89a;">★0</span><div class="tooltip-sw">paper-0<br>#ffffff<br>★ Card surface</div></div>
+          <div class="swatch star" style="background:#faf7f4;border:1px solid #e6ddd3;"><span class="swatch-val" style="color:#b8a89a;">★50</span><div class="tooltip-sw">paper-50<br>#faf7f4<br>★ App background</div></div>
+          <div class="swatch star" style="background:#f2ece5;border:1px solid #d4c8bc;"><span class="swatch-val" style="color:#8f7b6e;">★100</span><div class="tooltip-sw">paper-100<br>#f2ece5<br>★ Header surface</div></div>
+          <div class="swatch" style="background:#e6ddd3;"><span class="swatch-val" style="color:#8f7b6e;">150</span><div class="tooltip-sw">paper-150<br>#e6ddd3<br>Card borders, nav border</div></div>
+          <div class="swatch" style="background:#d4c8bc;"><span class="swatch-val" style="color:#6b5c50;">200</span><div class="tooltip-sw">paper-200<br>#d4c8bc<br>Input borders, header hairline</div></div>
+          <div class="swatch" style="background:#b8a89a;"><span class="swatch-val" style="color:#4a3c32;">300</span><div class="tooltip-sw">paper-300<br>#b8a89a<br>Tagline, placeholder, nav inactive</div></div>
+          <div class="swatch" style="background:#8f7b6e;"><span class="swatch-val" style="color:white;">★400</span><div class="tooltip-sw">paper-400<br>#8f7b6e<br>★ Tagline colour<br>"Hong Kong books.<br>Keep them moving."</div></div>
+          <div class="swatch" style="background:#6b5c50;"><span class="swatch-val" style="color:white;">500</span><div class="tooltip-sw">paper-500<br>#6b5c50<br>Body text</div></div>
+          <div class="swatch" style="background:#4a3c32;"><span class="swatch-val" style="color:rgba(255,255,255,0.8);">600</span><div class="tooltip-sw">paper-600<br>#4a3c32<br>Primary text</div></div>
+          <div class="swatch" style="background:#2e2420;"><span class="swatch-val" style="color:rgba(255,255,255,0.7);">700</span><div class="tooltip-sw">paper-700<br>#2e2420<br>★ Headings, book titles</div></div>
+          <div class="swatch" style="background:#1a1410;"><span class="swatch-val" style="color:rgba(255,255,255,0.5);">800</span><div class="tooltip-sw">paper-800<br>#1a1410<br>Deep dark (dark mode future)</div></div>
+        </div>
+        <div class="note">Not grey — warm-tinted toward aged paper and library card stock. paper-400 (#8F7B6E) is the designated tagline colour: <strong>"Hong Kong books. Keep them moving."</strong></div>
+      </div>
+
+      <div class="sub-section">
+        <div class="sub-label">Revamp — Rosy Ink Scale · anchored on #190609 (2019·06·09) · 10 stops</div>
+        <div class="swatch-row scale-10">
+          <div class="swatch" style="background:#190609;"><span class="swatch-val" style="color:#f1e9ea;">950</span><div class="tooltip-sw">ink-950<br>#190609<br>★ Primary text, titles,<br>gradient frame · text-safe</div></div>
+          <div class="swatch" style="background:#321519;"><span class="swatch-val" style="color:#f1e9ea;">900</span><div class="tooltip-sw">ink-900<br>#321519<br>Secondary headings · text-safe</div></div>
+          <div class="swatch" style="background:#502b30;"><span class="swatch-val" style="color:#f1e9ea;">800</span><div class="tooltip-sw">ink-800<br>#502b30<br>Body text · text-safe</div></div>
+          <div class="swatch" style="background:#70484d;"><span class="swatch-val" style="color:#ffffff;">700</span><div class="tooltip-sw">ink-700<br>#70484d<br>Muted text, active icons · text-safe</div></div>
+          <div class="swatch" style="background:#956a70;"><span class="swatch-val" style="color:#ffffff;">600</span><div class="tooltip-sw">ink-600<br>#956a70<br>Captions, placeholder<br>(large / non-critical only)</div></div>
+          <div class="swatch" style="background:#b19599;"><span class="swatch-val" style="color:#190609;">500</span><div class="tooltip-sw">ink-500<br>#b19599<br>Disabled text, strong border</div></div>
+          <div class="swatch" style="background:#cebbbd;"><span class="swatch-val" style="color:#190609;">400</span><div class="tooltip-sw">ink-400<br>#cebbbd<br>Borders, dividers</div></div>
+          <div class="swatch" style="background:#e4d8da;"><span class="swatch-val" style="color:#190609;">300</span><div class="tooltip-sw">ink-300<br>#e4d8da<br>Hairlines</div></div>
+          <div class="swatch" style="background:#f1e9ea;border:1px solid #e4d8da;"><span class="swatch-val" style="color:#190609;">200</span><div class="tooltip-sw">ink-200<br>#f1e9ea<br>Hover, surface tint</div></div>
+          <div class="swatch" style="background:#f9f5f6;border:1px solid #e4d8da;"><span class="swatch-val" style="color:#190609;">100</span><div class="tooltip-sw">ink-100<br>#f9f5f6<br>Faint wash, card surface</div></div>
+        </div>
+        <div class="note"><strong>Replaces the Warm Paper Neutrals above.</strong> Same hue family as the brand magenta (rosy ≈352°) so neutrals and accent feel related, not adjacent strangers. The warmth is invisible at ink-950, peaks around the ink-500–400 borders, fades by the wash. <strong>Text-safe down to ink-600</strong> (large / non-critical only); ink-500 and lighter are structure-only — never body text. Adopting this also shifts the app background cream → pale pink and frees magenta for accent duty only.</div>
+      </div>
+    </div>
+
+    <!-- ══ SEMANTIC TOKENS ══ -->
+    <div class="section" id="tokens">
+      <div class="section-label">Foundations — 03</div>
+      <div class="section-title">Semantic Tokens</div>
+      <div class="section-intro">Named slots engineers reference in code. If a colour changes, only the token updates — everything follows. Prefix: <code>--</code> CSS custom property.</div>
+
+      <table class="token-table">
+        <thead>
+          <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="t-name">--surface-app</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#f9f5f6;border:1px solid #e4d8da;"></div>ink-100 · #f9f5f6</div></td><td class="t-use">Main app background</td></tr>
+          <tr><td class="t-name">--surface-card</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#ffffff;border:1px solid #e4d8da;"></div>#ffffff</div></td><td class="t-use">Book cards, modal sheets</td></tr>
+          <tr><td class="t-name">--surface-header</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#ffffff;border:1px solid #e4d8da;"></div>#ffffff · white chrome</div></td><td class="t-use">App header / top bar — shadow, no border</td></tr>
+          <tr><td class="t-name">--surface-curator</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#f1e9ea;"></div>ink-200 · #f1e9ea</div></td><td class="t-use">館長推介 wrap band</td></tr>
+          <tr><td class="t-name">--brand-500</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#db036b;"></div>#db036b</div></td><td class="t-use">Notification pip</td></tr>
+          <tr><td class="t-name">--fab-bg</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#b3005a;"></div>brand-600 · #b3005a</div></td><td class="t-use">Signal FAB button</td></tr>
+          <tr><td class="t-name">--nav-active</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#190609;"></div>ink-950 · #190609</div></td><td class="t-use">Active nav — filled dark pill, white icon</td></tr>
+          <tr><td class="t-name">--nav-active-pill</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#190609;"></div>ink-950 · #190609</div></td><td class="t-use">Active nav pill fill</td></tr>
+          <tr><td class="t-name">--nav-inactive</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#956a70;"></div>ink-600 · #956a70</div></td><td class="t-use">Inactive nav icons + labels</td></tr>
+          <tr><td class="t-name">--text-heading</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#190609;"></div>ink-950 · #190609</div></td><td class="t-use">Book titles, section headers, gradient frame</td></tr>
+          <tr><td class="t-name">--text-body</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#502b30;"></div>ink-800 · #502b30</div></td><td class="t-use">Descriptions, body copy</td></tr>
+          <tr><td class="t-name">--text-secondary</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#70484d;"></div>ink-700 · #70484d</div></td><td class="t-use">Year, metadata, captions</td></tr>
+          <tr><td class="t-name">--text-tagline</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#956a70;"></div>ink-600 · #956a70</div></td><td class="t-use">"Hong Kong books. Keep them moving."</td></tr>
+          <tr><td class="t-name">--text-link</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#8a0047;"></div>brand-700 · #8a0047</div></td><td class="t-use">Tappable text — links, View All</td></tr>
+          <tr><td class="t-name">--text-accent</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#8a0047;"></div>brand-700 · #8a0047</div></td><td class="t-use">City name, active interactive text</td></tr>
+          <tr><td class="t-name">--border-subtle</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#e4d8da;"></div>ink-300 · #e4d8da</div></td><td class="t-use">Card borders, dividers</td></tr>
+          <tr><td class="t-name">--border-default</td><td class="t-val"><div class="t-chip"><div class="t-dot" style="background:#cebbbd;"></div>ink-400 · #cebbbd</div></td><td class="t-use">Input borders</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ══ TYPOGRAPHY ══ -->
+    <div class="section" id="typography">
+      <div class="section-label">Foundations — 04</div>
+      <div class="section-title">Typography</div>
+      <div class="section-intro">Two typefaces. <strong>Noto Serif TC</strong> for cultural weight — brand name, book titles, section headers, Cantonese nav labels. <strong>IBM Plex Sans / Mono</strong> for functional UI — body text, metadata, badges, tagline. Eight named steps from display to micro. Bilingual rules govern minimum sizes, line-heights, and weight parity for mixed CJK/Latin text.</div>
+
+      <!-- ── Type Scale — 8 steps ── -->
+      <div class="sub-section">
+        <div class="sub-label">Type Scale — 8 named steps</div>
+        <div class="type-specimen">
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="tm-role">Display</div>
+              <div class="tm-spec">Noto Serif TC<br>700 · 22px · memorial colour</div>
+            </div>
+            <div style="font-family:'Noto Serif TC',serif;font-size:22px;font-weight:700;color:#890604;padding:10px 16px;background:#f9f5f6;border-radius:6px;line-height:1.3;">歡迎返嚟，米牙珠珠子</div>
+            <div class="type-spec-right">22px / 700<br>line-height: 1.3<br>color: seasonal memorial HEX</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="tm-role">Title LG</div>
+              <div class="tm-spec">Noto Serif TC<br>700 · 18px · ink-950</div>
+            </div>
+            <div style="font-family:'Noto Serif TC',serif;font-size:18px;font-weight:700;color:#190609;background:#ffffff;padding:10px 16px;border-radius:6px;line-height:1;display:flex;align-items:baseline;gap:7px;">BookGuide <span style="font-weight:600;color:#db036b;">Sydney</span></div>
+            <div class="type-spec-right">18px / 700<br>city: 18px / 600<br>color: ink-950 / brand-500</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="tm-role">Title</div>
+              <div class="tm-spec">Noto Serif TC<br>700 · 16px · ink-950</div>
+            </div>
+            <div style="font-family:'Noto Serif TC',serif;font-size:16px;font-weight:700;color:#190609;padding:10px 16px;background:#f9f5f6;border-radius:6px;">新番入庫</div>
+            <div class="type-spec-right">16px / 700<br>color: ink-950</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="tm-role">Body</div>
+              <div class="tm-spec">IBM Plex Sans<br>400 · 14px · ink-700</div>
+            </div>
+            <div style="font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:#70484d;padding:10px 16px;background:#f9f5f6;border-radius:6px;max-width:320px;line-height:1.55;">實體書改唔到，刪唔到。記憶值得留低。</div>
+            <div class="type-spec-right">14px / 400<br>line-height: 1.55<br>color: ink-700</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="tm-role">Body SM</div>
+              <div class="tm-spec">Noto Serif TC<br>400 · 13px · ink-700</div>
+            </div>
+            <div style="font-family:'Noto Serif TC',serif;font-size:13px;color:#70484d;padding:10px 16px;background:#f1e9ea;border-radius:6px;max-width:360px;line-height:1.5;">本月推薦：記憶與抗爭 — 六月，不能忘記的日子。</div>
+            <div class="type-spec-right">13px / 400<br>line-height: 1.5<br>curator note voice</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="tm-role">Label</div>
+              <div class="tm-spec">Noto Serif TC / Plex Sans<br>500–700 · 12px</div>
+            </div>
+            <div style="display:flex;gap:16px;align-items:center;padding:10px 16px;background:#ffffff;border:1px solid #e4d8da;border-radius:6px;">
+              <span style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:12px;color:#190609;">5月35日－創作・記憶</span>
+              <span style="font-size:12px;color:#8a0047;font-weight:500;">查看全部 →</span>
+            </div>
+            <div class="type-spec-right">12px / 500–700<br>card titles, links<br>CJK floor for must-read text</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="tm-role">Caption</div>
+              <div class="tm-spec">IBM Plex Sans<br>500–600 · 11px</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;padding:10px 16px;background:#ffffff;border:1px solid #e4d8da;border-radius:6px;">
+              <span style="font-size:11px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 7px;border-radius:5px;">可借閱</span>
+              <span style="font-size:11px;color:#190609;font-weight:600;">首頁</span>
+              <span style="font-size:11px;color:#70484d;padding:4px 9px;border:1px solid #e4d8da;border-radius:14px;">正體中文 ▾</span>
+            </div>
+            <div class="type-spec-right">11px / 500–600<br>badges, nav labels, buttons</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="tm-role">Micro</div>
+              <div class="tm-spec">Plex Sans 10px · chips<br>Plex Mono 9px · system</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;padding:10px 16px;background:#ffffff;border:1px solid #e4d8da;border-radius:6px;">
+              <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 5px;border-radius:4px;">禁書</span>
+              <span style="font-size:10px;font-weight:500;color:#890604;background:rgba(137,6,4,.12);padding:1px 5px;border-radius:4px;">六四</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#956a70;letter-spacing:.04em;">Hong Kong books.</span>
+            </div>
+            <div class="type-spec-right">10px chips, 9px system<br>CJK: 1–2 char labels only<br>9px: Latin decorative only</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Bilingual Rules ── -->
+      <div class="sub-section">
+        <div class="sub-label">Bilingual Rules — 正體中文 + English</div>
+
+        <table class="token-table" style="margin-bottom:20px;">
+          <thead><tr><th>Rule</th><th>正體中文 (CJK)</th><th>English (Latin)</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">Typeface</td><td class="t-val">Noto Serif TC</td><td class="t-val">IBM Plex Sans / Mono</td></tr>
+            <tr><td class="t-name">Role</td><td class="t-val">Cultural voice — titles, greetings, nav, book names</td><td class="t-val">Functional voice — UI, body, metadata, badges</td></tr>
+            <tr><td class="t-name">Min readable size</td><td class="t-val"><strong>12px</strong> (stroke-dense glyphs)</td><td class="t-val">9px (decorative only)</td></tr>
+            <tr><td class="t-name">Body line-height</td><td class="t-val">1.4–1.6 (extra leading for density)</td><td class="t-val">1.5–1.6</td></tr>
+            <tr><td class="t-name">Heading line-height</td><td class="t-val">1.3 (tight)</td><td class="t-val">1.2</td></tr>
+            <tr><td class="t-name">Bold weight</td><td class="t-val">700</td><td class="t-val">600 (to match CJK 700 visually)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>Mixed script rule:</strong> When CJK and Latin share a line, the CJK typeface governs. "5月35日" renders in Noto Serif TC, not Plex. <strong>Exception:</strong> system text — the tagline "Hong Kong books. Keep them moving." is Latin-primary, so Plex Mono governs.</div>
+
+        <div class="note" style="margin-top:8px;"><strong>Weight parity:</strong> CJK bold (700) reads heavier than Latin bold at the same weight. In mixed headings, use 600 for the Latin portion to match CJK 700 visually. Example: BookGuide (700) + Sydney (600).</div>
+
+        <div class="note" style="margin-top:8px;"><strong>CJK floor:</strong> Characters with 15+ strokes (鎮, 館, 灣, 歷) lose legibility below 12px on mobile. The 10px micro step is reserved for 1–2 character CJK chips (六四, 禁書) where glyphs are simple. Never set stroke-dense characters below 12px.</div>
+      </div>
+
+      <!-- ── Weight Map ── -->
+      <div class="sub-section">
+        <div class="sub-label">Weight Map</div>
+        <table class="token-table" style="max-width:500px;">
+          <thead><tr><th>Weight</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">400</td><td class="t-use">Regular — body, editorial notes, inactive labels</td></tr>
+            <tr><td class="t-name">500</td><td class="t-use">Medium — badges, chips, links, metadata emphasis</td></tr>
+            <tr><td class="t-name">600</td><td class="t-use">Semibold — city name, nav active label, Latin in mixed headings</td></tr>
+            <tr><td class="t-name">700</td><td class="t-use">Bold — CJK headings, titles, greeting, tab labels</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Accessibility ── -->
+      <div class="sub-section">
+        <div class="sub-label">Accessibility — Contrast & Readability</div>
+        <div class="note warn"><strong>All 23 text/background combinations pass WCAG AA.</strong> The majority hit AAA (7:1+). One constraint to enforce: <code>ink-600</code> (#956a70) is the lightest text-safe colour — safe on white (4.6:1), borderline on ink-100 (4.2:1, passes only as large text ≥16px bold), and <strong>fails on ink-200 or darker</strong>. Never use ink-600 for must-read text below 16px bold on any surface darker than white.</div>
+      </div>
+    </div>
+
+    <!-- ══ TYPOGRAPHY TOKENS ══ -->
+    <div class="section" id="type-tokens">
+      <div class="section-label">Foundations — 05</div>
+      <div class="section-title">Typography Tokens</div>
+      <div class="section-intro">Primitive tokens are raw values — sizes, weights, families. Semantic tokens are named roles that reference primitives and carry meaning. Engineers use semantic tokens; primitives are the building blocks underneath. This section is the single source of truth for responsive type across CJK and Latin scripts.</div>
+
+      <!-- ── 1. Primitive Scale ── -->
+      <div class="sub-section">
+        <div class="sub-label">1 · Primitives — Font Families</div>
+        <table class="token-table">
+          <thead><tr><th>Token</th><th>Value</th><th>Stack</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">--font-serif</td><td class="t-val">'Noto Serif TC'</td><td class="t-use">'Noto Serif TC', serif</td></tr>
+            <tr><td class="t-name">--font-sans</td><td class="t-val">'IBM Plex Sans'</td><td class="t-use">'IBM Plex Sans', -apple-system, sans-serif</td></tr>
+            <tr><td class="t-name">--font-mono</td><td class="t-val">'IBM Plex Mono'</td><td class="t-use">'IBM Plex Mono', monospace</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-label" style="margin-top:28px;">1 · Primitives — Font Size Scale</div>
+        <!-- Size specimens -->
+        <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:10px;overflow:hidden;margin-bottom:6px;">
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--paper-100);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-22</span>
+            <span style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:22px;color:#190609;line-height:1.3;">歡迎返嚟 Welcome</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">22px</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--paper-100);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-18</span>
+            <span style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:18px;color:#190609;">館長推介 BookGuide</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">18px</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--paper-100);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-16</span>
+            <span style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:16px;color:#190609;">新番入庫</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">16px</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--paper-100);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-14</span>
+            <span style="font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:#70484d;">實體書改唔到，刪唔到。</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">14px</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--paper-100);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-13</span>
+            <span style="font-family:'Noto Serif TC',serif;font-size:13px;color:#70484d;">本月推薦：記憶與抗爭</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">13px</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--paper-100);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-12</span>
+            <span style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:12px;color:#190609;">5月35日－創作・記憶 <span style="font-weight:500;color:#8a0047;">查看全部 →</span></span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">12px ← CJK floor</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--paper-100);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-11</span>
+            <span style="font-size:11px;color:#190609;font-weight:600;">首頁 <span style="font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:1px 6px;border-radius:4px;">可借閱</span></span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">11px</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--paper-100);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-10</span>
+            <span style="font-size:10px;font-weight:500;color:#502b30;"><span style="background:#e4d8da;padding:1px 5px;border-radius:4px;">禁書</span> <span style="background:rgba(137,6,4,.12);color:#890604;padding:1px 5px;border-radius:4px;">六四</span></span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">10px · chips</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:12px;padding:10px 16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;width:56px;flex-shrink:0;">--fs-9</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#956a70;letter-spacing:.04em;">Hong Kong books. Keep them moving.</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#b19599;margin-left:auto;">9px · Latin only</span>
+          </div>
+        </div>
+
+        <div class="sub-label" style="margin-top:28px;">1 · Primitives — Weights, Line-heights, Letter-spacing</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <table class="token-table">
+            <thead><tr><th>Weight token</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td class="t-name">--fw-regular</td><td class="t-val">400</td></tr>
+              <tr><td class="t-name">--fw-medium</td><td class="t-val">500</td></tr>
+              <tr><td class="t-name">--fw-semibold</td><td class="t-val">600</td></tr>
+              <tr><td class="t-name">--fw-bold</td><td class="t-val">700</td></tr>
+            </tbody>
+          </table>
+          <table class="token-table">
+            <thead><tr><th>Line-height token</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td class="t-name">--lh-none</td><td class="t-val">1</td></tr>
+              <tr><td class="t-name">--lh-tight</td><td class="t-val">1.2</td></tr>
+              <tr><td class="t-name">--lh-snug</td><td class="t-val">1.3</td></tr>
+              <tr><td class="t-name">--lh-normal</td><td class="t-val">1.5</td></tr>
+              <tr><td class="t-name">--lh-relaxed</td><td class="t-val">1.55</td></tr>
+            </tbody>
+          </table>
+          <table class="token-table">
+            <thead><tr><th>Spacing token</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td class="t-name">--ls-none</td><td class="t-val">0</td></tr>
+              <tr><td class="t-name">--ls-normal</td><td class="t-val">.04em</td></tr>
+              <tr><td class="t-name">--ls-wide</td><td class="t-val">.06em</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── 2. Semantic Roles ── -->
+      <div class="sub-section">
+        <div class="sub-label">2 · Semantic Roles — 8 named type tokens</div>
+        <div class="section-intro" style="margin-bottom:16px;">Each role maps to a fixed combination of family, size, weight, line-height, and script. Engineers use the semantic name; the primitives underneath can change without touching components.</div>
+        <table class="token-table">
+          <thead><tr><th>Role</th><th>Family</th><th>Size</th><th>Weight</th><th>Line-h</th><th>Script</th><th>Used for</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">--type-display</td><td class="t-val">serif</td><td class="t-val">--fs-22</td><td class="t-val">bold</td><td class="t-val">snug</td><td class="t-val">CJK</td><td class="t-use">Welcome greeting</td></tr>
+            <tr><td class="t-name">--type-title-lg</td><td class="t-val">serif</td><td class="t-val">--fs-18</td><td class="t-val">bold</td><td class="t-val">tight</td><td class="t-val">CJK</td><td class="t-use">Wordmark, 館長推介 title</td></tr>
+            <tr><td class="t-name">--type-title</td><td class="t-val">serif</td><td class="t-val">--fs-16</td><td class="t-val">bold</td><td class="t-val">tight</td><td class="t-val">CJK</td><td class="t-use">Section tab headers</td></tr>
+            <tr><td class="t-name">--type-body</td><td class="t-val">sans</td><td class="t-val">--fs-14</td><td class="t-val">regular</td><td class="t-val">relaxed</td><td class="t-val">Both</td><td class="t-use">Welcome body, descriptions</td></tr>
+            <tr><td class="t-name">--type-body-sm</td><td class="t-val">serif</td><td class="t-val">--fs-13</td><td class="t-val">regular</td><td class="t-val">normal</td><td class="t-val">CJK</td><td class="t-use">Curator note, editorial copy</td></tr>
+            <tr><td class="t-name">--type-label</td><td class="t-val">serif / sans</td><td class="t-val">--fs-12</td><td class="t-val">medium–bold</td><td class="t-val">snug</td><td class="t-val">Both</td><td class="t-use">Card titles, links, view-all</td></tr>
+            <tr><td class="t-name">--type-caption</td><td class="t-val">sans</td><td class="t-val">--fs-11</td><td class="t-val">medium–semi</td><td class="t-val">normal</td><td class="t-val">Both</td><td class="t-use">Badges, nav labels, buttons</td></tr>
+            <tr><td class="t-name">--type-micro</td><td class="t-val">sans / mono</td><td class="t-val">--fs-10 / --fs-9</td><td class="t-val">medium / regular</td><td class="t-val">normal</td><td class="t-val">Latin*</td><td class="t-use">Chips (10px), tagline (9px)</td></tr>
+          </tbody>
+        </table>
+        <div class="note">*Micro: CJK at 10px is permitted only for 1–2 character chip labels (六四, 禁書). Stroke-dense characters (鎮, 館, 灣) must stay at <code>--type-label</code> (12px) or above. The 9px step is Latin-only (tagline, system metadata).</div>
+      </div>
+
+      <!-- ── 3. Responsive Variance ── -->
+      <div class="sub-section">
+        <div class="sub-label">3 · Responsive Variance — breakpoint scaling</div>
+        <div class="section-intro" style="margin-bottom:16px;">Not every role scales. Body, label, caption, and micro hold steady across all widths — only display, title-lg, title, and body scale up for wider viewports. This table is the single source of truth for responsive type.</div>
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>≤ 480px<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">phone</span></th>
+              <th>481–599px<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">large phone</span></th>
+              <th>600–767px<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">tablet</span></th>
+              <th>≥ 768px<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">desktop</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="t-name">display</td><td class="t-val">22px</td><td class="t-val">22px</td><td class="t-val">24px</td><td class="t-val" style="color:#8a0047;">26px</td></tr>
+            <tr><td class="t-name">title-lg</td><td class="t-val">18px</td><td class="t-val">18px</td><td class="t-val">18px</td><td class="t-val" style="color:#8a0047;">20px</td></tr>
+            <tr><td class="t-name">title</td><td class="t-val">16px</td><td class="t-val">16px</td><td class="t-val">16px</td><td class="t-val" style="color:#8a0047;">17px</td></tr>
+            <tr><td class="t-name">body</td><td class="t-val">14px</td><td class="t-val">14px</td><td class="t-val">14px</td><td class="t-val" style="color:#8a0047;">15px</td></tr>
+            <tr><td class="t-name">body-sm</td><td class="t-val">13px</td><td class="t-val" colspan="3" style="color:#b19599;text-align:center;">— no change —</td></tr>
+            <tr><td class="t-name">label</td><td class="t-val">12px</td><td class="t-val" colspan="3" style="color:#b19599;text-align:center;">— no change —</td></tr>
+            <tr><td class="t-name">caption</td><td class="t-val">11px</td><td class="t-val" colspan="3" style="color:#b19599;text-align:center;">— no change —</td></tr>
+            <tr><td class="t-name">micro</td><td class="t-val">10 / 9px</td><td class="t-val" colspan="3" style="color:#b19599;text-align:center;">— no change —</td></tr>
+          </tbody>
+        </table>
+        <div class="note">Values in <span style="color:#8a0047;font-weight:500;">magenta</span> indicate a breakpoint override. Only four roles scale — the rest are size-locked. Scaling is modest (1–4px per step) to maintain density on larger screens without the app feeling "zoomed in."</div>
+      </div>
+
+      <!-- ── 4. Script Rules ── -->
+      <div class="sub-section">
+        <div class="sub-label">4 · CJK / Latin Script Rules</div>
+        <div class="section-intro" style="margin-bottom:16px;">These rules constrain the token system. An engineer picks a semantic token first, then checks these rules to confirm it's safe for the content script.</div>
+
+        <table class="token-table" style="margin-bottom:16px;">
+          <thead><tr><th>Rule</th><th>正體中文 (CJK)</th><th>English (Latin)</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">Typeface</td><td class="t-val">--font-serif (Noto Serif TC)</td><td class="t-val">--font-sans / --font-mono</td></tr>
+            <tr><td class="t-name">Voice</td><td class="t-val">Cultural — titles, greetings, nav, book names</td><td class="t-val">Functional — UI, body, metadata, badges</td></tr>
+            <tr><td class="t-name">Min size (must-read)</td><td class="t-val"><strong>--fs-12 (12px)</strong></td><td class="t-val">--fs-11 (11px)</td></tr>
+            <tr><td class="t-name">Min size (decorative)</td><td class="t-val">--fs-10 (10px, 1–2 char only)</td><td class="t-val">--fs-9 (9px)</td></tr>
+            <tr><td class="t-name">Body line-height</td><td class="t-val">--lh-normal (1.5) to --lh-relaxed (1.55)</td><td class="t-val">--lh-relaxed (1.55)</td></tr>
+            <tr><td class="t-name">Heading line-height</td><td class="t-val">--lh-snug (1.3)</td><td class="t-val">--lh-tight (1.2)</td></tr>
+            <tr><td class="t-name">Bold weight</td><td class="t-val">--fw-bold (700)</td><td class="t-val">--fw-semibold (600) in mixed headings</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note"><strong>Mixed-script resolution:</strong> When CJK and Latin share a line, the CJK typeface (--font-serif) governs. Digits and punctuation within CJK text inherit the serif face. <strong>Exception:</strong> Latin-primary system text (tagline, version labels) uses --font-mono regardless of surrounding CJK context.</div>
+
+        <div class="note" style="margin-top:8px;"><strong>Weight parity:</strong> CJK glyphs at --fw-bold (700) appear heavier than Latin at the same weight due to stroke density. In mixed headings, pair CJK 700 with Latin 600 for visual balance. Example: <span style="font-family:'Noto Serif TC',serif;font-weight:700;color:#190609;">BookGuide</span> <span style="font-family:'Noto Serif TC',serif;font-weight:600;color:#db036b;">Sydney</span> — the title is 700, the city is 600, but they read as the same visual weight.</div>
+
+        <div class="note" style="margin-top:8px;"><strong>CJK floor enforcement:</strong> Characters with 15+ strokes (鎮 館 灣 歷 讀 職 議 鐵) collapse below --fs-12 on mobile screens. The --type-micro step (10px) is safe only for simple CJK (六 四 書 人 文) — 1–2 character labels where every stroke is distinct. When in doubt, use --type-label (12px).</div>
+
+        <div class="note warn" style="margin-top:8px;"><strong>Accessibility gate:</strong> ink-600 (#956a70) is the lightest text-safe colour. It passes WCAG AA on white (4.6:1) and on ink-100 only at ≥16px bold. It <strong>fails on ink-200 or darker</strong> at any size. Never pair ink-600 text with --type-caption (11px) or --type-micro (10px) on any non-white surface.</div>
+      </div>
+
+    </div>
+
+    <!-- ══ RADIUS TOKENS ══ -->
+    <div class="section" id="radius-tokens">
+      <div class="section-label">Foundations — 06</div>
+      <div class="section-title">Radius Tokens</div>
+      <div class="section-intro">Four named steps. Each serves a different signal: sharper = data label, softer = container, pill-ish = action, circle = signal point. Colour, position, and icons distinguish elements <em>within</em> a radius step — the radius itself distinguishes <em>between</em> classes of element.</div>
+
+      <!-- ── Primitive Scale ── -->
+      <div class="sub-section">
+        <div class="sub-label">Primitive Scale — 4 tokens</div>
+
+        <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:16px;">
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:16px;">
+            <div style="width:52px;height:34px;border-radius:4px;background:#190609;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:baseline;gap:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;">--radius-sm</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;">4px · fixed</span>
+              </div>
+              <div style="font-size:12px;color:#70484d;margin-top:3px;">All small labels — category chips, status badges, structural indicators</div>
+              <div style="display:flex;gap:6px;margin-top:8px;align-items:center;">
+                <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 6px;border-radius:4px;">禁書</span>
+                <span style="font-size:10px;font-weight:500;color:#890604;background:rgba(137,6,4,.12);padding:1px 6px;border-radius:4px;">六四</span>
+                <span style="font-size:11px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 7px;border-radius:4px;display:flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>可借閱</span>
+                <span style="font-size:11px;font-weight:500;color:#7a5000;background:rgba(254,243,216,.94);padding:2px 7px;border-radius:4px;">借出中</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:16px;">
+            <div style="display:flex;gap:4px;flex-shrink:0;">
+              <div style="width:24px;height:34px;border-radius:10px;background:#190609;"></div>
+              <div style="width:24px;height:34px;border-radius:12px;background:#190609;opacity:.6;"></div>
+              <div style="width:24px;height:34px;border-radius:14px;background:#190609;opacity:.3;"></div>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:baseline;gap:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;">--radius-lg</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a0047;font-weight:500;">10–14px · fluid</span>
+              </div>
+              <div style="font-size:12px;color:#70484d;margin-top:3px;">Containers — book cards, curator strip, photo frames, section panels</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#956a70;margin-top:6px;padding:5px 8px;background:#f9f5f6;border-radius:4px;display:inline-block;">clamp(10px, 2vw + 4px, 14px)</div>
+            </div>
+          </div>
+
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:16px;">
+            <div style="width:52px;height:34px;border-radius:12px;background:#190609;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:baseline;gap:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;">--radius-button</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;">12px · fixed</span>
+              </div>
+              <div style="font-size:12px;color:#70484d;margin-top:3px;">Interactive controls — CTA buttons, submit, confirm. Deliberate, not playful.</div>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <span style="font-size:12px;font-weight:500;color:#fff;background:#b3005a;padding:6px 16px;border-radius:12px;">借閱</span>
+                <span style="font-size:12px;font-weight:500;color:#190609;background:#fff;padding:6px 16px;border-radius:12px;border:1px solid #cebbbd;">取消</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:16px;">
+            <div style="width:34px;height:34px;border-radius:50%;background:#190609;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:baseline;gap:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;">--radius-full</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;">50% · fixed</span>
+              </div>
+              <div style="font-size:12px;color:#70484d;margin-top:3px;">Signal points — FAB, notification pip, nav active pill, avatars</div>
+              <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#b3005a;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#db036b;"></div>
+                <div style="width:46px;height:26px;border-radius:50vh;background:#190609;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="#f9f5f6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 9v11h14V9"/></svg></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Responsive Behaviour ── -->
+      <div class="sub-section">
+        <div class="sub-label">Responsive Behaviour</div>
+        <table class="token-table">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>≤ 480px</th>
+              <th>481–767px</th>
+              <th>≥ 768px</th>
+              <th>Behaviour</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="t-name">--radius-sm</td><td class="t-val">4px</td><td class="t-val" colspan="2" style="color:#b19599;text-align:center;">— no change —</td><td class="t-use">Fixed. Element doesn't resize.</td></tr>
+            <tr><td class="t-name">--radius-lg</td><td class="t-val">10px</td><td class="t-val" style="color:#8a0047;">↗ fluid</td><td class="t-val" style="color:#8a0047;">14px</td><td class="t-use">Fluid. Tracks card width.</td></tr>
+            <tr><td class="t-name">--radius-button</td><td class="t-val">12px</td><td class="t-val" colspan="2" style="color:#b19599;text-align:center;">— no change —</td><td class="t-use">Fixed. Shape = identity.</td></tr>
+            <tr><td class="t-name">--radius-full</td><td class="t-val">50%</td><td class="t-val" colspan="2" style="color:#b19599;text-align:center;">— always 50% —</td><td class="t-use">Fixed by definition.</td></tr>
+          </tbody>
+        </table>
+        <div class="note">Only <code>--radius-lg</code> scales, because only containers change size across breakpoints. Everything else is either too small for responsive radius to be perceptible (chips, badges) or shape-defined (buttons, circles). The nav active pill resolves into <code>--radius-full</code> — 50% of its 30px height = 15px, a circle-family element in an oblong container.</div>
+      </div>
+
+      <!-- ── Shape Language ── -->
+      <div class="sub-section">
+        <div class="sub-label">Shape Language</div>
+        <div class="note"><strong>4px (sm)</strong> = "this is a label." Chips classify, badges state, indicators mark. Colour and icons distinguish roles within this shape. A 六四 chip is red; a 可借閱 badge is green with a checkmark. Same radius, different signals.</div>
+        <div class="note" style="margin-top:8px;"><strong>10–14px (lg)</strong> = "this is a container." Something you browse, scroll, or tap into. The softness invites entry. Cards, strips, and frames all share this feeling.</div>
+        <div class="note" style="margin-top:8px;"><strong>12px (button)</strong> = "this is an action." Considered, editorial, deliberate — not bouncy or playful. Matches the gravity of an app whose subject matter includes 六四 and 國安法.</div>
+        <div class="note" style="margin-top:8px;"><strong>50% (full)</strong> = "look here." A circle is the strongest attractor shape. Reserved for the elements that demand immediate attention: the FAB, the notification pip, the active-state signal.</div>
+      </div>
+
+    </div>
+
+    <!-- ══ SPACING TOKENS ══ -->
+    <div class="section" id="spacing-tokens">
+      <div class="section-label">Foundations — 07</div>
+      <div class="section-title">Spacing Tokens</div>
+      <div class="section-intro">Eight steps on a 4px base unit. Every gap, margin, and padding in the app snaps to one of these. The scale governs <em>layout</em> — space between elements the user perceives as separate. Sub-4px values (chip internal padding) are component anatomy, defined within each component, not global spacing.</div>
+
+      <!-- ── Primitive Scale ── -->
+      <div class="sub-section">
+        <div class="sub-label">Primitive Scale — 8 steps · 4px base</div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:64px;flex-shrink:0;">--space-1</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;width:44px;flex-shrink:0;">4px</span>
+            <div style="flex:1;"><div style="height:16px;width:4px;background:#8a0047;border-radius:1px;"></div></div>
+            <span style="font-size:11px;color:#70484d;width:190px;flex-shrink:0;text-align:right;">chip-to-chip, icon-to-text</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:64px;flex-shrink:0;">--space-2</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;width:44px;flex-shrink:0;">8px</span>
+            <div style="flex:1;"><div style="height:16px;width:8px;background:#8a0047;border-radius:1px;"></div></div>
+            <span style="font-size:11px;color:#70484d;width:190px;flex-shrink:0;text-align:right;">title-to-chips, tight stacks</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:64px;flex-shrink:0;">--space-3</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;width:44px;flex-shrink:0;">12px</span>
+            <div style="flex:1;"><div style="height:16px;width:12px;background:#8a0047;border-radius:1px;"></div></div>
+            <span style="font-size:11px;color:#70484d;width:190px;flex-shrink:0;text-align:right;">card gaps, grid gutters</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:64px;flex-shrink:0;">--space-4</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;width:44px;flex-shrink:0;">16px</span>
+            <div style="flex:1;"><div style="height:16px;width:16px;background:#8a0047;border-radius:1px;"></div></div>
+            <span style="font-size:11px;color:#70484d;width:190px;flex-shrink:0;text-align:right;">card padding, component internal</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:64px;flex-shrink:0;">--space-5</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;width:44px;flex-shrink:0;">20px</span>
+            <div style="flex:1;"><div style="height:16px;width:20px;background:#8a0047;border-radius:1px;"></div></div>
+            <span style="font-size:11px;color:#70484d;width:190px;flex-shrink:0;text-align:right;">screen edge padding (mobile)</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:64px;flex-shrink:0;">--space-6</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;width:44px;flex-shrink:0;">24px</span>
+            <div style="flex:1;"><div style="height:16px;width:24px;background:#8a0047;border-radius:1px;"></div></div>
+            <span style="font-size:11px;color:#70484d;width:190px;flex-shrink:0;text-align:right;">section gaps, welcome padding</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:64px;flex-shrink:0;">--space-7</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;width:44px;flex-shrink:0;">28px</span>
+            <div style="flex:1;"><div style="height:16px;width:28px;background:#8a0047;border-radius:1px;"></div></div>
+            <span style="font-size:11px;color:#70484d;width:190px;flex-shrink:0;text-align:right;">screen edge (desktop), big gaps</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:16px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:64px;flex-shrink:0;">--space-8</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#956a70;width:44px;flex-shrink:0;">32px</span>
+            <div style="flex:1;"><div style="height:16px;width:32px;background:#8a0047;border-radius:1px;"></div></div>
+            <span style="font-size:11px;color:#70484d;width:190px;flex-shrink:0;text-align:right;">major section breaks</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Collapse Map ── -->
+      <div class="sub-section">
+        <div class="sub-label">Collapse Map — 18 drifting values → 8 steps</div>
+        <div class="section-intro" style="margin-bottom:14px;">The app previously used 18 distinct spacing values. Each maps to its nearest step. High-frequency values (20, 24, 16, 12) form the backbone; one-off drifts (5, 7, 18, 22) snap to a neighbour.</div>
+        <table class="token-table">
+          <thead><tr><th>Raw values found</th><th>Snaps to</th><th>Token</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">4, 5px</td><td class="t-val">4px</td><td class="t-use">--space-1</td></tr>
+            <tr><td class="t-name">6, 7, 8px</td><td class="t-val">8px</td><td class="t-use">--space-2</td></tr>
+            <tr><td class="t-name">10, 12px</td><td class="t-val">12px</td><td class="t-use">--space-3</td></tr>
+            <tr><td class="t-name">14, 16px</td><td class="t-val">16px</td><td class="t-use">--space-4</td></tr>
+            <tr><td class="t-name">18, 20px</td><td class="t-val">20px</td><td class="t-use">--space-5</td></tr>
+            <tr><td class="t-name">22, 24px</td><td class="t-val">24px</td><td class="t-use">--space-6</td></tr>
+            <tr><td class="t-name">28px</td><td class="t-val">28px</td><td class="t-use">--space-7</td></tr>
+            <tr><td class="t-name">32px</td><td class="t-val">32px</td><td class="t-use">--space-8</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Layout vs Anatomy ── -->
+      <div class="sub-section">
+        <div class="sub-label">Layout Spacing vs Component Anatomy</div>
+        <div class="note"><strong>Layout spacing (this scale):</strong> space <em>between</em> elements the user perceives as separate — gap between cards, screen-edge padding, title-to-grid. These recur across contexts, risk drift if not centralised, and belong in the global scale.</div>
+        <div class="note" style="margin-top:8px;"><strong>Component anatomy (not this scale):</strong> space <em>inside</em> a single perceived unit — the 2px between a checkmark and its label inside one badge, a chip's vertical padding. These live in one component, are enforced by that component's own definition, and would only clutter the global scale. Sub-4px values (1–3px) are always anatomy, never layout.</div>
+        <div class="note" style="margin-top:8px;"><strong>The test:</strong> a value belongs in the scale when it is (1) layout space between separate elements, (2) recurring across contexts, and (3) at risk of drift if not centralised. It stays local when it is internal construction of one unit, used in one place, already enforced by that component.</div>
+      </div>
+
+    </div>
+
+    <!-- ══ STATUS CHIP ══ -->
+    <div class="section" id="status-chip">
+      <div class="section-label">Components — 01</div>
+      <div class="section-title">Status Chip</div>
+      <div class="section-intro">Renders a book's <code>ItemStatus</code> — one of five production enum values. Sits top-right of the cover photo overlay on every book card. Built entirely from tokens: <code>--radius-sm</code> (4px), <code>--type-caption</code> (11px), and internal anatomy padding. Each state carries a distinct colour + icon so it reads without relying on text alone.</div>
+
+      <!-- ── States ── -->
+      <div class="sub-section">
+        <div class="sub-label">States — 5 production enum values · bilingual</div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:14px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:120px;flex-shrink:0;">AVAILABLE</span>
+            <span style="font-size:11px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>可借用</span>
+            <span style="font-size:11px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Available</span>
+            <span style="font-size:11px;color:#956a70;margin-left:auto;">green</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:14px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:120px;flex-shrink:0;">EXCHANGEABLE</span>
+            <span style="font-size:11px;font-weight:500;color:#1a4a7a;background:rgba(224,236,247,.94);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>可交換</span>
+            <span style="font-size:11px;font-weight:500;color:#1a4a7a;background:rgba(224,236,247,.94);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Exchangeable</span>
+            <span style="font-size:11px;color:#956a70;margin-left:auto;">blue</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:14px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:120px;flex-shrink:0;">GIFT</span>
+            <span style="font-size:11px;font-weight:500;color:#5a2a6b;background:rgba(240,232,245,.94);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>贈送物</span>
+            <span style="font-size:11px;font-weight:500;color:#5a2a6b;background:rgba(240,232,245,.94);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Gift</span>
+            <span style="font-size:11px;color:#956a70;margin-left:auto;">violet</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:14px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:120px;flex-shrink:0;">RESERVED</span>
+            <span style="font-size:11px;font-weight:500;color:#7a5000;background:rgba(254,243,216,.94);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>已預留</span>
+            <span style="font-size:11px;font-weight:500;color:#7a5000;background:rgba(254,243,216,.94);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Reserved</span>
+            <span style="font-size:11px;color:#956a70;margin-left:auto;">amber</span>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:14px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#190609;font-weight:500;width:120px;flex-shrink:0;">TRANSFERRED</span>
+            <span style="font-size:11px;font-weight:500;color:#70484d;background:#e4d8da;padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>已轉讓</span>
+            <span style="font-size:11px;font-weight:500;color:#70484d;background:#e4d8da;padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>Transferred</span>
+            <span style="font-size:11px;color:#956a70;margin-left:auto;">neutral ink</span>
+          </div>
+        </div>
+        <div class="note"><strong>Colour logic:</strong> The three "active" states (AVAILABLE, EXCHANGEABLE, GIFT) use distinct functional hues — green, blue, violet — so a user scanning a grid can tell borrow from swap from free at a glance. RESERVED (amber) signals "wait." TRANSFERRED (neutral ink) is deliberately muted — the book is gone, so its chip recedes. <strong>Memorial colours are never used for status</strong> — status is a mundane UI state, and the memorial palette is reserved for editorial/categorical meaning only.</div>
+        <div class="note" style="margin-top:8px;"><strong>Bilingual:</strong> The chip renders in the active app language via the header toggle. CJK labels come from <code>zh-HK.json</code>, English from <code>en.json</code> — both keyed to the same <code>ItemStatus</code> enum. Colour and icon are identical across languages; only the text swaps. English labels run longer, so the chip is content-width (never fixed-width) to accommodate "Exchangeable" without clipping.</div>
+      </div>
+
+      <!-- ── Anatomy ── -->
+      <div class="sub-section">
+        <div class="sub-label">Anatomy — token map</div>
+        <table class="token-table">
+          <thead><tr><th>Property</th><th>Token / value</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">Corner radius</td><td class="t-val">--radius-sm · 4px</td><td class="t-use">Label shape — fixed, non-responsive</td></tr>
+            <tr><td class="t-name">Text size</td><td class="t-val">--type-caption · 11px</td><td class="t-use">Latin/CJK both legible</td></tr>
+            <tr><td class="t-name">Text weight</td><td class="t-val">--fw-medium · 500</td><td class="t-use">Reads clearly on busy covers</td></tr>
+            <tr><td class="t-name">Padding (vertical)</td><td class="t-val">2px</td><td class="t-use">Component anatomy — not global spacing</td></tr>
+            <tr><td class="t-name">Padding (horizontal)</td><td class="t-val">8px (--space-2)</td><td class="t-use">Layout-safe step</td></tr>
+            <tr><td class="t-name">Icon size</td><td class="t-val">11px</td><td class="t-use">Matches cap height</td></tr>
+            <tr><td class="t-name">Icon-to-text gap</td><td class="t-val">3px</td><td class="t-use">Component anatomy</td></tr>
+            <tr><td class="t-name">Backdrop</td><td class="t-val">blur(4px)</td><td class="t-use">Legibility over any cover photo</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Behaviour ── -->
+      <div class="sub-section">
+        <div class="sub-label">Behaviour Rules</div>
+        <div class="note"><strong>One per card.</strong> A book has exactly one status. The chip is singular — never stacked. It always sits top-right of the cover overlay.</div>
+        <div class="note" style="margin-top:8px;"><strong>Non-responsive.</strong> The chip is the same size on every breakpoint. Its text is 11px on phone and desktop alike. It doesn't grow with the card.</div>
+        <div class="note" style="margin-top:8px;"><strong>Icon + colour, never colour alone.</strong> Every state pairs a hue with an icon, so the chip is legible to colour-blind users and readable in greyscale. Colour is reinforcement, not the sole signal.</div>
+      </div>
+
+      <!-- ── Engineering ── -->
+      <div class="sub-section">
+        <div class="sub-label">Engineering — enum mapping</div>
+        <table class="token-table">
+          <thead><tr><th>ItemStatus</th><th>zh-HK</th><th>en</th><th>Colour role</th><th>Icon</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">AVAILABLE</td><td class="t-val">可借用</td><td class="t-val">Available</td><td class="t-val">green #0f6b56</td><td class="t-use">check-circle</td></tr>
+            <tr><td class="t-name">EXCHANGEABLE</td><td class="t-val">可交換</td><td class="t-val">Exchangeable</td><td class="t-val">blue #1a4a7a</td><td class="t-use">swap arrows</td></tr>
+            <tr><td class="t-name">GIFT</td><td class="t-val">贈送物</td><td class="t-val">Gift</td><td class="t-val">violet #5a2a6b</td><td class="t-use">gift box</td></tr>
+            <tr><td class="t-name">RESERVED</td><td class="t-val">已預留</td><td class="t-val">Reserved</td><td class="t-val">amber #7a5000</td><td class="t-use">clock</td></tr>
+            <tr><td class="t-name">TRANSFERRED</td><td class="t-val">已轉讓</td><td class="t-val">Transferred</td><td class="t-val">ink #70484d</td><td class="t-use">arrow-right</td></tr>
+          </tbody>
+        </table>
+        <div class="note warn"><strong>Enum spelling:</strong> <code>TRANSFERRED</code> — two Rs, correct English. Wire the chip directly to the <code>ItemStatus</code> enum; labels come from <code>zh-HK.json</code>. Do not invent statuses — a lent-out book stays <code>AVAILABLE</code> in the data; lending is a separate transaction concern, not a status.</div>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY CHIP ══ -->
+    <div class="section" id="category-chip">
+      <div class="section-label">Components — 02</div>
+      <div class="section-title">Category Chip</div>
+      <div class="section-intro">Renders a book's category — a free-form string from the <code>category</code> field. Two visual modes: <strong>neutral</strong> for ordinary categories, <strong>memorial-tinted</strong> for categories that match a known collective-memory event. The memorial tint is a presentation-layer lookup, not data — the category string itself carries no special flag.</div>
+
+      <!-- ── Modes ── -->
+      <div class="sub-section">
+        <div class="sub-label">Modes — neutral vs memorial</div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:14px 16px;">
+            <div style="font-size:12px;color:#70484d;margin-bottom:8px;">Neutral — the default for any category string</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 6px;border-radius:4px;">禁書</span>
+              <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 6px;border-radius:4px;">政治</span>
+              <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 6px;border-radius:4px;">散文</span>
+              <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 6px;border-radius:4px;">紀實</span>
+              <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 6px;border-radius:4px;">海外</span>
+            </div>
+          </div>
+          <div style="background:var(--paper-0);border:1px solid var(--paper-150);border-radius:8px;padding:14px 16px;">
+            <div style="font-size:12px;color:#70484d;margin-bottom:8px;">Memorial-tinted — only for categories matching a known event</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:10px;font-weight:500;color:#890604;background:rgba(137,6,4,.12);padding:1px 6px;border-radius:4px;">六四</span>
+              <span style="font-size:10px;font-weight:500;color:#140928;background:rgba(20,9,40,.12);padding:1px 6px;border-radius:4px;">雨傘</span>
+              <span style="font-size:10px;font-weight:500;color:#200630;background:rgba(32,6,48,.12);padding:1px 6px;border-radius:4px;">國安法</span>
+            </div>
+          </div>
+        </div>
+        <div class="note"><strong>Why a lookup, not data:</strong> Categories are free-form strings (<code>category: String!</code>). The data has no "this is a memorial event" flag. The memorial tint is applied client-side: if the category string matches an entry in a small memorial-events map, render the tinted variant; otherwise render neutral. This keeps the meaning in the design layer where it belongs.</div>
+        <div class="note" style="margin-top:8px;"><strong>Tags don't translate.</strong> A category is content, not UI copy. It has one fixed display form — whatever the curator entered — and renders identically regardless of app language. 六四 stays 六四; "Hong Kong" stays "Hong Kong"; tags can be mixed-script (六四 and "Hong Kong" on the same book). Only the surrounding UI (status chip, buttons, labels) swaps with the language toggle.</div>
+      </div>
+
+      <!-- ── Anatomy ── -->
+      <div class="sub-section">
+        <div class="sub-label">Anatomy — token map</div>
+        <table class="token-table">
+          <thead><tr><th>Property</th><th>Token / value</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">Corner radius</td><td class="t-val">--radius-sm · 4px</td><td class="t-use">Same label shape as status chip</td></tr>
+            <tr><td class="t-name">Text size</td><td class="t-val">--type-micro · 10px</td><td class="t-use">1–2 char CJK — simple glyphs only</td></tr>
+            <tr><td class="t-name">Text weight</td><td class="t-val">--fw-medium · 500</td><td class="t-use"></td></tr>
+            <tr><td class="t-name">Padding</td><td class="t-val">1px / 6px</td><td class="t-use">Component anatomy</td></tr>
+            <tr><td class="t-name">Neutral fill</td><td class="t-val">ink-300 #e4d8da</td><td class="t-use">Text: ink-800</td></tr>
+            <tr><td class="t-name">Memorial fill</td><td class="t-val">event HEX @ 12% alpha</td><td class="t-use">Text: full event HEX</td></tr>
+          </tbody>
+        </table>
+        <div class="note warn"><strong>CJK floor watch:</strong> Category chips use 10px (<code>--type-micro</code>) — safe only for 1–2 simple characters (六四, 禁書, 政治). A longer or stroke-dense category (e.g. 親歷者著作) must render at <code>--type-label</code> 12px or truncate. The 10px floor is the exception the type system explicitly allows for chips.</div>
+      </div>
+
+      <!-- ── Memorial map ── -->
+      <div class="sub-section">
+        <div class="sub-label">Memorial Event Map — the client-side lookup</div>
+        <table class="token-table">
+          <thead><tr><th>Category string</th><th>Event</th><th>Memorial HEX</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">六四</td><td class="t-val">1989 Tiananmen</td><td class="t-val"><span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:2px;background:#890604;"></span>#890604</span></td></tr>
+            <tr><td class="t-name">雨傘</td><td class="t-val">2014 Umbrella</td><td class="t-val"><span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:2px;background:#140928;"></span>#140928</span></td></tr>
+            <tr><td class="t-name">國安法</td><td class="t-val">2020 NSL</td><td class="t-val"><span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:2px;background:#200630;"></span>#200630</span></td></tr>
+          </tbody>
+        </table>
+        <div class="note">This map is the single place memorial categories are defined. Adding an event means adding one row. Everything else renders neutral. The memorial HEX values encode the event dates — see Governing Colour Principle.</div>
+      </div>
+    </div>
+
+    <!-- ══ BOOK CARD ══ -->
+    <div class="section" id="book-card">
+      <div class="section-label">Components — 03</div>
+      <div class="section-title">Book Card</div>
+      <div class="section-intro">The core browse unit. Assembled from a cover image, a 2-line name, one status chip, and up to two category chips (memorial-first, +N overflow). One component with three size variants — horizontal, grid, compact — sharing anatomy but differing in width and responsive behaviour. Built entirely on tokens: <code>--radius-lg</code> (fluid), <code>--space-*</code>, <code>--type-label</code>, plus the two chip components.</div>
+
+      <!-- ── Live Variants ── -->
+      <div class="sub-section">
+        <div class="sub-label">Three Variants</div>
+        <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;padding:20px;background:#f9f5f6;border-radius:10px;">
+
+          <!-- Horizontal -->
+          <div>
+            <div style="width:140px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(25,6,9,.06);">
+              <div style="position:relative;width:100%;height:194px;overflow:hidden;">
+                <div style="position:absolute;inset:0;background:linear-gradient(160deg,#2f6d5a,#3b7d8a 55%,#7a8a4a);"></div>
+                <span style="position:absolute;top:7px;right:7px;font-size:11px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 7px;border-radius:4px;backdrop-filter:blur(4px);display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>可借用</span>
+                <div style="position:absolute;left:0;right:0;bottom:0;padding:16px 8px 7px;background:linear-gradient(to top,rgba(249,245,246,.97) 48%,rgba(249,245,246,.6) 78%,transparent);">
+                  <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:12px;line-height:1.35;color:#190609;">5月35日－創作・記憶・抗爭</div>
+                  <div style="display:flex;align-items:center;gap:4px;margin-top:6px;">
+                    <span style="font-size:10px;font-weight:500;color:#890604;background:rgba(137,6,4,.12);padding:1px 5px;border-radius:4px;">六四</span>
+                    <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 5px;border-radius:4px;">禁書</span>
+                    <span style="font-size:10px;color:#956a70;">+2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-size:11px;color:#70484d;">Horizontal · 140px fixed</div>
+          </div>
+
+          <!-- Grid -->
+          <div>
+            <div style="width:112px;background:#fff;border-radius:11px;overflow:hidden;box-shadow:0 1px 3px rgba(25,6,9,.06);">
+              <div style="position:relative;width:100%;aspect-ratio:1/1.46;overflow:hidden;">
+                <div style="position:absolute;inset:0;background:linear-gradient(160deg,#4a5a8a,#3a4a7a 55%,#2a3a6a);"></div>
+                <span style="position:absolute;top:5px;right:5px;font-size:10px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 6px;border-radius:4px;backdrop-filter:blur(4px);">可借用</span>
+                <div style="position:absolute;left:0;right:0;bottom:0;padding:14px 6px 5px;background:linear-gradient(to top,rgba(249,245,246,.97) 45%,rgba(249,245,246,.55) 78%,transparent);">
+                  <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:11px;line-height:1.3;color:#190609;">異鄉人的十年</div>
+                  <div style="display:flex;align-items:center;gap:3px;margin-top:3px;">
+                    <span style="font-size:9px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 4px;border-radius:3px;">海外</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-size:11px;color:#70484d;">Grid · fluid width</div>
+          </div>
+
+          <!-- Compact -->
+          <div>
+            <div style="width:88px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(25,6,9,.06);">
+              <div style="position:relative;width:100%;aspect-ratio:1/1.46;overflow:hidden;">
+                <div style="position:absolute;inset:0;background:linear-gradient(160deg,#8a6a5a,#7a5a4a 55%,#5a3a2a);"></div>
+                <span style="position:absolute;top:4px;right:4px;font-size:9px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:1px 5px;border-radius:3px;backdrop-filter:blur(4px);">可借用</span>
+                <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 5px 5px;background:linear-gradient(to top,rgba(249,245,246,.97) 42%,rgba(249,245,246,.5) 75%,transparent);">
+                  <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:10px;line-height:1.3;color:#190609;">無悔的征程</div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-size:11px;color:#70484d;">Compact · no chips</div>
+          </div>
+
+        </div>
+        <div class="note"><strong>What differs across variants:</strong> width (140px fixed / fluid / small), cover height (194px / aspect-ratio / aspect-ratio), title size (12 / 11 / 10px), and category chips (2+overflow / 1 / hidden). <strong>What stays constant:</strong> the cover-title-chips stacking order, the frosted-light gradient frame, the status chip top-right, and the card radius token.</div>
+      </div>
+
+      <!-- ── Bilingual ── -->
+      <div class="sub-section">
+        <div class="sub-label">Bilingual Behaviour — UI translates, content doesn't</div>
+        <div class="section-intro" style="margin-bottom:16px;">The same card in both language modes. Only the <strong>status chip</strong> swaps (它 is UI copy, keyed to the enum). The <strong>book name</strong> and <strong>category tags</strong> are content — one fixed form each, identical in both modes. A tag reads 六四 whether the app is in Chinese or English; a tag reads "Hong Kong" in both too. Tags never translate.</div>
+        <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;padding:20px;background:#f9f5f6;border-radius:10px;">
+
+          <!-- Chinese mode -->
+          <div>
+            <div style="width:150px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(25,6,9,.06);">
+              <div style="position:relative;width:100%;height:208px;overflow:hidden;">
+                <div style="position:absolute;inset:0;background:linear-gradient(160deg,#2f6d5a,#3b7d8a 55%,#7a8a4a);"></div>
+                <span style="position:absolute;top:8px;right:8px;font-size:11px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 7px;border-radius:4px;backdrop-filter:blur(4px);display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>可借用</span>
+                <div style="position:absolute;left:0;right:0;bottom:0;padding:18px 9px 8px;background:linear-gradient(to top,rgba(249,245,246,.97) 48%,rgba(249,245,246,.6) 78%,transparent);">
+                  <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:12px;line-height:1.35;color:#190609;">5月35日－創作・記憶・抗爭</div>
+                  <div style="display:flex;align-items:center;gap:4px;margin-top:6px;">
+                    <span style="font-size:10px;font-weight:500;color:#890604;background:rgba(137,6,4,.12);padding:1px 5px;border-radius:4px;">六四</span>
+                    <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 5px;border-radius:4px;">禁書</span>
+                    <span style="font-size:10px;color:#956a70;">+2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#70484d;">正體中文 mode</div>
+          </div>
+
+          <!-- English mode -->
+          <div>
+            <div style="width:150px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(25,6,9,.06);">
+              <div style="position:relative;width:100%;height:208px;overflow:hidden;">
+                <div style="position:absolute;inset:0;background:linear-gradient(160deg,#2f6d5a,#3b7d8a 55%,#7a8a4a);"></div>
+                <span style="position:absolute;top:8px;right:8px;font-size:11px;font-weight:500;color:#0f6b56;background:rgba(224,244,240,.94);padding:2px 7px;border-radius:4px;backdrop-filter:blur(4px);display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Available</span>
+                <div style="position:absolute;left:0;right:0;bottom:0;padding:18px 9px 8px;background:linear-gradient(to top,rgba(249,245,246,.97) 48%,rgba(249,245,246,.6) 78%,transparent);">
+                  <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:12px;line-height:1.35;color:#190609;">5月35日－創作・記憶・抗爭</div>
+                  <div style="display:flex;align-items:center;gap:4px;margin-top:6px;">
+                    <span style="font-size:10px;font-weight:500;color:#890604;background:rgba(137,6,4,.12);padding:1px 5px;border-radius:4px;">六四</span>
+                    <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 5px;border-radius:4px;">禁書</span>
+                    <span style="font-size:10px;color:#956a70;">+2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#70484d;">English mode</div>
+          </div>
+
+          <!-- Mixed-tag example -->
+          <div>
+            <div style="width:150px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(25,6,9,.06);">
+              <div style="position:relative;width:100%;height:208px;overflow:hidden;">
+                <div style="position:absolute;inset:0;background:linear-gradient(160deg,#4a5a8a,#3a4a7a 55%,#2a3a6a);"></div>
+                <span style="position:absolute;top:8px;right:8px;font-size:11px;font-weight:500;color:#1a4a7a;background:rgba(224,236,247,.94);padding:2px 7px;border-radius:4px;backdrop-filter:blur(4px);display:inline-flex;align-items:center;gap:3px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Exchangeable</span>
+                <div style="position:absolute;left:0;right:0;bottom:0;padding:18px 9px 8px;background:linear-gradient(to top,rgba(249,245,246,.97) 48%,rgba(249,245,246,.6) 78%,transparent);">
+                  <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:12px;line-height:1.35;color:#190609;">重慶大廈：世界中心的邊緣</div>
+                  <div style="display:flex;align-items:center;gap:4px;margin-top:6px;">
+                    <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 5px;border-radius:4px;">Hong Kong</span>
+                    <span style="font-size:10px;font-weight:500;color:#502b30;background:#e4d8da;padding:1px 5px;border-radius:4px;">紀實</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#70484d;">mixed tags · either mode</div>
+          </div>
+
+        </div>
+        <div class="note"><strong>Read the difference:</strong> Between the first two cards, only the status chip changed (可借用 → Available). The name and both tags are untouched — they're content with one fixed form. The third card shows tags can be mixed-script by nature: "Hong Kong" and 紀實 sit side by side, and neither swaps when the app language changes. The status chip ("Exchangeable") also shows the width point — English UI labels run longer, so chip width is always content-driven, never fixed.</div>
+      </div>
+
+      <!-- ── Anatomy ── -->
+      <div class="sub-section">
+        <div class="sub-label">Anatomy — internal spacing regulated to tokens</div>
+        <table class="token-table">
+          <thead><tr><th>Zone</th><th>Token / value</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">Card radius</td><td class="t-val">--radius-lg · clamp(10–14px)</td><td class="t-use">Fluid — the only responsive radius</td></tr>
+            <tr><td class="t-name">Cover aspect</td><td class="t-val">1 : 1.46</td><td class="t-use">Book-cover proportion, all variants</td></tr>
+            <tr><td class="t-name">Frame padding</td><td class="t-val">16px 8px 7px</td><td class="t-use">Component anatomy — gradient frame</td></tr>
+            <tr><td class="t-name">Title → chips gap</td><td class="t-val">--space-2 · 8px (horiz)</td><td class="t-use">Grid uses anatomy 3px (tighter)</td></tr>
+            <tr><td class="t-name">Chip → chip gap</td><td class="t-val">--space-1 · 4px</td><td class="t-use">Between category chips</td></tr>
+            <tr><td class="t-name">Status chip inset</td><td class="t-val">7px (horiz) / 5px / 4px</td><td class="t-use">Scales down with variant</td></tr>
+            <tr><td class="t-name">Card shadow</td><td class="t-val">0 1px 4px rgba(25,6,9,.06)</td><td class="t-use">Lighter for grid/compact</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Responsive ── -->
+      <div class="sub-section">
+        <div class="sub-label">Responsive Sizing — per variant</div>
+        <table class="token-table">
+          <thead><tr><th>Variant</th><th>Width</th><th>Cover</th><th>Title</th><th>Chips</th></tr></thead>
+          <tbody>
+            <tr><td class="t-name">Horizontal</td><td class="t-val">140px fixed (155/160 at ≥481/768)</td><td class="t-val">194px height</td><td class="t-val">12px</td><td class="t-use">2 + overflow</td></tr>
+            <tr><td class="t-name">Grid</td><td class="t-val">fluid (3-col ≤599, 4-col 600+, 5-col 900+)</td><td class="t-val">aspect 1:1.46</td><td class="t-val">11–12px</td><td class="t-use">1</td></tr>
+            <tr><td class="t-name">Compact</td><td class="t-val">small fixed (~88px)</td><td class="t-val">aspect 1:1.46</td><td class="t-val">10px</td><td class="t-use">hidden</td></tr>
+          </tbody>
+        </table>
+        <div class="note"><strong>Horizontal</strong> lives in a scroll row — fixed width so cards line up predictably, snap-aligned. <strong>Grid</strong> flexes to fill columns — width is a fraction of the container, so it grows with the grid's column count across breakpoints. <strong>Compact</strong> is for the related-books row on the item detail page — small, chip-free, just cover + name for quick recognition. The card radius scales fluidly in all three via <code>--radius-lg</code>.</div>
+      </div>
+
+      <!-- ── Rules ── -->
+      <div class="sub-section">
+        <div class="sub-label">Composition Rules</div>
+        <div class="note"><strong>Category overflow:</strong> Show up to 2 chips. Memorial categories claim slots first (六四 before 散文), so the culturally significant tag always wins limited space. Remaining categories collapse to a <code>+N</code> count in ink-600.</div>
+        <div class="note" style="margin-top:8px;"><strong>Status is singular, top-right.</strong> Exactly one status chip, always over the cover's top-right, backdrop-blurred for legibility on any image.</div>
+        <div class="note" style="margin-top:8px;"><strong>UI translates, content doesn't:</strong> The status chip swaps with app language (可借用 / Available — it's UI copy keyed to the enum). The book name and category tags do <em>not</em> — they're content with one fixed display form each. A tag reads 六四 in both modes; a tag reads "Hong Kong" in both modes. Because English UI labels run longer than CJK, the card never fixes chip width — the frame accommodates content-width chips in either language.</div>
+        <div class="note" style="margin-top:8px;"><strong>Title clamps to 2 lines.</strong> Noto Serif TC, weight 700. Longer names truncate with ellipsis — the full name lives on the detail page.</div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<script>
+// Scroll progress bar
+const line = document.getElementById('scrollLine');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  line.style.transform = `scaleX(${window.scrollY / h})`;
+});
+
+// Active nav link on scroll
+const sections = document.querySelectorAll('.section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
