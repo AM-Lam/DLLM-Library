@@ -22,6 +22,7 @@ import {
 import { auth } from "../../firebase";
 import { useTranslation } from "react-i18next";
 import GoogleIcon from "@mui/icons-material/Google";
+import { markSignupOnboardingPending } from "../../utils/signupOnboarding";
 
 interface AuthDialogProps {
   open: boolean;
@@ -61,8 +62,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({
         setError(
           t(
             "auth.passwordTooShort",
-            "Password must be at least 6 characters long"
-          )
+            "Password must be at least 6 characters long",
+          ),
         );
         return;
       }
@@ -76,15 +77,21 @@ const AuthDialog: React.FC<AuthDialogProps> = ({
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
-          password
+          password,
         );
+        markSignupOnboardingPending();
         console.log("Account created successfully");
 
         // Send verification email
         await sendEmailVerification(userCredential.user);
         console.log("Verification email sent");
 
-        alert(t("auth.verificationEmailSent"));
+        alert(
+          `${t("auth.verificationEmailSent")} ${t(
+            "auth.verificationSupportHint",
+            "If you don't receive the verification email, please check your spam or junk mailbox. If you still need help, click the chat button in the bottom-right corner to contact the user group for support.",
+          )}`,
+        );
       } else {
         // Sign In
         await signInWithEmailAndPassword(auth, email, password);
@@ -103,8 +110,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({
         error.message ||
           t(
             isSignUp ? "auth.signUpError" : "auth.signInError",
-            isSignUp ? "Failed to create account" : "Failed to sign in"
-          )
+            isSignUp ? "Failed to create account" : "Failed to sign in",
+          ),
       );
     } finally {
       setLoading(false);
@@ -152,7 +159,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({
       console.error("Google sign in error:", error);
       setError(
         error.message ||
-          t("auth.googleSignInError", "Failed to sign in with Google")
+          t("auth.googleSignInError", "Failed to sign in with Google"),
       );
     } finally {
       setLoading(false);
@@ -276,8 +283,8 @@ const AuthDialog: React.FC<AuthDialogProps> = ({
             {loading
               ? t("common.loading", "Loading...")
               : isSignUp
-              ? t("auth.signUp")
-              : t("auth.signIn")}
+                ? t("auth.signUp")
+                : t("auth.signIn")}
           </Button>
 
           {/* Forgot Password - Only for Sign In */}
@@ -305,11 +312,11 @@ const AuthDialog: React.FC<AuthDialogProps> = ({
               {isSignUp
                 ? t(
                     "auth.alreadyHaveAccount",
-                    "Already have an account? Uncheck the box above to sign in."
+                    "Already have an account? Uncheck the box above to sign in.",
                   )
                 : t(
                     "auth.needAccount",
-                    "Need an account? Check the box above to sign up."
+                    "Need an account? Check the box above to sign up.",
                   )}
             </Typography>
           </Box>

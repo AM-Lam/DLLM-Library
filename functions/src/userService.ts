@@ -54,12 +54,14 @@ export class UserService {
       user = await this.createUser(
         loginUser,
         loginUser.email,
-        "" // default empty address
+        "", // default empty address
       );
     }
     if (!user.isVerified && loginUser.emailVerified) {
       // update user to verified if email is verified
       await userCollection.doc(loginUser.uid).update({ isVerified: true });
+      user.isVerified = true;
+      this.userCache.set(user.id, user); // update cache
     }
     // return user data
     return user;
@@ -94,7 +96,7 @@ export class UserService {
   async pinItem(
     userModel: UserModel,
     itemId: string,
-    recommendService: RecommendService
+    recommendService: RecommendService,
   ): Promise<boolean> {
     const item = await this.itemService.itemById(userModel, itemId);
     if (!item) {
@@ -120,7 +122,7 @@ export class UserService {
     await recommendService.updateRecommendation(
       userModel.id,
       RecommendationType.UserPicked,
-      item
+      item,
     );
     return true;
   }
@@ -158,13 +160,18 @@ export class UserService {
    * @returns
    */
   async getOrComputeUserItemCategory(userModel: UserModel) {
-    var itemCategory = await this.categoryService.getUserItemCategory(userModel.id);
+    var itemCategory = await this.categoryService.getUserItemCategory(
+      userModel.id,
+    );
 
     if (!itemCategory || itemCategory.length === 0) {
-      const categoryCount = await this.itemService.itemCategoriesByUser(userModel, userModel.id);
+      const categoryCount = await this.itemService.itemCategoriesByUser(
+        userModel,
+        userModel.id,
+      );
       itemCategory = await this.categoryService.initializeUserCategories(
         userModel.id,
-        categoryCount
+        categoryCount,
       );
     }
     return itemCategory;
@@ -175,7 +182,7 @@ export class UserService {
     for (const exchangePoint of user.exchangePoints || []) {
       await this._AddItemCacheToExchangePoint(
         exchangePoint,
-        new Map([[item.id, { categories: item.category || [] }]])
+        new Map([[item.id, { categories: item.category || [] }]]),
       );
     }
   }
@@ -186,7 +193,7 @@ export class UserService {
       await this._RemoveItemCacheFromExchangePoint(exchangePoint, [item.id]);
       await this._AddItemCacheToExchangePoint(
         exchangePoint,
-        new Map([[item.id, { categories: item.category || [] }]])
+        new Map([[item.id, { categories: item.category || [] }]]),
       );
     }
   }
@@ -201,16 +208,15 @@ export class UserService {
     loginUser: LoginUser | null,
     nickname: string,
     address: string,
-    visibleContentRating?: number | null 
+    visibleContentRating?: number | null,
   ): Promise<User> {
     if (!loginUser) throw new Error("Not authenticated");
 
     let resolvedLocation: Location | undefined | null = undefined;
 
     if (address && address.trim().length > 0) {
-      resolvedLocation = await this.mapService.resolveLocationAndGeohash(
-        address
-      );
+      resolvedLocation =
+        await this.mapService.resolveLocationAndGeohash(address);
     }
 
     let userData: UserModel = {
@@ -238,7 +244,7 @@ export class UserService {
 
   async exchangePoints(
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<User[]> {
     const usersSnapshot = await userCollection
       .where("role", "==", Role.ExchangePointAdmin)
@@ -270,7 +276,7 @@ export class UserService {
     address?: string | null,
     contactMethods?: ContactMethod[] | null,
     exchangePoints?: string[] | null,
-    visibleContentRating?: number | null
+    visibleContentRating?: number | null,
   ): Promise<User> {
     if (!loginUser) throw new Error("Not authenticated");
 
@@ -292,7 +298,7 @@ export class UserService {
       updates.contactMethods = contactMethods;
     }
 
-    if ( visibleContentRating != null) {
+    if (visibleContentRating != null) {
       updates.visibleContentRating = visibleContentRating;
     }
 
@@ -300,13 +306,12 @@ export class UserService {
       const oldAddress = userDoc.data()?.address;
 
       if (address !== oldAddress) {
-        let resolvedLocation = await this.mapService.resolveLocationAndGeohash(
-          address
-        );
+        let resolvedLocation =
+          await this.mapService.resolveLocationAndGeohash(address);
 
         await this.itemService.updateUserItemsLocation(
           loginUser.uid,
-          resolvedLocation
+          resolvedLocation,
         );
 
         if (resolvedLocation) {
@@ -330,7 +335,7 @@ export class UserService {
       let validExchangePoints: string[] = [];
       if (exchangePoints.length !== 0) {
         validExchangePoints = exchangePoints.filter((point) =>
-          this.isValidExchangePoint(point)
+          this.isValidExchangePoint(point),
         );
         if (validExchangePoints.length === 0) {
           throw new Error("Invalid exchange points");
@@ -339,10 +344,10 @@ export class UserService {
       updates.exchangePoints = validExchangePoints;
       const oldExchangePoints: string[] = userDoc.data()?.exchangePoints || [];
       const newExchangePoints = validExchangePoints.filter(
-        (point) => !oldExchangePoints.includes(point)
+        (point) => !oldExchangePoints.includes(point),
       );
       const removedExchangePoints = oldExchangePoints.filter(
-        (point) => !validExchangePoints.includes(point)
+        (point) => !validExchangePoints.includes(point),
       );
       if (newExchangePoints.length > 0 || removedExchangePoints.length > 0) {
         // update item and categories cache in exchange points
@@ -355,7 +360,7 @@ export class UserService {
             undefined, // status
             undefined, // keyword
             100, // limit
-            offset // offset
+            offset, // offset
           );
           if (itemsPerUser.length === 0) break;
           offset += itemsPerUser.length;
@@ -367,7 +372,7 @@ export class UserService {
             };
             itemCacheModelMap.set(item.id, itemCacheModel);
           }
-            // add item cache to new exchange points
+          // add item cache to new exchange points
           for (const point of newExchangePoints) {
             await this._AddItemCacheToExchangePoint(point, itemCacheModelMap);
           }
@@ -375,24 +380,23 @@ export class UserService {
           for (const point of removedExchangePoints) {
             await this._RemoveItemCacheFromExchangePoint(
               point,
-              Array.from(itemCacheModelMap.keys())
+              Array.from(itemCacheModelMap.keys()),
             );
           }
         }
         // update CategoryCache for exchange points
-        const userItemCategories = await this.getOrComputeUserItemCategory(
-          userModel
-        );
+        const userItemCategories =
+          await this.getOrComputeUserItemCategory(userModel);
         for (const point of newExchangePoints) {
           await this.categoryService.upsertExchangePointCategoryCache(
             point,
-            userItemCategories
+            userItemCategories,
           );
         }
         for (const point of removedExchangePoints) {
           await this.categoryService.removeExchangePointCategoryCache(
             point,
-            userItemCategories
+            userItemCategories,
           );
         }
       }
@@ -411,7 +415,7 @@ export class UserService {
 
   private async _AddItemCacheToExchangePoint(
     userId: string,
-    itemCacheModelMap: Map<string, ItemCacheModel>
+    itemCacheModelMap: Map<string, ItemCacheModel>,
   ) {
     const itemCacheCollection = userCollection
       .doc(userId)
@@ -431,7 +435,7 @@ export class UserService {
 
   private async _RemoveItemCacheFromExchangePoint(
     userId: string,
-    itemIds: string[]
+    itemIds: string[],
   ) {
     const itemCacheCollection = userCollection
       .doc(userId)
@@ -447,7 +451,7 @@ export class UserService {
     userId: string,
     categories?: string[],
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<string[]> {
     const itemCacheCollection = userCollection
       .doc(userId)
@@ -464,7 +468,7 @@ export class UserService {
 
     if (snapshot.empty) {
       console.debug(
-        `No cached items found for user ${userId} with categories ${categories}`
+        `No cached items found for user ${userId} with categories ${categories}`,
       );
       return [];
     }
@@ -473,7 +477,7 @@ export class UserService {
     const itemIds = snapshot.docs.map((doc) => doc.id);
 
     console.debug(
-      `Found ${itemIds.length} cached item IDs for user ${userId} with categories ${categories}`
+      `Found ${itemIds.length} cached item IDs for user ${userId} with categories ${categories}`,
     );
 
     return itemIds;
@@ -483,7 +487,10 @@ export class UserService {
     // get all pinned items
     let pinItems: Item[] = [];
     if (userModel.pinItemIds && userModel.pinItemIds.length > 0) {
-      pinItems = await this.itemService.itemsByIds(userModel, userModel.pinItemIds);
+      pinItems = await this.itemService.itemsByIds(
+        userModel,
+        userModel.pinItemIds,
+      );
     }
     const itemCategory = await this.getOrComputeUserItemCategory(userModel);
     const updatedUser = {

@@ -20,6 +20,8 @@ import {
   FormControlLabel,
   Checkbox,
   Select,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -41,6 +43,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { alpha } from "@mui/material/styles";
 import { calculateDistance, formatDistance } from "../utils/geoProcessor";
 import BookSpinePreview from "./BookSpinePreview";
+import ItemPreview from "./ItemPreview";
 import PaginationControls from "./PaginationControls";
 // import { TagCloud } from "react-tagcloud";
 import UpdateUser from "./UserProfile";
@@ -143,6 +146,10 @@ const UserDetail: React.FC<UserDetailProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isDesktopLayout = useMediaQuery(theme.breakpoints.up("md"));
+  const isPortraitOrientation = useMediaQuery("(orientation: portrait)");
+  const useBookSpine = !isDesktopLayout || isPortraitOrientation;
   const [searchParams, setSearchParams] = useSearchParams();
   const [itemsPage, setItemsPage] = useState<number>(
     parseInt(searchParams.get("page") || "1", 10),
@@ -157,6 +164,9 @@ const UserDetail: React.FC<UserDetailProps> = ({
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [showAddressReminder, setShowAddressReminder] = useState(false);
   const [showItemForm, setShowItemForm] = useState(false);
+  const [activeTab, setActiveTab] = useState<"profile" | "bookshelf">(
+    "profile",
+  );
 
   const {
     data: userData,
@@ -278,6 +288,11 @@ const UserDetail: React.FC<UserDetailProps> = ({
 
   const isCurrentUser =
     currentUser && userData?.user && currentUser.id === userData.user.id;
+
+  useEffect(() => {
+    if (!userData?.user) return;
+    setActiveTab(isCurrentUser ? "profile" : "bookshelf");
+  }, [isCurrentUser, userData?.user?.id]);
 
   const handleUserCreated = () => {
     setShowUpdateUser(false);
@@ -432,110 +447,20 @@ const UserDetail: React.FC<UserDetailProps> = ({
   }
 
   const sortedCategories = userData?.user?.itemCategory;
+  const bookshelfTitle = isCurrentUser
+    ? t("user.yourBookshelf", "Your Bookshelf")
+    : t("user.otherUsersBookshelf", "{{name}}'s Bookshelf", {
+        name: userData?.user?.nickname || userData?.user?.email || "User",
+      });
 
   return (
     <Container maxWidth="lg" sx={pageContainerLgSx}>
-      {/* Header with Back Button */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 1,
-          mb: 3,
-        }}
-      >
-        {onBack && (
-          <IconButton onClick={handleBack} sx={backIconButtonSx}>
-            <ArrowBack />
-          </IconButton>
-        )}
-        <Typography variant="h4" sx={{ flexGrow: 1, minWidth: 0 }}>
-          {userData?.user ? (
-            <>
-              <PersonIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-              {userData.user.nickname || userData.user.email}
-              {isCurrentUser && (
-                <Chip
-                  label={t("user.editProfile")}
-                  color="primary"
-                  size="small"
-                  sx={{ ml: 2 }}
-                  onClick={() => setShowUpdateUser(true)}
-                />
-              )}
-              {isCurrentUser && (
-                <Chip
-                  label={t("goodreads.importButton", "Import from GoodReads")}
-                  color="secondary"
-                  size="small"
-                  sx={{ ml: 1 }}
-                  onClick={() => navigate("/import/goodreads")}
-                />
-              )}
-              {userData.user.isVerified && (
-                <VerifiedIcon
-                  color="primary"
-                  sx={{ ml: 1, verticalAlign: "middle" }}
-                  titleAccess={t("user.verified", "Verified User")}
-                />
-              )}
-              {isExchangePointAdmin && (
-                <Chip
-                  label={t("user.exchangePointAdmin", "Exchange Point Admin")}
-                  color="secondary"
-                  size="small"
-                  sx={{ ml: 1 }}
-                />
-              )}
-              {signOut && (
-                <Button
-                  variant="outlined"
-                  color="error"
-                  size="small"
-                  sx={{ ml: 2 }}
-                  onClick={signOut}
-                >
-                  {t("auth.signOut", "Sign Out")}
-                </Button>
-              )}
-            </>
-          ) : (
-            t("user.loadingProfile", "Profile Loading")
-          )}
-        </Typography>
-        {userData?.user && (
-          <Button
-            variant="outlined"
-            color="primary"
-            size="large"
-            startIcon={<ShareIcon />}
-            onClick={() => setShareDialogOpen(true)}
-          >
-            {t("user.shareProfile", "Share profile")}
-          </Button>
-        )}
-        {isCurrentUser && (
-          <Button
-            variant="outlined"
-            color="primary"
-            size="large"
-            onClick={handleAddItem}
-            data-tour="add-item"
-          >
-            {t("item.create", "Add Item")}
-          </Button>
-        )}
-      </Box>
-
-      {/* Loading State */}
       {userLoading && (
         <Box sx={{ display: "flex", justifyContent: "center", p: 6 }}>
           <CircularProgress size={60} />
         </Box>
       )}
 
-      {/* Error State */}
       {userError && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {t("user.errorLoading", "Error loading user profile")}:{" "}
@@ -543,470 +468,628 @@ const UserDetail: React.FC<UserDetailProps> = ({
         </Alert>
       )}
 
-      {/* User Content */}
       {userData?.user && (
-        <>
-          {/* User Info Card */}
-          <Accordion>
-            {/* Basic Info */}
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Grid size={{ xs: 12 }}>
-                <Typography variant="h6" sx={sectionTitleWithIconSx}>
-                  <PersonIcon sx={iconInlineSx} />
-                  {t("user.basicInfo", "Basic Information")}
-                </Typography>
-              </Grid>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={3}>
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>{t("user.email", "Email")}:</strong>{" "}
-                    {userData.user.email}
-                  </Typography>
-                </Grid>
-
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>{t("user.joinedOn", "Joined on")}:</strong>{" "}
-                    {formatDate(userData.user.createdAt)}
-                  </Typography>
-                </Grid>
-
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>{t("user.status.title", "Status")}:</strong>{" "}
-                    <Chip
-                      label={
-                        userData.user.isActive
-                          ? t("user.status.active", "Active")
-                          : t("user.status.inactive", "Inactive")
-                      }
-                      color={userData.user.isActive ? "success" : "default"}
-                      size="small"
-                      sx={{ ml: 1 }}
-                    />
-                  </Typography>
-                </Grid>
-
-                {/* Address */}
-                {userData.user.address && (
-                  <Grid size={{ xs: 12 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      <HomeIcon sx={iconInlineSx} />
-                      <strong>{t("user.address", "Address")}:</strong>{" "}
-                      {userData.user.address}
-                    </Typography>
-                  </Grid>
+        <Paper
+          elevation={0}
+          sx={{
+            mx: "auto",
+            width: "100%",
+            border: "1px solid rgba(0,0,0,0.08)",
+            bgcolor: "#f2f1f0",
+            p: 2.5,
+            boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.25)",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 1,
+              mb: 1.5,
+            }}
+          >
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  wordBreak: "break-word",
+                }}
+              >
+                {userData.user.nickname || userData.user.email}
+                {userData.user.isVerified && (
+                  <VerifiedIcon
+                    color="primary"
+                    sx={{ ml: 1, verticalAlign: "middle", fontSize: 20 }}
+                    titleAccess={t("user.verified", "Verified User")}
+                  />
                 )}
+              </Typography>
+              {isCurrentUser && (
+                <Button
+                  variant="text"
+                  color="secondary"
+                  size="small"
+                  sx={{
+                    p: 0,
+                    minWidth: 0,
+                    mt: 0.5,
+                    textTransform: "none",
+                    fontWeight: 600,
+                  }}
+                  onClick={() => setShowUpdateUser(true)}
+                >
+                  {t("user.editMemberName", "Edit member name")}
+                </Button>
+              )}
+            </Box>
+          </Box>
 
-                {/* Distance */}
-                {currentUser && getDistanceToUser() && (
-                  <Grid size={{ xs: 12 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      <LocationOnIcon sx={iconInlineSx} />
-                      <strong>
-                        {t("user.distance", "Distance from you")}:
-                      </strong>{" "}
-                      <Chip
-                        label={getDistanceToUser()}
-                        color="info"
-                        size="small"
-                        sx={{ ml: 1 }}
-                      />
-                    </Typography>
-                  </Grid>
-                )}
-              </Grid>
-              {/* Contact Methods in read-only mode */}
-              {userData?.user?.contactMethods &&
-              userData.user?.contactMethods.length > 0 ? (
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+            {userData?.user && (
+              <Button
+                variant="text"
+                size="small"
+                sx={{
+                  p: 0,
+                  minWidth: 0,
+                  color: "#b14c7b",
+                  fontWeight: 600,
+                  textTransform: "none",
+                }}
+                onClick={() => setShareDialogOpen(true)}
+              >
+                {t("user.shareProfile", "Share profile")}
+              </Button>
+            )}
+            {signOut && (
+              <Button
+                variant="text"
+                size="small"
+                sx={{
+                  p: 0,
+                  minWidth: 0,
+                  color: "#b14c7b",
+                  fontWeight: 600,
+                  textTransform: "none",
+                }}
+                onClick={signOut}
+              >
+                {t("auth.signOut", "Sign out")}
+              </Button>
+            )}
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              borderBottom: "1px solid rgba(0,0,0,0.1)",
+              mb: 2,
+            }}
+          >
+            <Button
+              onClick={() => setActiveTab("profile")}
+              sx={{
+                flex: 1,
+                borderBottom:
+                  activeTab === "profile"
+                    ? "2px solid #b14c7b"
+                    : "2px solid transparent",
+                borderRadius: 0,
+                color: activeTab === "profile" ? "#b14c7b" : "text.secondary",
+                fontWeight: 600,
+                textTransform: "none",
+                py: 1.2,
+              }}
+            >
+              {t("user.accountProfile", "Account Profile")}
+            </Button>
+            <Button
+              onClick={() => setActiveTab("bookshelf")}
+              sx={{
+                flex: 1,
+                borderBottom:
+                  activeTab === "bookshelf"
+                    ? "2px solid #b14c7b"
+                    : "2px solid transparent",
+                borderRadius: 0,
+                color: activeTab === "bookshelf" ? "#b14c7b" : "text.secondary",
+                fontWeight: 600,
+                textTransform: "none",
+                py: 1.2,
+              }}
+            >
+              {t("user.yourBookshelf", "Your Bookshelf")}
+            </Button>
+          </Box>
+
+          {activeTab === "profile" ? (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Box sx={{ bgcolor: "#f5f3f2", borderRadius: 2, p: 1.5 }}>
                 <Box
                   sx={{
-                    mb: 2,
-                    p: 2,
-                    bgcolor: "action.hover",
-                    borderRadius: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 1.5,
                   }}
                 >
-                  <ContactMethods
-                    contactMethods={userData.user.contactMethods}
-                    readOnly={true}
-                    title={t("user.contactMethods", "Contact Methods")}
-                    showTitle={true}
-                    showAddButton={false}
-                    showPublicPrivateFilter={!isCurrentUser} // Show filter only for other users
-                    maxHeight={300}
-                  />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      color: "text.secondary",
+                    }}
+                  >
+                    {t("user.memberInformation", "MEMBER INFORMATION")}
+                  </Typography>
                 </Box>
-              ) : (
-                <Box>
-                  <Typography variant="body1" color="text.secondary">
-                    <strong>{t("user.email", "Email")}:</strong>{" "}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 0.75,
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("user.email", "Email")}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      textAlign: "right",
+                      wordBreak: "break-word",
+                    }}
+                  >
                     {userData.user.email}
                   </Typography>
                 </Box>
-              )}
-            </AccordionDetails>
-          </Accordion>
-
-          {/* Pinned Items Section - Grid Layout */}
-          <Paper elevation={1} sx={{ p: 4, mt: 3, mb: 3 }}>
-            <Typography variant="h6" sx={sectionTitleWithIconSx}>
-              <LabelIcon sx={iconInlineSx} />
-              {t("user.pinnedItems", "Pinned Items")}
-            </Typography>
-
-            {pinnedItemsWithDistance.length > 0 ? (
-              <>
-                <Grid container spacing={{ xs: 1, sm: 2 }} sx={{ mb: 2 }}>
-                  {pinnedItemsWithDistance.map((item) => (
-                    <Grid key={item.id} size={{ xs: 2, sm: 1.5, md: 1 }}>
-                      <BookSpinePreview
-                        item={item}
-                        distance={item.distance}
-                        onClick={handleItemClick}
-                      />
-                    </Grid>
-                  ))}
-                </Grid>
-
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block" }}
+                <Box
+                  sx={{ borderTop: "1px solid rgba(0,0,0,0.08)", my: 0.5 }}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 0.75,
+                  }}
                 >
-                  {t("user.pinnedItemsCount", "{{count}} pinned item(s)", {
-                    count: pinnedItemsWithDistance.length,
-                  })}
-                </Typography>
-              </>
-            ) : (
-              <Alert severity="info">
-                {isCurrentUser
-                  ? t(
-                      "user.noPinnedItemsYou",
-                      "You haven't pinned any items yet.",
-                    )
-                  : t(
-                      "user.noPinnedItemsUser",
-                      "This user hasn't pinned any items.",
-                    )}
-              </Alert>
-            )}
-          </Paper>
+                  <Typography variant="body2" color="text.secondary">
+                    {t("user.joinedOn", "Joined")}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {formatDate(userData.user.createdAt)}
+                  </Typography>
+                </Box>
+              </Box>
 
-          {/* Item Categories Tag Cloud */}
-          {userData.user.itemCategory &&
-            userData.user.itemCategory.length > 0 && (
-              <Paper elevation={1} sx={{ p: 4, mb: 4 }}>
-                <Typography variant="h6" sx={sectionTitleWithIconSx}>
-                  <LabelIcon sx={iconInlineSx} />
-                  {t("user.itemCategories", "Item Categories")}
-                </Typography>
+              <Box
+                sx={{
+                  bgcolor: "#f7e6ed",
+                  borderRadius: 2,
+                  p: 1.5,
+                  color: "#7a3b5c",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 1.5,
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, letterSpacing: 0.8 }}
+                  >
+                    {t("user.exchangeInformation", "EXCHANGE INFORMATION")}
+                  </Typography>
+                  {isCurrentUser && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      sx={{
+                        p: 0,
+                        minWidth: 0,
+                        color: "#b14c7b",
+                        textTransform: "none",
+                        fontWeight: 600,
+                      }}
+                      onClick={() => setShowUpdateUser(true)}
+                    >
+                      {t("common.edit", "Edit")}
+                    </Button>
+                  )}
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 0.75,
+                  }}
+                >
+                  <Typography variant="body2">
+                    {t("user.exchangeAddress", "Exchange address")}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 600, textAlign: "right" }}
+                  >
+                    {userData.user.address || t("user.notSet", "Not set yet")}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{ borderTop: "1px solid rgba(122,59,92,0.18)", my: 0.5 }}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 0.75,
+                  }}
+                >
+                  <Typography variant="body2">
+                    {t("user.meetupContact", "Meetup contact")}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 600, textAlign: "right" }}
+                  >
+                    {userData.user.contactMethods &&
+                    userData.user.contactMethods.length > 0
+                      ? t("user.seeDetails", "Available")
+                      : t("user.notSet", "None added yet")}
+                  </Typography>
+                </Box>
 
-                {/* Exchange Point Items Control - Only show for exchange point admins */}
-                {isExchangePointAdmin && (
-                  <Box
+                {userData.user.contactMethods &&
+                  userData.user.contactMethods.length > 0 && (
+                    <Box sx={{ mt: 1.5 }}>
+                      <ContactMethods
+                        contactMethods={userData.user.contactMethods}
+                        readOnly={true}
+                        canViewPrivateMethods={Boolean(isCurrentUser)}
+                        title={t(
+                          "userProfile.contactMethods.title",
+                          "Contact Methods",
+                        )}
+                        showTitle={true}
+                        showAddButton={false}
+                        maxHeight={320}
+                      />
+                    </Box>
+                  )}
+              </Box>
+
+              <Box sx={{ bgcolor: "#f5f3f2", borderRadius: 2, p: 1.5 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 1.5,
+                  }}
+                >
+                  <Typography
+                    variant="caption"
                     sx={{
-                      mb: 2,
-                      p: 2,
-                      bgcolor: "action.hover",
-                      borderRadius: 1,
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      color: "text.secondary",
                     }}
                   >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={includeExchangePointItems}
-                          onChange={handleExchangePointItemsToggle}
-                          icon={<StorageIcon />}
-                          checkedIcon={<StorageIcon />}
-                        />
-                      }
-                      label={
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                        >
-                          <Typography variant="body2">
-                            {t(
-                              "user.includeExchangePointItems",
-                              "Include Exchange Point Cached Items",
-                            )}
-                          </Typography>
-                          <Chip
-                            label={
-                              includeExchangePointItems
-                                ? t("common.enabled", "Enabled")
-                                : t("common.disabled", "Disabled")
-                            }
-                            size="small"
-                            color={
-                              includeExchangePointItems ? "success" : "default"
-                            }
-                          />
-                        </Box>
-                      }
-                    />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: "block", mt: 1 }}
+                    {t("user.exchangePoints", "EXCHANGE POINTS")}
+                  </Typography>
+                  {isCurrentUser && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      sx={{
+                        p: 0,
+                        minWidth: 0,
+                        color: "#b14c7b",
+                        textTransform: "none",
+                        fontWeight: 600,
+                      }}
+                      onClick={() => setShowUpdateUser(true)}
                     >
-                      {t(
-                        "user.exchangePointItemsHelper",
-                        "When enabled, includes items cached at your exchange point in addition to your personal items.",
-                      )}
-                    </Typography>
-                  </Box>
-                )}
-                {tagCloudData.length > 0 ? (
-                  <Select
-                    native
-                    value={selectedCategory || ""}
-                    onChange={(e) =>
-                      setSelectedCategory(e.target.value || null)
-                    }
-                  >
-                    <option value="">
-                      {t("user.allCategories", "All Categories")}
-                    </option>
-                    {tagCloudData.map((tag) => (
-                      <option key={tag.value} value={tag.value}>
-                        {tag.value} ({tag.count})
-                      </option>
-                    ))}
-                  </Select>
-                ) : (
+                      {t("common.edit", "Edit")}
+                    </Button>
+                  )}
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 0.75,
+                  }}
+                >
                   <Typography variant="body2" color="text.secondary">
-                    {t("user.noCategories", "No categories available")}
+                    {t("user.selected", "Selected")}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {userData.user.exchangePoints &&
+                    userData.user.exchangePoints.length > 0
+                      ? userData.user.exchangePoints.join(", ")
+                      : t("user.notSet", "None selected")}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ bgcolor: "#f5f3f2", borderRadius: 2, p: 1.5 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 1.5,
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      letterSpacing: 0.8,
+                      color: "text.secondary",
+                    }}
+                  >
+                    {t("user.contentFilter", "CONTENT FILTER")}
+                  </Typography>
+                  {isCurrentUser && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      sx={{
+                        p: 0,
+                        minWidth: 0,
+                        color: "#b14c7b",
+                        textTransform: "none",
+                        fontWeight: 600,
+                      }}
+                      onClick={() => setShowUpdateUser(true)}
+                    >
+                      {t("common.edit", "Edit")}
+                    </Button>
+                  )}
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 0.75,
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("user.currentSetting", "Current setting")}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {t("contentRating.cat2b", "Category IIB")}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mt: 1,
+                }}
+              >
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {bookshelfTitle}
+                </Typography>
+                {isCurrentUser && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{
+                      bgcolor: "#b14c7b",
+                      borderRadius: 1.5,
+                      textTransform: "none",
+                      fontWeight: 700,
+                      px: 1.4,
+                    }}
+                    onClick={handleAddItem}
+                    data-tour="add-item"
+                  >
+                    <Box component="span" sx={{ mr: 0.5 }}>
+                      +
+                    </Box>
+                    {t("item.create", "Create Item")}
+                  </Button>
+                )}
+              </Box>
+
+              {pinnedItemsWithDistance.length > 0 && (
+                <Box
+                  sx={{
+                    bgcolor: "rgba(255,255,255,0.2)",
+                    borderRadius: 2,
+                    p: 1.5,
+                  }}
+                >
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, mb: 1.5, color: "text.primary" }}
+                  >
+                    {t("user.pinnedItems", "Pinned Items")}
+                  </Typography>
+                  <Grid container spacing={{ xs: 1, sm: 1.5 }}>
+                    {pinnedItemsWithDistance.map((item) => (
+                      <Grid key={item.id} size={{ xs: 3, sm: 2, md: 2 }}>
+                        {useBookSpine ? (
+                          <BookSpinePreview
+                            item={item}
+                            distance={item.distance}
+                            onClick={handleItemClick}
+                          />
+                        ) : (
+                          <ItemPreview item={item} onClick={handleItemClick} />
+                        )}
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              )}
+
+              <Box
+                sx={{
+                  bgcolor: "rgba(255,255,255,0.2)",
+                  borderRadius: 2,
+                  p: 1.5,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 2,
+                    mb: 1.5,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "text.primary" }}
+                  >
+                    {isCurrentUser
+                      ? t("item.myLentItems", "All My Items")
+                      : t("item.allItems", "All Items")}
+                  </Typography>
+
+                  {tagCloudData.length > 0 && (
+                    <Select
+                      native
+                      value={selectedCategory || ""}
+                      onChange={(e) =>
+                        setSelectedCategory(e.target.value || null)
+                      }
+                      sx={{ minWidth: 170, fontSize: "0.875rem" }}
+                    >
+                      <option value="">
+                        {t("user.allCategories", "All Categories")}
+                      </option>
+                      {tagCloudData.map((tag) => (
+                        <option key={tag.value} value={tag.value}>
+                          {tag.value} ({tag.count})
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 1.5,
+                    flexWrap: "wrap",
+                    gap: 1,
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {itemsLoading
+                      ? t("common.loading", "Loading...")
+                      : t("itemsAll.itemsFound", "Found {{count}} item(s)", {
+                          count: totalFilteredCount,
+                        })}
+                  </Typography>
+                </Box>
+
+                {itemsLoading ? (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", py: 2 }}
+                  >
+                    <CircularProgress size={28} />
+                  </Box>
+                ) : itemsWithDistance.length > 0 ? (
+                  <>
+                    <Grid container spacing={{ xs: 1, sm: 1.5 }}>
+                      {itemsWithDistance.map((item) => (
+                        <Grid key={item.id} size={{ xs: 3, sm: 2, md: 2 }}>
+                          {useBookSpine ? (
+                            <BookSpinePreview
+                              item={item}
+                              distance={item.distance}
+                              onClick={handleItemClick}
+                            />
+                          ) : (
+                            <ItemPreview
+                              item={item}
+                              onClick={handleItemClick}
+                            />
+                          )}
+                        </Grid>
+                      ))}
+                    </Grid>
+
+                    <Box sx={{ mt: 2 }}>
+                      <PaginationControls
+                        currentPage={itemsPage}
+                        onPageChange={handleItemsPageChange}
+                        hasNextPage={
+                          itemsPage * ITEMS_PER_PAGE < totalFilteredCount
+                        }
+                        totalItems={totalFilteredCount}
+                        hasPrevPage={itemsPage > 1}
+                        isLoading={itemsLoading}
+                        itemsPerPage={ITEMS_PER_PAGE}
+                        showPageInfo={true}
+                      />
+                    </Box>
+                  </>
+                ) : (
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    {isCurrentUser
+                      ? t("item.noLentItems", "You currently have no items.")
+                      : t(
+                          "user.noPinnedItemsUser",
+                          "This user hasn't added any items yet.",
+                        )}
                   </Typography>
                 )}
-                {/* User's Items - Only show when a category is selected - Grid Layout */}
-                {selectedCategory ? (
-                  <>
-                    <Box sx={resultHeaderRowSx}>
-                      <Typography variant="h6">
-                        {isCurrentUser
-                          ? t(
-                              "user.yourItemsInCategory",
-                              "Your {{category}} Items",
-                              {
-                                category: selectedCategory,
-                              },
-                            )
-                          : t(
-                              "user.userItemsInCategory",
-                              "{{name}}'s {{category}} Items",
-                              {
-                                name:
-                                  userData.user.nickname || userData.user.email,
-                                category: selectedCategory,
-                              },
-                            )}
-                        {isExchangePointAdmin && includeExchangePointItems && (
-                          <Chip
-                            label={t(
-                              "user.includesCachedItems",
-                              "Includes cached items",
-                            )}
-                            size="small"
-                            variant="outlined"
-                            sx={{ ml: 2 }}
-                          />
-                        )}
-                      </Typography>
+              </Box>
 
-                      {/* Results count */}
-                      <Typography variant="body2" color="text.secondary">
-                        {itemsLoading
-                          ? t("common.loading", "Loading...")
-                          : t(
-                              "itemsAll.itemsFound",
-                              "Found {{count}} item(s)",
-                              {
-                                count: totalFilteredCount,
-                              },
-                            )}
-                      </Typography>
-                    </Box>
-
-                    {/* Loading State */}
-                    {itemsLoading && (
-                      <Box sx={loadingCenterPaddedSx}>
-                        <CircularProgress />
-                      </Box>
+              {isCurrentUser && (
+                <Box sx={{ textAlign: "center", mt: 0.5 }}>
+                  <Button
+                    variant="text"
+                    sx={{
+                      color: "#b14c7b",
+                      textTransform: "none",
+                      fontWeight: 600,
+                      p: 0,
+                    }}
+                    onClick={() => navigate("/import/goodreads")}
+                  >
+                    {t(
+                      "user.goodreadsImport",
+                      "Already have a Goodreads list? Import it here.",
                     )}
-
-                    {/* Items Grid */}
-                    {!itemsLoading && itemsWithDistance.length > 0 ? (
-                      <>
-                        <Grid
-                          container
-                          spacing={{ xs: 1, sm: 2 }}
-                          sx={itemsGridSx}
-                        >
-                          {itemsWithDistance.map((item) => (
-                            <Grid
-                              key={item.id}
-                              size={{ xs: 2, sm: 1.5, md: 1 }}
-                            >
-                              <BookSpinePreview
-                                item={item}
-                                distance={item.distance}
-                                onClick={handleItemClick}
-                              />
-                            </Grid>
-                          ))}
-                        </Grid>
-
-                        {/* Pagination Controls */}
-                        <Box sx={paginationWrapSx}>
-                          <PaginationControls
-                            currentPage={itemsPage}
-                            onPageChange={handleItemsPageChange}
-                            hasNextPage={
-                              itemsPage * ITEMS_PER_PAGE < totalFilteredCount
-                            }
-                            totalItems={totalFilteredCount}
-                            hasPrevPage={itemsPage > 1}
-                            isLoading={itemsLoading}
-                            itemsPerPage={ITEMS_PER_PAGE}
-                            showPageInfo={true}
-                          />
-                        </Box>
-                      </>
-                    ) : (
-                      !itemsLoading && (
-                        <Alert severity="info">
-                          {isCurrentUser
-                            ? t(
-                                "user.noItemsInCategoryYou",
-                                "You haven't added any {{category}} items yet.",
-                                {
-                                  category: selectedCategory,
-                                },
-                              )
-                            : t(
-                                "user.noItemsInCategoryUser",
-                                "This user hasn't added any {{category}} items yet.",
-                                {
-                                  category: selectedCategory,
-                                },
-                              )}
-                        </Alert>
-                      )
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <Box sx={resultHeaderRowSx}>
-                      <Typography variant="h6">
-                        {isCurrentUser
-                          ? t("item.myLentItems", "All My Items")
-                          : `${userData.user.nickname || userData.user.email}'s ${t("item.allItems", "All Items")}`}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {itemsLoading
-                          ? t("common.loading", "Loading...")
-                          : t(
-                              "itemsAll.itemsFound",
-                              "Found {{count}} item(s)",
-                              {
-                                count: totalFilteredCount,
-                              },
-                            )}
-                      </Typography>
-                    </Box>
-
-                    {itemsLoading && (
-                      <Box sx={loadingCenterPaddedSx}>
-                        <CircularProgress />
-                      </Box>
-                    )}
-
-                    {!itemsLoading && itemsWithDistance.length > 0 ? (
-                      <>
-                        <Grid
-                          container
-                          spacing={{ xs: 1, sm: 2 }}
-                          sx={itemsGridSx}
-                        >
-                          {itemsWithDistance.map((item) => (
-                            <Grid
-                              key={item.id}
-                              size={{ xs: 2, sm: 1.5, md: 1 }}
-                            >
-                              <BookSpinePreview
-                                item={item}
-                                distance={item.distance}
-                                onClick={handleItemClick}
-                              />
-                            </Grid>
-                          ))}
-                        </Grid>
-                        <Box sx={paginationWrapSx}>
-                          <PaginationControls
-                            currentPage={itemsPage}
-                            onPageChange={handleItemsPageChange}
-                            hasNextPage={
-                              itemsPage * ITEMS_PER_PAGE < totalFilteredCount
-                            }
-                            totalItems={totalFilteredCount}
-                            hasPrevPage={itemsPage > 1}
-                            isLoading={itemsLoading}
-                            itemsPerPage={ITEMS_PER_PAGE}
-                            showPageInfo={true}
-                          />
-                        </Box>
-                      </>
-                    ) : (
-                      !itemsLoading && (
-                        <Alert severity="info">
-                          {isCurrentUser
-                            ? t(
-                                "item.noLentItems",
-                                "You currently have no items.",
-                              )
-                            : t(
-                                "user.noPinnedItemsUser",
-                                "This user hasn't added any items yet.",
-                              )}
-                        </Alert>
-                      )
-                    )}
-                  </>
-                )}
-              </Paper>
-            )}
-          {/* UpdateUser Dialog - Only render when needed */}
-          {showUpdateUser && (
-            <UpdateUser
-              email={userData.user.email}
-              onUserCreated={handleUserCreated}
-              open={showUpdateUser}
-              isCreateUser={false}
-              initialNickname={userData.user?.nickname || userData.user.email}
-              initialAddress={userData.user?.address || ""}
-              initialExchangePoints={userData.user?.exchangePoints}
-              initialContactMethods={userData.user?.contactMethods || []}
-              initialVisibleContentRating={
-                (userData.user as any)?.visibleContentRating
-              }
-              onClose={() => setShowUpdateUser(false)}
-            />
+                  </Button>
+                </Box>
+              )}
+            </Box>
           )}
-
-          <UserProfileShareDialog
-            open={shareDialogOpen}
-            onClose={() => setShareDialogOpen(false)}
-            profileUrl={profileShareUrl}
-            displayName={
-              userData.user.nickname || userData.user.email || userData.user.id
-            }
-          />
-        </>
+        </Paper>
       )}
+
       {showAddressReminder && (
         <AddressReminderDialog
           open={showAddressReminder}
@@ -1023,6 +1106,35 @@ const UserDetail: React.FC<UserDetailProps> = ({
           onItemCreated={handleItemCreated}
         />
       )}
+
+      {isCurrentUser && showUpdateUser && userData?.user && (
+        <UpdateUser
+          email={userData.user.email}
+          onUserCreated={handleUserCreated}
+          open={showUpdateUser}
+          isCreateUser={false}
+          initialNickname={userData.user?.nickname || userData.user.email}
+          initialAddress={userData.user?.address || ""}
+          initialExchangePoints={userData.user?.exchangePoints}
+          initialContactMethods={userData.user?.contactMethods || []}
+          initialVisibleContentRating={
+            (userData.user as any)?.visibleContentRating
+          }
+          onClose={() => setShowUpdateUser(false)}
+        />
+      )}
+
+      <UserProfileShareDialog
+        open={shareDialogOpen}
+        onClose={() => setShareDialogOpen(false)}
+        profileUrl={profileShareUrl}
+        displayName={
+          userData?.user?.nickname ||
+          userData?.user?.email ||
+          userData?.user?.id ||
+          ""
+        }
+      />
     </Container>
   );
 };

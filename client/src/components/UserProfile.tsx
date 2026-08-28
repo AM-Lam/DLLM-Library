@@ -147,10 +147,10 @@ const UserProfile: React.FC<UserProfileProps> = ({
       type: cm.type,
       value: cm.value,
       isPublic: cm.isPublic,
-    })) || []
+    })) || [],
   );
   const [visibleContentRating, setVisibleContentRating] = useState<number>(
-    initialVisibleContentRating ?? DEFAULT_CONTENT_RATING
+    initialVisibleContentRating ?? DEFAULT_CONTENT_RATING,
   );
   const [mapDialogOpen, setMapDialogOpen] = useState(false);
   const [selectedPointForMap, setSelectedPointForMap] =
@@ -167,7 +167,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   // Add validation states
   const [contactMethodError, setContactMethodError] = useState<string | null>(
-    null
+    null,
   );
 
   const [resolvedLocation, setResolvedLocation] = useState<{
@@ -190,7 +190,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     {
       variables: { limit: 50, offset: 0 },
       skip: isCreateUser,
-    }
+    },
   );
 
   // Update mutation
@@ -210,7 +210,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
         setSnackbarErrorMsg(err.message);
         setShowErrorSnackbar(true);
       },
-    }
+    },
   );
 
   // Create mutation
@@ -230,7 +230,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
         setSnackbarErrorMsg(err.message);
         setShowErrorSnackbar(true);
       },
-    }
+    },
   );
 
   const data = isCreateUser ? createData : updateData;
@@ -251,7 +251,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
         type: cm.type,
         value: cm.value,
         isPublic: cm.isPublic,
-      })) || []
+      })) || [],
     );
     setResolvedLocation(null);
     setLocationError(null);
@@ -290,8 +290,8 @@ const UserProfile: React.FC<UserProfileProps> = ({
           setLocationError(
             t(
               "userProfile.locationNotFound",
-              "Could not find location for the address."
-            )
+              "Could not find location for the address.",
+            ),
           );
           setResolvedLocation(null);
         }
@@ -300,12 +300,12 @@ const UserProfile: React.FC<UserProfileProps> = ({
       onError: (error) => {
         console.error("Geocoding error:", error);
         setLocationError(
-          t("userProfile.geocodeError", "Failed to resolve address location")
+          t("userProfile.geocodeError", "Failed to resolve address location"),
         );
         setResolvedLocation(null);
         setIsGeocodingAddress(false);
       },
-    }
+    },
   );
 
   const handleAddressChange = (newAddress: string) => {
@@ -372,7 +372,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   const validateContactMethod = (
     type: ContactMethodType,
-    value: string
+    value: string,
   ): { isValid: boolean; error?: string } => {
     const trimmedValue = value.trim();
 
@@ -390,7 +390,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
             isValid: false,
             error: t(
               "userProfile.validation.invalidEmail",
-              "Please enter a valid email address"
+              "Please enter a valid email address",
             ),
           };
         }
@@ -402,7 +402,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
             isValid: false,
             error: t(
               "userProfile.validation.invalidWhatsappUrl",
-              "Please enter a valid WhatsApp HTTPS link (e.g., https://wa.me/1234567890)"
+              "Please enter a valid WhatsApp HTTPS link (e.g., https://wa.me/1234567890)",
             ),
           };
         }
@@ -415,7 +415,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
             isValid: false,
             error: t(
               "userProfile.validation.whatsappFormat",
-              "Please use a WhatsApp link format (wa.me or whatsapp.com)"
+              "Please use a WhatsApp link format (wa.me or whatsapp.com)",
             ),
           };
         }
@@ -427,7 +427,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
             isValid: false,
             error: t(
               "userProfile.validation.invalidSignalUrl",
-              "Please enter a valid Signal HTTPS link (e.g., https://signal.me/#p/+1234567890)"
+              "Please enter a valid Signal HTTPS link (e.g., https://signal.me/#p/+1234567890)",
             ),
           };
         }
@@ -440,7 +440,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
             isValid: false,
             error: t(
               "userProfile.validation.signalFormat",
-              "Please use a Signal link format (signal.me or signal.org)"
+              "Please use a Signal link format (signal.me or signal.org)",
             ),
           };
         }
@@ -452,7 +452,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
             isValid: false,
             error: t(
               "userProfile.validation.invalidTelegramUrl",
-              "Please enter a valid Telegram HTTPS link (e.g., https://t.me/username)"
+              "Please enter a valid Telegram HTTPS link (e.g., https://t.me/username)",
             ),
           };
         }
@@ -465,7 +465,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
             isValid: false,
             error: t(
               "userProfile.validation.telegramFormat",
-              "Please use a Telegram link format (t.me or telegram.me)"
+              "Please use a Telegram link format (t.me or telegram.me)",
             ),
           };
         }
@@ -485,17 +485,17 @@ const UserProfile: React.FC<UserProfileProps> = ({
       case ContactMethodType.Whatsapp:
         return t(
           "userProfile.whatsappPlaceholder",
-          "e.g., https://wa.me/1234567890"
+          "e.g., https://wa.me/1234567890",
         );
       case ContactMethodType.Signal:
         return t(
           "userProfile.signalPlaceholder",
-          "e.g., https://signal.me/#p/+1234567890"
+          "e.g., https://signal.me/#p/+1234567890",
         );
       case ContactMethodType.Telegram:
         return t(
           "userProfile.telegramPlaceholder",
-          "e.g., https://t.me/username"
+          "e.g., https://t.me/username",
         );
       default:
         return t("userProfile.socialPlaceholder", "Enter contact information");
@@ -509,17 +509,17 @@ const UserProfile: React.FC<UserProfileProps> = ({
       case ContactMethodType.Whatsapp:
         return t(
           "userProfile.whatsappHelper",
-          "Enter your WhatsApp link (https://wa.me/your-number)"
+          "Enter your WhatsApp link (https://wa.me/your-number)",
         );
       case ContactMethodType.Signal:
         return t(
           "userProfile.signalHelper",
-          "Enter your Signal link (https://signal.me/#p/your-number)"
+          "Enter your Signal link (https://signal.me/#p/your-number)",
         );
       case ContactMethodType.Telegram:
         return t(
           "userProfile.telegramHelper",
-          "Enter your Telegram link (https://t.me/username)"
+          "Enter your Telegram link (https://t.me/username)",
         );
       default:
         return t("userProfile.socialHelper", "Enter your contact information");
@@ -554,7 +554,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
   const handleSaveContactMethod = () => {
     const validation = validateContactMethod(
       newContactMethod.type,
-      newContactMethod.value
+      newContactMethod.value,
     );
 
     if (!validation.isValid) {
@@ -568,15 +568,15 @@ const UserProfile: React.FC<UserProfileProps> = ({
         index !== editingContactMethodIndex &&
         cm.type === newContactMethod.type &&
         cm.value.trim().toLowerCase() ===
-        newContactMethod.value.trim().toLowerCase()
+          newContactMethod.value.trim().toLowerCase(),
     );
 
     if (isDuplicate) {
       setContactMethodError(
         t(
           "userProfile.validation.duplicate",
-          "This contact method already exists"
-        )
+          "This contact method already exists",
+        ),
       );
       return;
     }
@@ -587,11 +587,11 @@ const UserProfile: React.FC<UserProfileProps> = ({
         prev.map((cm, index) =>
           index === editingContactMethodIndex
             ? {
-              ...newContactMethod,
-              value: newContactMethod.value.trim(),
-            }
-            : cm
-        )
+                ...newContactMethod,
+                value: newContactMethod.value.trim(),
+              }
+            : cm,
+        ),
       );
     } else {
       // Adding new contact method
@@ -620,7 +620,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
     if (!newContactMethod.value.trim()) return true;
     const validation = validateContactMethod(
       newContactMethod.type,
-      newContactMethod.value
+      newContactMethod.value,
     );
     return !validation.isValid;
   };
@@ -649,13 +649,13 @@ const UserProfile: React.FC<UserProfileProps> = ({
       ...(isCreateUser
         ? {}
         : {
-          exchangePoints: selectedExchangePoints,
-          contactMethods: contactMethods.map((cm) => ({
-            type: cm.type,
-            value: cm.value.trim(),
-            isPublic: cm.isPublic,
-          })),
-        }),
+            exchangePoints: selectedExchangePoints,
+            contactMethods: contactMethods.map((cm) => ({
+              type: cm.type,
+              value: cm.value.trim(),
+              isPublic: cm.isPublic,
+            })),
+          }),
     };
 
     if (isCreateUser) {
@@ -667,9 +667,11 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   return (
     <Box>
-      <Dialog open={internalOpen} onClose={handleClose} maxWidth="md" fullWidth>
+      <Dialog open={internalOpen} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ textAlign: "center" }}>
-          {isCreateUser ? t("auth.createProfile") : t("user.editProfile")}
+          {isCreateUser
+            ? t("auth.createProfile")
+            : t("userProfile.exchangeInformation", "Exchange Information")}
         </DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
@@ -684,7 +686,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
             />
 
             <TextField
-              label={t("userProfile.address")}
+              label={t("user.exchangeAddress", "Exchange address")}
               type="text"
               fullWidth
               margin="normal"
@@ -697,7 +699,10 @@ const UserProfile: React.FC<UserProfileProps> = ({
                   resolveAddress();
                 }
               }}
-              placeholder={t("userProfile.searchAddress")}
+              placeholder={t(
+                "userProfile.exchangeAddressPlaceholder",
+                "e.g. Eastwood, Ashfield, Hurstville",
+              )}
               disabled={isGeocodingAddress}
               required
               error={Boolean(locationError)}
@@ -711,7 +716,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                       <Tooltip
                         title={t(
                           "userProfile.geocodeErrorTooltip",
-                          "Failed to resolve address"
+                          "Failed to resolve address",
                         )}
                       >
                         <SignalIcon color="error" fontSize="small" />
@@ -723,7 +728,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                         <Tooltip
                           title={t(
                             "userProfile.geocodeResolvedTooltip",
-                            "Address resolved"
+                            "Address resolved",
                           )}
                         >
                           <SignalIcon color="success" fontSize="small" />
@@ -733,6 +738,19 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 ),
               }}
             />
+
+            {!isCreateUser && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
+                {t(
+                  "userProfile.exchangeAddressHelper",
+                  "Enter your preferred location, for example Eastwood, Ashfield, Hurstville. This helps you and the other member agree on a convenient spot to meet.",
+                )}
+              </Typography>
+            )}
 
             {isGeocodingAddress && (
               <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
@@ -797,18 +815,55 @@ const UserProfile: React.FC<UserProfileProps> = ({
             {/* Contact Methods Section - Only show for update user */}
             {!isCreateUser && (
               <Box sx={{ mt: 3 }}>
-                <Divider sx={{ mb: 2 }} />
-                <ContactMethods
-                  contactMethods={contactMethods}
-                  onContactMethodsChange={handleContactMethodsChange}
-                  readOnly={false}
-                  title={t(
-                    "userProfile.contactMethods.title",
-                    "Contact Methods"
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
+                  {t("user.meetupContact", "Meetup contact")}
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    color="text.secondary"
+                  >
+                    {" "}
+                    {t("common.optional", "(optional)")}
+                  </Typography>
+                </Typography>
+
+                <Box
+                  sx={{
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 2,
+                    p: 1.5,
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <ContactMethods
+                    contactMethods={contactMethods}
+                    onContactMethodsChange={handleContactMethodsChange}
+                    readOnly={false}
+                    showTitle={false}
+                    showAddButton={true}
+                    addButtonLabel={t(
+                      "userProfile.contactMethods.addCompact",
+                      "+ Add contact method",
+                    )}
+                    addButtonSx={{
+                      borderStyle: "dashed",
+                      textTransform: "none",
+                    }}
+                    maxHeight={240}
+                  />
+                </Box>
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  {t(
+                    "userProfile.contactMethods.compactHelper",
+                    "Use this for easier contact when meeting up to exchange. New entries default to private.",
                   )}
-                  showTitle={true}
-                  showAddButton={true}
-                />
+                </Typography>
               </Box>
             )}
 
@@ -824,7 +879,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                     <Typography variant="body2" color="text.secondary">
                       {t(
                         "userProfile.exchangePointsHelper",
-                        "Select exchange points where you can meet for item handovers"
+                        "Select exchange points where you can meet for item handovers",
                       )}
                     </Typography>
                   </FormLabel>
@@ -835,7 +890,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                       <Typography variant="body2" color="text.secondary">
                         {t(
                           "userProfile.loadingExchangePoints",
-                          "Loading exchange points..."
+                          "Loading exchange points...",
                         )}
                       </Typography>
                     </Box>
@@ -850,7 +905,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                               control={
                                 <Checkbox
                                   checked={selectedExchangePoints.includes(
-                                    point.id
+                                    point.id,
                                   )}
                                   onChange={() =>
                                     handleExchangePointToggle(point.id)
@@ -886,7 +941,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                               </IconButton>
                             </ListItemSecondaryAction>
                           </ListItem>
-                        )
+                        ),
                       )}
                     </List>
                   )}
@@ -898,7 +953,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                         "{{count}} exchange point(s) selected",
                         {
                           count: selectedExchangePoints.length,
-                        }
+                        },
                       )}
                     </Typography>
                   )}
@@ -922,7 +977,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                     }
                   >
                     {CONTENT_RATING_OPTIONS.filter(
-                      (opt) => opt.value <= CONTENT_RATING_CENSOR_THRESHOLD
+                      (opt) => opt.value <= CONTENT_RATING_CENSOR_THRESHOLD,
                     ).map((opt) => (
                       <MenuItem key={opt.value} value={opt.value}>
                         {t(opt.labelKey, opt.labelKey)}
@@ -936,7 +991,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                   >
                     {t(
                       "contentRating.visibleRatingHelper",
-                      "Items with a higher rating will be hidden from your feed."
+                      "Items with a higher rating will be hidden from your feed.",
                     )}
                   </Typography>
                 </FormControl>
@@ -969,6 +1024,10 @@ const UserProfile: React.FC<UserProfileProps> = ({
               variant="contained"
               fullWidth
               disabled={submitDisabled}
+              sx={{
+                textTransform: "none",
+                fontWeight: 700,
+              }}
             >
               {loading
                 ? isCreateUser
@@ -976,16 +1035,18 @@ const UserProfile: React.FC<UserProfileProps> = ({
                   : t("common.updating")
                 : isCreateUser
                   ? t("auth.createProfile")
-                  : t("userProfile.updateProfile")}
+                  : t("common.saveChanges", "Save changes")}
             </Button>
-            <Button
-              onClick={handleClose}
-              variant="outlined"
-              fullWidth
-              disabled={loading}
-            >
-              {t("auth.cancel")}
-            </Button>
+            {isCreateUser && (
+              <Button
+                onClick={handleClose}
+                variant="outlined"
+                fullWidth
+                disabled={loading}
+              >
+                {t("auth.cancel")}
+              </Button>
+            )}
           </DialogActions>
         </form>
       </Dialog>
@@ -1013,7 +1074,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
               label={t("userProfile.contactMethodType", "Type")}
               onChange={(e) =>
                 handleContactMethodTypeChange(
-                  e.target.value as ContactMethodType
+                  e.target.value as ContactMethodType,
                 )
               }
             >
@@ -1079,13 +1140,13 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 <Typography variant="caption" color="text.secondary">
                   {newContactMethod.isPublic
                     ? t(
-                      "userProfile.publicContactHelp",
-                      "This contact method will be visible to all users"
-                    )
+                        "userProfile.publicContactHelp",
+                        "This contact method will be visible to all users",
+                      )
                     : t(
-                      "userProfile.privateContactHelp",
-                      "This contact method will only be shared during transactions"
-                    )}
+                        "userProfile.privateContactHelp",
+                        "This contact method will only be shared during transactions",
+                      )}
                 </Typography>
               </Box>
             }

@@ -36,6 +36,8 @@ import NewsForm from "./NewsForm";
 import ClassificationAssignment from "./ClassificationAssignment";
 import ContentRatingApprovalDialog from "./ContentRatingApprovalDialog";
 import OnboardingTour from "./OnboardingTour";
+import SignupOnboardingDialog from "./SignupOnboardingDialog";
+import { hasPendingSignupOnboarding } from "../utils/signupOnboarding";
 import { resolveBranding } from "../utils/branding";
 
 const headerActionButtonSx = {
@@ -99,6 +101,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
 
   // State management
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [signupOnboardingOpen, setSignupOnboardingOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showNewsForm, setShowNewsForm] = useState(false);
   const [showClassificationAssignment, setShowClassificationAssignment] =
@@ -177,6 +180,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     }
   };
 
+  React.useEffect(() => {
+    if (user && hasPendingSignupOnboarding()) {
+      setSignupOnboardingOpen(true);
+    }
+  }, [user]);
+
   const handleAuthSuccess = () => {
     setAuthDialogOpen(false);
     setTimeout(() => {
@@ -222,7 +231,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     <Box
       sx={{
         ...navPillSx,
-        backgroundColor: isActive ? "var(--color-nav-selected-bg)" : "transparent",
+        backgroundColor: isActive
+          ? "var(--color-nav-selected-bg)"
+          : "transparent",
         color: isActive ? "var(--color-brand-primary)" : "inherit",
       }}
     >
@@ -528,6 +539,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         onClose={() => setAuthDialogOpen(false)}
         onSuccess={handleAuthSuccess}
         defaultIsSignUp={false}
+      />
+
+      <SignupOnboardingDialog
+        open={signupOnboardingOpen}
+        onClose={() => setSignupOnboardingOpen(false)}
+        onAddAddress={() => navigate("/profile")}
       />
 
       {showNewsForm && (
