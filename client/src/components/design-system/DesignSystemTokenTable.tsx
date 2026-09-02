@@ -18,7 +18,7 @@ const headerCellSx = {
   py: 1,
   px: 1.75,
   fontFamily: "var(--font-family-mono)",
-  fontSize: "9px",
+  fontSize: "12px",
   letterSpacing: "0.12em",
   textTransform: "uppercase",
   color: "var(--color-text-muted)",
@@ -69,26 +69,26 @@ export default function DesignSystemTokenTable({
               }}
             >
               <TableCell sx={bodyCellSx}>
-                <Typography variant="body2" sx={{ fontFamily: "var(--font-family-mono)", fontSize: "11px", color: "var(--color-text-link)" }}>
+                <Typography variant="body2" sx={{ fontFamily: "var(--font-family-mono)", fontSize: "12px", color: "var(--color-text-link)" }}>
                   {row.name}
                 </Typography>
               </TableCell>
               <TableCell sx={bodyCellSx}>
                 {showColorChip ? (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Box sx={{ width: 14, height: 14, borderRadius: 0.75, bgcolor: row.value, border: "1px solid rgba(0,0,0,0.06)" }} />
-                    <Typography variant="body2" sx={{ fontFamily: "var(--font-family-mono)", fontSize: "11px", color: "var(--color-text-body)" }}>
+                    <Box sx={{ width: 14, height: 14, borderRadius: 0.75, bgcolor: row.value, border: "1px solid var(--color-border-subtle)" }} />
+                    <Typography variant="body2" sx={{ fontFamily: "var(--font-family-mono)", fontSize: "12px", color: "var(--color-text-body)" }}>
                       {row.value}
                     </Typography>
                   </Box>
                 ) : (
-                  <Typography variant="body2" sx={{ fontFamily: "var(--font-family-mono)", fontSize: "11px", color: "var(--color-text-body)" }}>
+                  <Typography variant="body2" sx={{ fontFamily: "var(--font-family-mono)", fontSize: "12px", color: "var(--color-text-body)" }}>
                     {row.value}
                   </Typography>
                 )}
               </TableCell>
               <TableCell sx={bodyCellSx}>
-                <Typography variant="body2" sx={{ fontSize: "11px", color: "var(--color-text-muted)" }}>
+                <Typography variant="body2" sx={{ fontSize: "12px", color: "var(--color-text-muted)" }}>
                   {row.use}
                 </Typography>
               </TableCell>

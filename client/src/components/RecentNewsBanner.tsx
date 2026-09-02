@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import { Link } from "react-router";
+import { alpha } from "@mui/material/styles";
 import {
   useNewsRecentPostsQuery,
   NewsRecentPostsQueryVariables,
@@ -21,6 +22,8 @@ import NewsSummary from "./NewsSummary";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import ItemPreview from "./ItemPreview";
+import { PageLoader } from "./LoadingState";
+import { semanticTokens } from "../styles/semanticTokens";
 
 interface RecentNewsBannerProps {
   newsStatus: NewsStatus;
@@ -88,7 +91,7 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({
     navigate(`/news/${newsId}`);
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <PageLoader size={32} minHeight={180} message={t("common.loading", "Loading...")} />;
   if (error) return <Typography>Error: {error.message}</Typography>;
   let title = t("news.trending");
   if (newsStatus === NewsStatus.Draft) {
@@ -104,37 +107,91 @@ const RecentNewsBanner: React.FC<RecentNewsBannerProps> = ({
         {/* Header Section */}
         {isFrontPage ? (
           data && (
-            <List>
-              {data.newsRecentPosts.map((news) => (
-                <>
-                  <NewsSummary
-                    key={news.id}
-                    news={news}
-                    onClick={handleNewsItemClick}
-                  />
-                  <Grid
-                    container
-                    spacing={{ xs: 1, sm: 2 }}
+            <Box
+              sx={{
+                border: `1px solid ${alpha(semanticTokens.color.brandPrimary, 0.18)}`,
+                borderRadius: 3,
+                background: `linear-gradient(135deg, ${alpha(semanticTokens.color.bgSubtle, 0.06)} 0%, ${semanticTokens.color.bgCanvas} 46%, ${alpha(semanticTokens.color.bgSubtle, 0.03)} 100%)`,
+                boxShadow: `0 10px 24px ${alpha(semanticTokens.color.bgSubtle, 0.06)}`,
+                overflow: "hidden",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 1,
+                  px: { xs: 2, md: 2.5 },
+                  py: 1.5,
+                  borderBottom: `1px solid ${alpha(semanticTokens.color.brandPrimary, 0.12)}`,
+                  background: alpha(semanticTokens.color.bgSubtle, 0.8),
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box
                     sx={{
-                      width: "100%",
+                      px: 1,
+                      py: 0.35,
+                      borderRadius: 999,
+                      backgroundColor: alpha(semanticTokens.color.bgSubtle, 0.08),
+                      color: semanticTokens.color.brandPrimary,
+                      fontFamily: "var(--font-family-mono)",
+                      fontSize: "10px",
+                      letterSpacing: "0.12em",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
                     }}
                   >
-                    {news.relatedItems?.map((item) => (
-                      <Grid
-                        key={item.id}
-                        size={{
-                          xs: 4, // 3 items per row on mobile (vertical)
-                          sm: 4, // 3 items per row on small screens
-                          md: 2, // 6 items per row on desktop (horizontal)
-                        }}
-                      >
-                        <ItemPreview item={item} onClick={handleItemClick} />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </>
-              ))}
-            </List>
+                    Highlighted
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontFamily: "var(--font-family-display)",
+                      fontSize: { xs: "1.15rem", md: "1.5rem" },
+                      fontWeight: 700,
+                      color: "var(--color-text-primary)",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {t("news.trending", "Latest stories")}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <List sx={{ px: 2, pt: 1.5, pb: 2 }}>
+                {data.newsRecentPosts.map((news) => (
+                  <React.Fragment key={news.id}>
+                    <NewsSummary
+                      news={news}
+                      onClick={handleNewsItemClick}
+                    />
+                    <Grid
+                      container
+                      spacing={{ xs: 1, sm: 2 }}
+                      sx={{
+                        width: "100%",
+                        mt: 0.5,
+                        mb: 1,
+                      }}
+                    >
+                      {news.relatedItems?.map((item) => (
+                        <Grid
+                          key={item.id}
+                          size={{
+                            xs: 4,
+                            sm: 4,
+                            md: 2,
+                          }}
+                        >
+                          <ItemPreview item={item} onClick={handleItemClick} />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </React.Fragment>
+                ))}
+              </List>
+            </Box>
           )
         ) : (
           <>

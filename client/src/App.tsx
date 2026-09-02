@@ -5,8 +5,10 @@ import { User, HostConfig } from "./generated/graphql";
 import { createRouter } from "./Router";
 import { RouterProvider } from "react-router";
 import SplashScreen from "./components/SplashScreen";
-import { CircularProgress, Box } from "@mui/material";
+import { Box } from "@mui/material";
+import { PageLoader } from "./components/LoadingState";
 import { getCookie, setCookie } from "./utils/cookies";
+import { semanticTokens } from "./styles/semanticTokens";
 import JSZip from "jszip";
 
 const ME_QUERY = gql`
@@ -170,14 +172,18 @@ const App: React.FC<AppProps> = ({ user, onSignOut }) => {
     return (
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: `linear-gradient(135deg, ${semanticTokens.color.brandPrimary} 0%, ${semanticTokens.color.brandAccent} 100%)`,
         }}
       >
-        <CircularProgress size={60} sx={{ color: "white" }} />
+        <PageLoader
+          size={60}
+          minHeight={0}
+          message="Loading..."
+        />
       </Box>
     );
   }

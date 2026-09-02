@@ -33,6 +33,8 @@ import { useTranslation } from "react-i18next";
 import { useOutletContext } from "react-router-dom";
 import { useNavigateBack } from "../hook/useNavigateBack";
 import { User, Transaction, TransactionStatus } from "../generated/graphql";
+import { PageLoader } from "../components/LoadingState";
+import { getTransactionStatusChipProps } from "../utils/itemStatusChip";
 
 const GET_USER_TRANSACTIONS = gql`
   query GetUserTransactions($userId: ID!) {
@@ -170,20 +172,12 @@ const TransactionsPage: React.FC = () => {
   };
 
   const getStatusColor = (status: TransactionStatus) => {
-    switch (status) {
-      case TransactionStatus.Pending:
-        return "warning";
-      case TransactionStatus.Approved:
-        return "success";
-      case TransactionStatus.Transfered:
-        return "primary";
-      case TransactionStatus.Completed:
-        return "success";
-      case TransactionStatus.Cancelled:
-        return "error";
-      default:
-        return "default";
-    }
+    const palette = getTransactionStatusChipProps(status);
+    return {
+      backgroundColor: palette.bgColor,
+      color: palette.color,
+      borderColor: palette.borderColor,
+    };
   };
 
   const formatDate = (dateString: string) => {
@@ -202,11 +196,7 @@ const TransactionsPage: React.FC = () => {
     error: any,
   ) => {
     if (loading) {
-      return (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
-        </Box>
-      );
+      return <PageLoader message={t("common.loading", "Loading...")} minHeight={180} />;
     }
 
     if (error) {
@@ -312,9 +302,15 @@ const TransactionsPage: React.FC = () => {
                         `transactions.status.${transaction.status.toLowerCase()}`,
                         transaction.status,
                       )}
-                      color={getStatusColor(transaction.status) as any}
                       size="small"
-                      sx={{ fontWeight: 600 }}
+                      sx={{
+                        ...getStatusColor(transaction.status),
+                        border: `1px solid ${getTransactionStatusChipProps(transaction.status).borderColor}`,
+                        fontWeight: 600,
+                        ".MuiChip-icon": {
+                          color: getTransactionStatusChipProps(transaction.status).color,
+                        },
+                      }}
                     />
                   </Box>
                 }

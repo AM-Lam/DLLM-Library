@@ -12,21 +12,54 @@ import {
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import GoverningPrincipleSection from "./GoverningPrincipleSection";
+import BookCardSection from "./BookCardSection";
+import CategoryChipSection from "./CategoryChipSection";
 import ColourScalesSection from "./ColourScalesSection";
+import GoverningPrincipleSection from "./GoverningPrincipleSection";
+import RadiusTokensSection from "./RadiusTokensSection";
 import SemanticTokensSection from "./SemanticTokensSection";
+import SpacingTokensSection from "./SpacingTokensSection";
+import StatusChipSection from "./StatusChipSection";
 import TypographySection from "./TypographySection";
 import TypeTokensSection from "./TypeTokensSection";
 
 const DRAWER_WIDTH = 220;
 
-const navItems = [
-  { id: "governing", labelKey: "designSystem.nav.governing", color: "var(--color-brand-primary)" },
-  { id: "colours", labelKey: "designSystem.nav.colours", color: "#DB036B" },
-  { id: "tokens", labelKey: "designSystem.nav.tokens", color: "#8F7B6E" },
-  { id: "typography", labelKey: "designSystem.nav.typography", color: "#2E2420" },
-  { id: "type-tokens", labelKey: "designSystem.nav.typeTokens", color: "#190609" },
+type NavItem = {
+  id: string;
+  labelKey: string;
+  color: string;
+};
+
+type NavSection = {
+  labelKey: string;
+  items: NavItem[];
+};
+
+export const designSystemNavSections: NavSection[] = [
+  {
+    labelKey: "designSystem.nav.foundations",
+    items: [
+      { id: "governing", labelKey: "designSystem.nav.governing", color: "var(--color-brand-primary)" },
+      { id: "colours", labelKey: "designSystem.nav.colours", color: "var(--color-brand-primary)" },
+      { id: "tokens", labelKey: "designSystem.nav.tokens", color: "var(--color-text-muted)" },
+      { id: "typography", labelKey: "designSystem.nav.typography", color: "var(--color-text-primary)" },
+      { id: "type-tokens", labelKey: "designSystem.nav.typeTokens", color: "var(--color-text-primary)" },
+      { id: "radius-tokens", labelKey: "designSystem.nav.radiusTokens", color: "var(--color-text-primary)" },
+      { id: "spacing-tokens", labelKey: "designSystem.nav.spacingTokens", color: "var(--color-brand-accent)" },
+    ],
+  },
+  {
+    labelKey: "designSystem.nav.components",
+    items: [
+      { id: "status-chip", labelKey: "designSystem.nav.statusChip", color: "var(--color-special)" },
+      { id: "category-chip", labelKey: "designSystem.nav.categoryChip", color: "var(--color-text-body)" },
+      { id: "book-card", labelKey: "designSystem.nav.bookCard", color: "var(--color-text-primary)" },
+    ],
+  },
 ];
+
+const navItems: NavItem[] = designSystemNavSections.flatMap((section) => section.items);
 
 export default function DesignSystemPage() {
   const { t } = useTranslation();
@@ -125,7 +158,7 @@ export default function DesignSystemPage() {
           <Typography
             sx={{
               fontFamily: "var(--font-family-mono)",
-              fontSize: "9px",
+              fontSize: "12px",
               lineHeight: 1.5,
               color: "var(--color-text-muted)",
               whiteSpace: "pre-line",
@@ -140,10 +173,10 @@ export default function DesignSystemPage() {
               px: 0.875,
               py: 0.25,
               borderRadius: "20px",
-              bgcolor: "#FCD4E8",
+              bgcolor: "var(--color-bg-canvas)",
               color: "var(--color-text-link)",
               fontFamily: "var(--font-family-mono)",
-              fontSize: "8px",
+              fontSize: "12px",
               textTransform: "uppercase",
               letterSpacing: "0.1em",
             }}
@@ -153,57 +186,61 @@ export default function DesignSystemPage() {
         </Toolbar>
 
         <List dense sx={{ px: 0, py: 1.5 }}>
-          <ListItem sx={{ px: 2.5, py: 0.5 }}>
-            <Typography
-              sx={{
-                fontFamily: "var(--font-family-mono)",
-                fontSize: "8.5px",
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "var(--color-text-tertiary)",
-              }}
-            >
-              {t("designSystem.nav.foundations")}
-            </Typography>
-          </ListItem>
-          {navItems.map((item) => (
-            <ListItem key={item.id} disablePadding>
-              <ListItemButton
-                selected={activeId === item.id}
-                onClick={() => scrollTo(item.id)}
-                sx={{
-                  py: 0.875,
-                  px: 2.5,
-                  borderLeft: 2,
-                  borderColor: activeId === item.id ? "var(--color-text-link)" : "transparent",
-                  bgcolor: activeId === item.id ? "#FFF0F6" : "transparent",
-                  color: activeId === item.id ? "var(--color-text-link)" : "var(--color-text-body)",
-                  "&:hover": {
-                    bgcolor: "var(--color-bg-curator)",
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 28 }}>
-                  <Box
-                    sx={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: "50%",
-                      bgcolor: item.color,
-                      border: item.id === "type-tokens" ? "1px solid var(--color-border-default)" : "none",
-                    }}
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  primary={t(item.labelKey)}
-                  primaryTypographyProps={{
+          {designSystemNavSections.map((section) => (
+            <Box key={section.labelKey} sx={{ mb: 1.5 }}>
+              <ListItem sx={{ px: 2.5, py: 0.5 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "var(--font-family-mono)",
                     fontSize: "12px",
-                    fontWeight: activeId === item.id ? 500 : 400,
-                    color: activeId === item.id ? "var(--color-text-link)" : "var(--color-text-secondary)",
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "var(--color-text-tertiary)",
                   }}
-                />
-              </ListItemButton>
-            </ListItem>
+                >
+                  {t(section.labelKey)}
+                </Typography>
+              </ListItem>
+              {section.items.map((item) => (
+                <ListItem key={item.id} disablePadding>
+                  <ListItemButton
+                    selected={activeId === item.id}
+                    onClick={() => scrollTo(item.id)}
+                    sx={{
+                      py: 0.875,
+                      px: 2.5,
+                      borderLeft: 2,
+                      borderColor: activeId === item.id ? "var(--color-text-link)" : "transparent",
+                      bgcolor: activeId === item.id ? "var(--color-bg-subtle)" : "transparent",
+                      color: activeId === item.id ? "var(--color-text-link)" : "var(--color-text-body)",
+                      "&:hover": {
+                        bgcolor: "var(--color-bg-curator)",
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 28 }}>
+                      <Box
+                        sx={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: item.id === "radius-tokens" || item.id === "spacing-tokens" ? "2px" : "50%",
+                          bgcolor: item.color,
+                          border: item.id === "type-tokens" || item.id === "book-card" ? "1px solid var(--color-border-default)" : "none",
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t(item.labelKey)}
+                      primaryTypographyProps={{
+                        fontSize: "12px",
+                        fontWeight: activeId === item.id ? 500 : 400,
+                        color: activeId === item.id ? "var(--color-text-link)" : "var(--color-text-secondary)",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </Box>
           ))}
         </List>
       </Drawer>
@@ -233,7 +270,7 @@ export default function DesignSystemPage() {
               display: "block",
               mb: 1.5,
               fontFamily: "var(--font-family-mono)",
-              fontSize: "9px",
+              fontSize: "12px",
               color: "var(--color-brand-primary-hover)",
               letterSpacing: "0.18em",
             }}
@@ -256,7 +293,7 @@ export default function DesignSystemPage() {
               Sydney
             </Box>
           </Typography>
-          <Typography sx={{ fontFamily: "var(--font-family-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "var(--color-text-muted)" }}>
+          <Typography sx={{ fontFamily: "var(--font-family-mono)", fontSize: "12px", letterSpacing: "0.06em", color: "var(--color-text-muted)" }}>
             {t("designSystem.tagline")}
           </Typography>
         </Box>
@@ -267,6 +304,11 @@ export default function DesignSystemPage() {
           <SemanticTokensSection />
           <TypographySection />
           <TypeTokensSection />
+          <RadiusTokensSection />
+          <SpacingTokensSection />
+          <StatusChipSection />
+          <CategoryChipSection />
+          <BookCardSection />
         </Box>
       </Box>
     </Box>

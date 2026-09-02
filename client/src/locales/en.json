@@ -11,13 +11,20 @@
     "tagline": "Hong Kong books. Keep them moving.",
     "version": "Component Library v2.0",
     "foundations": "Foundations",
+    "components": "Components",
     "nav": {
       "foundations": "Foundations",
+      "components": "Components",
       "governing": "Governing Principle",
       "colours": "Colour Scales",
       "tokens": "Semantic Tokens",
       "typography": "Typography",
-      "typeTokens": "Type Tokens"
+      "typeTokens": "Type Tokens",
+      "radiusTokens": "Radius Tokens",
+      "spacingTokens": "Spacing Tokens",
+      "statusChip": "Status Chip",
+      "categoryChip": "Category Chip",
+      "bookCard": "Book Card"
     },
     "governing": {
       "title": "Governing Colour Principle",
@@ -45,6 +52,30 @@
     "typeTokens": {
       "title": "Type Tokens",
       "description": "Engineering tokens for typography, radius, and spacing. Reference these instead of hard-coding values."
+    },
+    "radiusTokens": {
+      "title": "Radius Tokens",
+      "description": "A small, scalable radius system that keeps labels, cards, and containers visually consistent without over-rounding the interface."
+    },
+    "spacingTokens": {
+      "title": "Spacing Tokens",
+      "description": "A consistent spacing rhythm for cards, rows, sections, and the layout shell. These tokens pace the interface and reduce visual drift."
+    },
+    "statusChip": {
+      "title": "Status Chip",
+      "description": "Small state indicators with semantic colour and a clear, short label. They reveal what a user can do next without adding visual noise.",
+      "states": "Status states"
+    },
+    "categoryChip": {
+      "title": "Category Chip",
+      "description": "Short, metadata-style labels for subject, authorial context, and civic memory. They stay compact and readable across scripts.",
+      "tagSet": "Tag set",
+      "neutral": "Neutral",
+      "memorial": "Memorial-tinted"
+    },
+    "bookCard": {
+      "title": "Book Card",
+      "description": "Flexible card system for featured books, recent arrivals, and topical shelf lists. The content can vary by language, but the card structure remains fixed."
     }
   },
   "tabs": {
@@ -260,7 +291,7 @@
   },
   "news": {
     "title": "News",
-    "trending": "Articles",
+    "trending": "Latest Articles",
     "draft": "Draft News",
     "editItem": "Edit",
     "coedit": "Co-edit articles",
@@ -510,7 +541,6 @@
     "reserved": "This item has been reserved!",
     "noComicsFound": "No comics found",
     "editItem": "Edit Item",
-    "transferOwnership": "Transfer Ownership",
     "transferOwnershipTitle": "Transfer Ownership",
     "transferOwnershipDescription": "Are you sure you want to transfer ownership of this item to the current holder?",
     "transferOwnershipConfirm": "Confirm Transfer",
@@ -555,6 +585,7 @@
     "historyHandedTo": "Handed to {{name}}",
     "historyRequestedBy": "Requested by {{name}}",
     "addbooklist": "Add to Book List",
+    "rebuildIndex": "Rebuild Item Index",
     "return": "Return"
   },
   "languages": {

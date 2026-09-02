@@ -232,7 +232,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       sx={{
         ...navPillSx,
         backgroundColor: isActive
-          ? "var(--color-nav-selected-bg)"
+          ? "var(--color-bg-subtle)"
           : "transparent",
         color: isActive ? "var(--color-brand-primary)" : "inherit",
       }}
@@ -286,11 +286,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 cursor: "pointer",
                 letterSpacing: "-0.5px",
                 lineHeight: "var(--line-height-tight)",
-                fontSize: {
-                  xs: "var(--font-size-title-lg)",
-                  sm: "24px",
-                  md: "28px",
-                },
+                fontSize: { xs: "var(--font-size-title-lg)", sm: "24px", md: "28px" },
               }}
             >
               {t("app.brand-title", "BookGuide")}
@@ -298,11 +294,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 component="span"
                 sx={{
                   color: "var(--color-brand-primary)",
-                  fontSize: {
-                    xs: "var(--font-size-body-sm)",
-                    sm: "var(--font-size-title)",
-                    md: "20px",
-                  },
+                  fontSize: { xs: "var(--font-size-body-sm)", sm: "var(--font-size-title)", md: "20px" },
                   fontWeight: "var(--font-weight-bold)",
                   ml: "var(--space-xs)",
                 }}
@@ -315,10 +307,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               sx={{
                 fontFamily: "var(--font-family-mono)",
                 color: "var(--color-text-tertiary)",
-                fontSize: {
-                  xs: "var(--font-size-micro-system)",
-                  sm: "var(--font-size-caption)",
-                },
+                fontSize: { xs: "var(--font-size-micro-system)", sm: "var(--font-size-caption)" },
                 mt: "var(--space-xs)",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
@@ -361,9 +350,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   }}
                   invisible={notificationCount === 0}
                 >
-                  <NotificationsIcon
-                    sx={{ fontSize: "var(--font-size-title)" }}
-                  />
+                  <NotificationsIcon sx={{ fontSize: "var(--font-size-title)" }} />
                 </Badge>
               </IconButton>
             ) : (

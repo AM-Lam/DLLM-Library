@@ -34,10 +34,12 @@ import SafeImage from "./SafeImage";
 import { useTranslation } from "react-i18next";
 import { convertLinksToClickable, hasMarkdownSyntax } from "../utils/helpers";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { PageLoader } from "./LoadingState";
 import ItemPreview from "./ItemPreview";
 import BookSpinePreview from "./BookSpinePreview";
 import NewsForm from "./NewsForm";
 import { markdownContentSx } from "../styles/markdownSx";
+import { semanticTokens } from "../styles/semanticTokens";
 
 interface OutletContext {
   user?: User;
@@ -191,9 +193,10 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ newsId, onBack }) => {
   return (
     <Container maxWidth="md" sx={{ pt: 4, pb: 4 }}>
       {loading && (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-          <CircularProgress />
-        </Box>
+        <PageLoader
+          message={t("news.loading", "Loading news...")}
+          minHeight={220}
+        />
       )}
 
       {error && (
@@ -330,7 +333,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ newsId, onBack }) => {
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                border: "1px solid #0d0d0d",
+                                border: `1px solid ${semanticTokens.color.textPrimary}`,
                                 borderRadius: 1,
                                 p: 2,
                                 my: 2,
@@ -411,7 +414,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ newsId, onBack }) => {
                     key={item.id}
                     sx={{
                       p: 2,
-                      border: "1px solid #ddd",
+                      border: `1px solid ${semanticTokens.color.borderDefault}`,
                       borderRadius: 1,
                       mb: 1,
                     }}
@@ -439,8 +442,8 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ newsId, onBack }) => {
                     key={index}
                     variant="body2"
                     sx={{
-                      bgcolor: "primary.main",
-                      color: "white",
+                      bgcolor: semanticTokens.color.brandPrimary,
+                      color: semanticTokens.color.textInverse,
                       px: 2,
                       py: 1,
                       borderRadius: 2,

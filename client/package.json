@@ -39,6 +39,8 @@
   "scripts": {
     "dev": "vite",
     "tokens:build": "node scripts/generate-semantic-tokens.mjs",
+    "tokens:export": "node scripts/export-design-tokens.mjs",
+    "tokens:all": "npm run tokens:build && npm run tokens:export",
     "build": "npm run tokens:build && npx tsc && npx vite build",
     "preview": "vite preview",
     "test": "vitest",

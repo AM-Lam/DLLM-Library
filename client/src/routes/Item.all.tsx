@@ -35,6 +35,7 @@ import { User, Item, CategoryMap } from "../generated/graphql";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ItemPreview from "../components/ItemPreview";
+import { PageLoader } from "../components/LoadingState";
 import { calculateDistance } from "../utils/geoProcessor";
 import { useNavigate } from "react-router";
 import PaginationControls from "../components/PaginationControls";
@@ -148,7 +149,7 @@ const detailedSearchFiltersSx = {
   borderRadius: 3,
   border: "1px solid var(--color-border-subtle)",
   backgroundColor: "var(--color-bg-surface)",
-  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+  boxShadow: "0 1px 4px var(--color-border-subtle)",
 };
 
 const ItemAllPage: React.FC = () => {
@@ -930,9 +931,10 @@ const ItemAllPage: React.FC = () => {
 
             {/* Loading State */}
             {itemsLoading && (
-              <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-                <CircularProgress />
-              </Box>
+              <PageLoader
+                message={t("common.loading", "Loading...")}
+                minHeight={180}
+              />
             )}
 
             {/* Error State */}

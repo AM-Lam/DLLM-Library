@@ -1,8 +1,9 @@
-import { Box, Grid, Paper, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { governingPrinciples, inkScale } from "../../styles/designSystemTokens";
 import DesignSystemSection from "./DesignSystemSection";
 import DesignSystemNote from "./DesignSystemNote";
+import DesignSystemPanel from "./DesignSystemPanel";
 
 const principleIcons = ["✓", "→", "◷", "!", "⇄", "★"] as const;
 
@@ -24,14 +25,11 @@ export default function GoverningPrincipleSection({ first = false }: GoverningPr
       <Grid container spacing={1}>
         {governingPrinciples.map((p, index) => (
           <Grid size={{ xs: 6, sm: 4, md: 2 }} key={p.name}>
-            <Paper
-              elevation={0}
+            <DesignSystemPanel
               sx={{
                 p: "16px 12px",
                 textAlign: "center",
                 borderRadius: "10px",
-                border: "1px solid var(--color-border-subtle)",
-                bgcolor: "var(--color-bg-surface)",
               }}
             >
               <Box
@@ -59,7 +57,7 @@ export default function GoverningPrincipleSection({ first = false }: GoverningPr
               <Typography sx={{ fontSize: "11px", lineHeight: 1.45, color: "var(--color-text-muted)" }}>
                 {p.rule}
               </Typography>
-            </Paper>
+            </DesignSystemPanel>
           </Grid>
         ))}
       </Grid>

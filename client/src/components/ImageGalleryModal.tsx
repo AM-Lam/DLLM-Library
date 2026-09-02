@@ -12,6 +12,7 @@ import {
   NavigateBefore as PrevIcon,
   NavigateNext as NextIcon,
 } from "@mui/icons-material";
+import { semanticTokens } from "../styles/semanticTokens";
 
 interface ImageGalleryModalProps {
   open: boolean;
@@ -52,7 +53,7 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
             maxWidth: "90vw",
             maxHeight: "90vh",
             bgcolor: "background.paper",
-            border: "2px solid #000",
+            border: `2px solid ${semanticTokens.color.textPrimary}`,
             boxShadow: 24,
             p: 2,
             display: "flex",

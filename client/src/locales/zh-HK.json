@@ -11,13 +11,20 @@
     "tagline": "香港書籍。流動不息。",
     "version": "組件庫 v2.0",
     "foundations": "基礎",
+    "components": "組件",
     "nav": {
       "foundations": "基礎",
+      "components": "組件",
       "governing": "色彩原則",
       "colours": "色階",
       "tokens": "語意代幣",
       "typography": "字體",
-      "typeTokens": "字體代幣"
+      "typeTokens": "字體代幣",
+      "radiusTokens": "圓角代幣",
+      "spacingTokens": "間距代幣",
+      "statusChip": "狀態標籤",
+      "categoryChip": "分類標籤",
+      "bookCard": "書卡"
     },
     "governing": {
       "title": "色彩原則",
@@ -45,6 +52,30 @@
     "typeTokens": {
       "title": "字體代幣",
       "description": "字體、圓角與間距的工程代幣。引用這些數值，避免硬編碼。"
+    },
+    "radiusTokens": {
+      "title": "圓角代幣",
+      "description": "一個小而可擴展的圓角系統，能讓標籤、卡片與容器保持視覺一致，同時不過度圓潤。"
+    },
+    "spacingTokens": {
+      "title": "間距代幣",
+      "description": "一個穩定的間距節奏，用於卡片、列表、區塊與頁面外殼，讓介面保持一致且減少視覺漂移。"
+    },
+    "statusChip": {
+      "title": "狀態標籤",
+      "description": "帶有語意顏色與簡潔標籤的小型狀態指示器。它能清楚揭示下一步可執行操作，且不造成過多視覺噪音。",
+      "states": "狀態"
+    },
+    "categoryChip": {
+      "title": "分類標籤",
+      "description": "用於主題、作者語境與公民記憶的短標籤，尺寸緊湊並在多語言與多字體中保持清晰。",
+      "tagSet": "標籤組合",
+      "neutral": "中性",
+      "memorial": "紀念色調"
+    },
+    "bookCard": {
+      "title": "書卡",
+      "description": "適用於精選書籍、新番與主題書架的靈活書卡系統。內容可隨語言變化，但卡片結構保持固定。"
     }
   },
   "tabs": {
@@ -486,7 +517,6 @@
     "reserved": "這個物品已被預留！",
     "noComicsFound": "未找到漫畫",
     "editItem": "編輯物品詳情",
-    "transferOwnership": "轉移所有權",
     "transferOwnershipTitle": "轉移所有權",
     "transferOwnershipDescription": "你確定要將此物品的所有權轉移至目前持有者嗎？",
     "transferOwnershipConfirm": "確認轉移",
@@ -563,6 +593,7 @@
     "historyHandedTo": "交給 {{name}}",
     "historyRequestedBy": "由 {{name}} 申請",
     "addbooklist": "加入書單",
+    "rebuildIndex": "重建索引",
     "return": "歸還"
   },
   "userProfile": {

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Box, Typography } from "@mui/material";
 import { Info as InfoIcon, Warning as WarningIcon, CheckCircle as SuccessIcon } from "@mui/icons-material";
+import { semanticTokens } from "../../styles/semanticTokens";
 
 interface CalloutProps {
   variant?: "info" | "warning" | "success" | "neutral";
@@ -23,9 +24,9 @@ const variantStyles = {
     Icon: WarningIcon,
   },
   success: {
-    borderColor: "#0f6b56",
+    borderColor: semanticTokens.color.special,
     bgcolor: "var(--color-bg-canvas)",
-    iconColor: "#0f6b56",
+    iconColor: semanticTokens.color.special,
     Icon: SuccessIcon,
   },
   neutral: {

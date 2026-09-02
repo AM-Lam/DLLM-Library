@@ -29,9 +29,9 @@ function SwatchRow({
                   sx={{
                     aspectRatio: "1",
                     bgcolor: value,
-                    border: "1px solid rgba(0,0,0,0.05)",
+                    border: "1px solid var(--color-border-subtle)",
                     borderRadius: "8px",
-                    outline: isStar ? "2px solid #4A3C32" : "none",
+                    outline: isStar ? "2px solid var(--color-text-primary)" : "none",
                     outlineOffset: isStar ? 2 : 0,
                     display: "flex",
                     alignItems: "flex-end",
@@ -50,7 +50,7 @@ function SwatchRow({
                       fontSize: "8px",
                       fontWeight: 500,
                       lineHeight: 1,
-                      color: isLight(value) ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.9)",
+                      color: isLight(value) ? "var(--color-text-primary)" : "var(--color-text-inverse)",
                     }}
                   >
                     {key}
@@ -121,7 +121,7 @@ export default function ColourScalesSection() {
                   p: 1.5,
                   bgcolor: token.bg,
                   color: token.fg,
-                  border: "1px solid rgba(0,0,0,0.05)",
+                  border: "1px solid var(--color-border-subtle)",
                   borderRadius: "8px",
                 }}
               >

@@ -31,15 +31,31 @@
   --color-warning: #7A5000;
   --color-warning-bg: #FEF3D8;
   --color-error: #8A1A1A;
-  --color-error-bg: #FDECea;
+  --color-error-bg: #FDECEA;
   --color-info: #1A4A7A;
   --color-info-bg: #E0ECF7;
   --color-special: #0F6B56;
   --color-special-bg: #E0F4F0;
+  --color-gift: #5A2A6B;
+  --color-gift-bg: #F0E8F5;
 
   --font-family-body: "IBM Plex Sans", "Noto Serif TC", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-family-display: "Noto Serif TC", "Playfair Display", serif;
-  --font-family-mono: "Roboto Mono", Menlo, Monaco, Consolas, monospace;
+  --font-family-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, monospace;
+
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-badge: 4px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
 
   --space-xs: 4px;
   --space-sm: 8px;

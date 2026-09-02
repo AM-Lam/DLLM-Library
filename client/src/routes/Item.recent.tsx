@@ -24,6 +24,7 @@ import ItemPreview from "../components/ItemPreview";
 import { useTranslation } from "react-i18next";
 import { useOutletContext } from "react-router-dom";
 import PaginationControls from "../components/PaginationControls";
+import { PageLoader } from "../components/LoadingState";
 
 interface OutletContext {
   user?: User;
@@ -183,9 +184,10 @@ const ItemRecentPage: React.FC = () => {
 
         {/* Loading State */}
         {loading && (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-            <CircularProgress />
-          </Box>
+          <PageLoader
+            message={t("common.loading", "Loading...")}
+            minHeight={180}
+          />
         )}
 
         {/* Error State */}
