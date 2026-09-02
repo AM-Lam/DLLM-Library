@@ -31,6 +31,7 @@ import {
   ExpandMore as ArrowDropDownIcon,
 } from "@mui/icons-material";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { PageLoader } from "../components/LoadingState";
 import {
   User,
   HostConfig,
@@ -287,10 +288,10 @@ const NewsPage: React.FC = () => {
               setSplashScreenImage((prev) =>
                 prev
                   ? {
-                      ...prev,
-                      isUploading: true,
-                      uploadProgress: progress.percentage,
-                    }
+                    ...prev,
+                    isUploading: true,
+                    uploadProgress: progress.percentage,
+                  }
                   : null,
               );
             },
@@ -298,11 +299,11 @@ const NewsPage: React.FC = () => {
               setSplashScreenImage((prev) =>
                 prev
                   ? {
-                      ...prev,
-                      isUploading: false,
-                      uploadProgress: 100,
-                      gsUrl: gsUrl,
-                    }
+                    ...prev,
+                    isUploading: false,
+                    uploadProgress: 100,
+                    gsUrl: gsUrl,
+                  }
                   : null,
               );
             },
@@ -313,10 +314,10 @@ const NewsPage: React.FC = () => {
               setSplashScreenImage((prev) =>
                 prev
                   ? {
-                      ...prev,
-                      isUploading: false,
-                      uploadError: error,
-                    }
+                    ...prev,
+                    isUploading: false,
+                    uploadError: error,
+                  }
                   : null,
               );
             },
@@ -387,9 +388,10 @@ const NewsPage: React.FC = () => {
   if (loading) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-          <CircularProgress />
-        </Box>
+        <PageLoader
+          message={t("news.loading", "Loading news...")}
+          minHeight={220}
+        />
       </Container>
     );
   }
@@ -418,13 +420,13 @@ const NewsPage: React.FC = () => {
         <Typography variant="body2" color="text.secondary">
           {isAdmin
             ? t(
-                "news.adminDescription",
-                "Manage community information and chat links",
-              )
+              "news.adminDescription",
+              "Manage community information and chat links",
+            )
             : t(
-                "news.userDescription",
-                "Learn more about our community library",
-              )}
+              "news.userDescription",
+              "Learn more about our community library",
+            )}
         </Typography>
       </Box>
 

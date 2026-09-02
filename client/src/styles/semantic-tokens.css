@@ -36,10 +36,17 @@
   --color-info-bg: #E0ECF7;
   --color-special: #0F6B56;
   --color-special-bg: #E0F4F0;
+  --color-gift: #5A2A6B;
+  --color-gift-bg: #F0E8F5;
 
   --font-family-body: "IBM Plex Sans", "Noto Serif TC", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-family-display: "Noto Serif TC", "Playfair Display", serif;
   --font-family-mono: "IBM Plex Mono", Menlo, Monaco, Consolas, monospace;
+
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-badge: 4px;
+  --radius-pill: 999px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -64,12 +71,8 @@
   --space-element-gap-sm: 8px;
 
   --font-size-display: 22px;
-  --font-size-display-xs: 30px;
-  --font-size-display-sm: 38px;
   --font-size-title-lg: 18px;
   --font-size-title: 16px;
-  --font-size-section-xs: 20px;
-  --font-size-section-sm: 22px;
   --font-size-body: 14px;
   --font-size-body-sm: 13px;
   --font-size-label: 12px;
@@ -87,34 +90,9 @@
   --line-height-snug: 1.3;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.55;
-  --line-height-loose: 1.6;
 
   --letter-spacing-normal: 0.04em;
   --letter-spacing-wide: 0.06em;
   --letter-spacing-wider: 0.12em;
   --letter-spacing-widest: 0.18em;
-}
-
-[data-color-scheme="dark"] {
-  --color-text-primary: #F9F5F6;
-  --color-text-body: #F1E9EA;
-  --color-text-secondary: #E4D8DA;
-  --color-text-tertiary: #CEBBBD;
-  --color-text-muted: #B19599;
-  --color-text-tagline: #B19599;
-  --color-text-link: #F07AB5;
-  --color-text-accent: #F07AB5;
-  --color-bg-canvas: #190609;
-  --color-bg-surface: #321519;
-  --color-bg-subtle: #502B30;
-  --color-bg-elevated: #321519;
-  --color-bg-curator: #502B30;
-  --color-border-default: #70484D;
-  --color-border-subtle: #502B30;
-  --color-border-soft: #70484D;
-  --color-border-strong: #956A70;
-  --color-chip-bg: #502B30;
-  --color-tag-surface: #502B30;
-  --color-nav-selected-bg: #FFFFFF;
-  --color-nav-selected-color: #190609;
 }

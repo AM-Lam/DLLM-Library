@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Box, Typography } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
 
 interface DesignSystemSectionProps {
   id: string;
@@ -8,7 +9,7 @@ interface DesignSystemSectionProps {
   description?: ReactNode;
   children: ReactNode;
   first?: boolean;
-  sx?: object;
+  sx?: SxProps<Theme>;
 }
 
 export default function DesignSystemSection({
@@ -39,7 +40,7 @@ export default function DesignSystemSection({
           sx={{
             fontFamily: "var(--font-family-mono)",
             color: "var(--color-text-muted)",
-            fontSize: "9px",
+            fontSize: "12px",
             letterSpacing: "0.18em",
             textTransform: "uppercase",
             lineHeight: 1.5,

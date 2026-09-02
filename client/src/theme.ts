@@ -30,7 +30,7 @@ const theme = createTheme({
     },
     warning: {
       main: semanticTokens.color.warning,
-      contrastText: "#000000",
+      contrastText: semanticTokens.color.textPrimary,
     },
     error: {
       main: semanticTokens.color.error,
@@ -38,7 +38,7 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 16,
+    borderRadius: 12,
   },
   typography: {
     fontFamily: [
@@ -53,21 +53,29 @@ const theme = createTheme({
       fontFamily: '"Noto Serif TC", serif',
       fontWeight: 700,
       color: semanticTokens.color.textPrimary,
+      lineHeight: 1.1,
+      letterSpacing: "-0.01em",
     },
     h2: {
       fontFamily: '"Noto Serif TC", serif',
       fontWeight: 700,
       color: semanticTokens.color.textPrimary,
+      lineHeight: 1.2,
+      letterSpacing: "-0.01em",
     },
     h3: {
       fontFamily: '"Noto Serif TC", serif',
       fontWeight: 700,
       color: semanticTokens.color.textPrimary,
+      lineHeight: 1.25,
+      letterSpacing: "-0.01em",
     },
     h4: {
       fontFamily: '"Noto Serif TC", serif',
       fontWeight: 700,
       color: semanticTokens.color.textPrimary,
+      lineHeight: 1.3,
+      letterSpacing: "-0.01em",
     },
     body1: {
       color: semanticTokens.color.textBody,
@@ -77,18 +85,24 @@ const theme = createTheme({
       color: semanticTokens.color.textBody,
       lineHeight: 1.6,
     },
+    caption: {
+      ...semanticTokens.typography.caption,
+      color: semanticTokens.color.textSecondary,
+    },
     button: {
       fontWeight: 600,
       textTransform: "none",
+      letterSpacing: "0.01em",
     },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 999,
+          borderRadius: 12,
           boxShadow: "none",
           padding: "10px 18px",
+          minHeight: 40,
         },
         contained: {
           backgroundColor: semanticTokens.color.brandPrimary,
@@ -98,7 +112,7 @@ const theme = createTheme({
           },
         },
         outlined: {
-          borderColor: semanticTokens.color.textSecondary,
+          borderColor: semanticTokens.color.borderDefault,
           color: semanticTokens.color.textPrimary,
           "&:hover": {
             backgroundColor: semanticTokens.color.bgCanvas,
@@ -119,9 +133,10 @@ const theme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 999,
+          borderRadius: 4,
           backgroundColor: semanticTokens.color.chipBg,
           color: semanticTokens.color.textSecondary,
+          fontWeight: 600,
         },
         colorPrimary: {
           backgroundColor: semanticTokens.color.textPrimary,
@@ -132,7 +147,7 @@ const theme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: semanticTokens.color.bgCanvas,
+          backgroundColor: semanticTokens.color.bgSurface,
           borderRight: `1px solid ${semanticTokens.color.borderSubtle}`,
         },
       },
@@ -142,6 +157,7 @@ const theme = createTheme({
         root: {
           backgroundColor: semanticTokens.color.bgSurface,
           boxShadow: semanticTokens.shadow.card,
+          borderRadius: 12,
         },
       },
     },
@@ -150,6 +166,7 @@ const theme = createTheme({
         root: {
           backgroundColor: semanticTokens.color.bgSurface,
           border: `1px solid ${semanticTokens.color.borderSubtle}`,
+          borderRadius: 12,
           boxShadow: semanticTokens.shadow.card,
         },
       },
@@ -158,6 +175,10 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: semanticTokens.color.textLink,
+          textDecoration: "none",
+          "&:hover": {
+            textDecoration: "underline",
+          },
         },
       },
     },

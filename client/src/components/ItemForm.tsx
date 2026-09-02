@@ -702,7 +702,15 @@ const ItemForm: React.FC<ItemFormProps> = ({
   return (
     <Box>
       {!item && (
-        <Button variant="contained" onClick={() => setDialogOpen(true)}>
+        <Button
+          variant="contained"
+          disabled={dialogOpen || open}
+          onClick={() => {
+            if (!dialogOpen && !open) {
+              setDialogOpen(true);
+            }
+          }}
+        >
           {t("item.create")}
         </Button>
       )}

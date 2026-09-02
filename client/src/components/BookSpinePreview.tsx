@@ -19,22 +19,20 @@ import {
 } from "../utils/contentRating";
 import { semanticTokens } from "../styles/semanticTokens";
 
-const absoluteFillSx = {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
+const coverInfoBoxSx = { p: 2, backgroundColor: semanticTokens.color.bgSurface };
+const coverTitleSx = {
+  mb: 1,
+  fontWeight: "bold",
+  color: semanticTokens.color.textPrimary,
 };
-const centeredContentSx = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-const coverInfoBoxSx = { p: 2, backgroundColor: "background.paper" };
-const coverTitleSx = { mb: 1, fontWeight: "bold" };
 const wrapChipsSx = { display: "flex", gap: 0.5, flexWrap: "wrap" };
-const publishedYearSx = { mt: 1, display: "block" };
+const publishedYearSx = {
+  mt: 1,
+  display: "block",
+  color: semanticTokens.color.textSecondary,
+};
+const imageTextShadow = (blur: number, opacity: number) =>
+  `0 1px ${blur}px ${alpha(semanticTokens.color.textPrimary, opacity)}`;
 const contentOverlayGradient = `linear-gradient(to bottom, ${alpha(semanticTokens.color.textMuted, 0.3)}, ${alpha(semanticTokens.color.textMuted, 0.5)})`;
 const modalBackdropSx = {
   backgroundColor: alpha(semanticTokens.color.textMuted, 0.85),
@@ -121,17 +119,17 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "AVAILABLE":
-        return "success.main";
+        return semanticTokens.color.success;
       case "EXCHANGEABLE":
-        return "info.main";
+        return semanticTokens.color.info;
       case "GIFT":
-        return "secondary.main";
+        return semanticTokens.color.special;
       case "RESERVED":
-        return "warning.main";
+        return semanticTokens.color.warning;
       case "TRANSFERRED":
-        return "grey.500";
+        return semanticTokens.color.textSecondary;
       default:
-        return "grey.500";
+        return semanticTokens.color.textSecondary;
     }
   };
 
@@ -215,10 +213,10 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
               <Typography
                 variant="caption"
                 sx={{
-                  color: hasImage ? "white" : "text.primary",
+                  color: hasImage ? semanticTokens.color.textInverse : semanticTokens.color.textPrimary,
                   fontWeight: "bold",
                   fontSize: "0.65rem",
-                  textShadow: hasImage ? "0 1px 2px rgba(0,0,0,0.8)" : "none",
+                  textShadow: hasImage ? imageTextShadow(2, 0.8) : "none",
                   display: "block",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -245,12 +243,12 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
             <Typography
               variant="body2"
               sx={{
-                color: hasImage ? "white" : "text.primary",
+                color: hasImage ? semanticTokens.color.textInverse : semanticTokens.color.textPrimary,
                 fontWeight: "bold",
                 fontSize: isCJK ? "0.75rem" : "0.68rem",
                 lineHeight: isCJK ? 1.3 : 1.05,
                 textAlign: "center",
-                textShadow: hasImage ? "0 1px 3px rgba(0,0,0,0.9)" : "none",
+                textShadow: hasImage ? imageTextShadow(3, 0.9) : "none",
 
                 width: "100%",
                 height: "100%",
@@ -287,9 +285,9 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
               <Typography
                 variant="caption"
                 sx={{
-                  color: hasImage ? "white" : "text.secondary",
+                  color: hasImage ? semanticTokens.color.textInverse : semanticTokens.color.textSecondary,
                   fontSize: "0.6rem",
-                  textShadow: hasImage ? "0 1px 2px rgba(0,0,0,0.8)" : "none",
+                  textShadow: hasImage ? imageTextShadow(2, 0.8) : "none",
                   display: "block",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -323,7 +321,7 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              maxWidth: "90vw",
+              width: { xs: "min(86vw, 420px)", md: "min(48vw, 560px)" },
               maxHeight: "90vh",
               outline: "none",
             }}
@@ -338,8 +336,9 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
               onClick={handleCoverClick}
               sx={{
                 cursor: "pointer",
-                maxWidth: 400,
+                width: "100%",
                 maxHeight: "85vh",
+                overflow: "hidden",
                 animation: "pullOut 0.3s ease-out",
                 "@keyframes pullOut": {
                   from: {
@@ -352,7 +351,7 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
                   },
                 },
                 "&:hover": {
-                  boxShadow: 8,
+                  boxShadow: semanticTokens.shadow.cardHover,
                 },
               }}
             >
@@ -361,7 +360,7 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
                 <Box
                   sx={{
                     width: "100%",
-                    paddingTop: "140%", // 5:7 aspect ratio
+                    aspectRatio: "3 / 4",
                     position: "relative",
                     backgroundColor: hasImage ? "transparent" : backgroundColor,
                     overflow: "hidden",
@@ -397,7 +396,7 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
                     >
                       <Typography
                         variant="body2"
-                        color="textSecondary"
+                        sx={{ color: semanticTokens.color.textSecondary }}
                         align="center"
                       >
                         {item.name}
@@ -415,7 +414,7 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
                     top: 8,
                     right: 8,
                     backgroundColor: getStatusColor(item.status),
-                    color: "white",
+                    color: semanticTokens.color.textInverse,
                     fontWeight: "bold",
                   }}
                 />
@@ -466,13 +465,29 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
 
                 {/* Categories */}
                 {item.category && item.category.length > 0 && (
-                  <Box sx={{ ...wrapChipsSx, mb: 1 }}>
+                  <Box
+                    sx={{
+                      ...wrapChipsSx,
+                      mb: 1,
+                      width: "100%",
+                      maxHeight: "72px",
+                      overflow: "hidden",
+                    }}
+                  >
                     {item.category.map((cat, idx) => (
                       <Chip
                         key={idx}
                         label={cat}
                         size="small"
                         variant="outlined"
+                        sx={{
+                          maxWidth: "100%",
+                          ".MuiChip-label": {
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          },
+                        }}
                       />
                     ))}
                   </Box>
@@ -480,7 +495,14 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
 
                 {/* Classifications */}
                 {item.clssfctns && item.clssfctns.length > 0 && (
-                  <Box sx={wrapChipsSx}>
+                  <Box
+                    sx={{
+                      ...wrapChipsSx,
+                      width: "100%",
+                      maxHeight: "72px",
+                      overflow: "hidden",
+                    }}
+                  >
                     {item.clssfctns.map((cls, idx) => {
                       const segments = cls.split("/").filter((s) => s.trim());
                       const label = segments[segments.length - 1];
@@ -491,6 +513,14 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
                           size="small"
                           variant="filled"
                           color="info"
+                          sx={{
+                            maxWidth: "100%",
+                            ".MuiChip-label": {
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            },
+                          }}
                         />
                       );
                     })}
@@ -498,11 +528,7 @@ const BookSpinePreview: React.FC<BookSpinePreviewProps> = ({
                 )}
 
                 {item.publishedYear && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={publishedYearSx}
-                  >
+                  <Typography variant="caption" sx={publishedYearSx}>
                     {item.publishedYear}
                   </Typography>
                 )}

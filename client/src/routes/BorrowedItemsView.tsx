@@ -28,6 +28,8 @@ import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { User } from "../generated/graphql";
 import { formatDistanceToNow } from "date-fns";
+import { PageLoader } from "../components/LoadingState";
+import { getItemStatusChipIcon, getItemStatusChipProps } from "../utils/itemStatusChip";
 
 const GET_ON_LOAN_ITEMS = gql`
   query GetOnLoanItemsByHolder($userId: ID!, $limit: Int!, $offset: Int!) {
@@ -226,14 +228,13 @@ const BorrowedItemsView: React.FC = () => {
     <Container maxWidth="md" sx={{ py: 2 }}>
       {/* Loading State */}
       {isLoadingContent && (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
-          <Typography sx={{ ml: 2 }}>
-            {loading
+        <PageLoader
+          message={
+            loading
               ? t("item.loadingBorrowedItems", "Loading your borrowed items...")
-              : t("item.loadingUserDetails", "Loading user details...")}
-          </Typography>
-        </Box>
+              : t("item.loadingUserDetails", "Loading user details...")
+          }
+        />
       )}
 
       {/* Error State */}
@@ -253,16 +254,16 @@ const BorrowedItemsView: React.FC = () => {
           <Typography variant="body1" color="text.secondary">
             {enrichedItems.length === 0
               ? t(
-                  "item.noBorrowedItems",
-                  "You currently have no borrowed items"
-                )
+                "item.noBorrowedItems",
+                "You currently have no borrowed items"
+              )
               : t(
-                  "item.borrowedItemsCount",
-                  "You have {{count}} borrowed item(s)",
-                  {
-                    count: enrichedItems.length,
-                  }
-                )}
+                "item.borrowedItemsCount",
+                "You have {{count}} borrowed item(s)",
+                {
+                  count: enrichedItems.length,
+                }
+              )}
           </Typography>
           {enrichedItems.length > 0 && (
             <Typography variant="caption" color="text.secondary">
@@ -316,11 +317,16 @@ const BorrowedItemsView: React.FC = () => {
                         </Typography>
                         <Chip
                           label={t(`shortStatus.${item.status}`, item.status)}
-                          color={
-                            item.status === "AVAILABLE" ? "success" : "default"
-                          }
+                          icon={getItemStatusChipIcon(item.status)}
                           size="small"
-                          sx={{ ml: 2 }}
+                          sx={{
+                            ml: 2,
+                            backgroundColor: getItemStatusChipProps(item.status).bgColor,
+                            color: getItemStatusChipProps(item.status).color,
+                            border: `1px solid ${getItemStatusChipProps(item.status).borderColor}`,
+                            fontWeight: 700,
+                            "& .MuiChip-icon": { color: "inherit", fontSize: "0.9rem" },
+                          }}
                         />
                       </Box>
 
@@ -404,17 +410,15 @@ const BorrowedItemsView: React.FC = () => {
                       {/* Condition and Deposit */}
                       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                         <Chip
-                          label={`${t("item.condition", "Condition")}: ${
-                            item.condition
-                          }`}
+                          label={`${t("item.condition", "Condition")}: ${item.condition
+                            }`}
                           variant="outlined"
                           size="small"
                         />
                         {item.deposit && item.deposit > 0 && (
                           <Chip
-                            label={`${t("item.deposit", "Deposit")}: $${
-                              item.deposit
-                            }`}
+                            label={`${t("item.deposit", "Deposit")}: $${item.deposit
+                              }`}
                             variant="outlined"
                             size="small"
                             color="warning"

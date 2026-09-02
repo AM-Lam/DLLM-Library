@@ -1,14 +1,47 @@
-import { Box, Grid, Paper, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import DesignSystemNote from "./DesignSystemNote";
+import DesignSystemPanel from "./DesignSystemPanel";
 import DesignSystemSection from "./DesignSystemSection";
 import DesignSystemSubSection from "./DesignSystemSubSection";
 
 const radiusScale = [
-  { token: "--radius-sm", value: "4px", description: "Labels, chips, status pills", radius: "4px" },
-  { token: "--radius-md", value: "8px", description: "Small containers, inputs", radius: "8px" },
-  { token: "--radius-lg", value: "12px", description: "Cards, panels, overlays", radius: "12px" },
-  { token: "--radius-full", value: "999px", description: "Pills, FAB, signal dots", radius: "999px" },
+  {
+    token: "--radius-badge",
+    value: "4px",
+    description: "All small labels — category chips, status badges, structural indicators",
+    radius: "4px",
+    sampleWidth: 52,
+    sampleHeight: 34,
+    sampleVariant: "simple",
+  },
+  {
+    token: "--radius-control",
+    value: "8px",
+    description: "Small containers, compact cards, form inputs",
+    radius: "8px",
+    sampleWidth: 48,
+    sampleHeight: 34,
+    sampleVariant: "soft",
+  },
+  {
+    token: "--radius-card",
+    value: "12px",
+    description: "Cards and large content containers",
+    radius: "12px",
+    sampleWidth: 52,
+    sampleHeight: 34,
+    sampleVariant: "panel",
+  },
+  {
+    token: "--radius-pill",
+    value: "999px",
+    description: "Pills, FAB, signal dots, and truly circular affordances",
+    radius: "999px",
+    sampleWidth: 34,
+    sampleHeight: 34,
+    sampleVariant: "circle",
+  },
 ] as const;
 
 export default function RadiusTokensSection() {
@@ -25,38 +58,56 @@ export default function RadiusTokensSection() {
         <Grid container spacing={1.5}>
           {radiusScale.map((item) => (
             <Grid size={{ xs: 12, md: 6 }} key={item.token}>
-              <Paper
-                elevation={0}
+              <DesignSystemPanel
                 sx={{
-                  p: 1.75,
-                  border: "1px solid var(--color-border-subtle)",
-                  borderRadius: 1.5,
-                  bgcolor: "var(--color-bg-surface)",
+                  p: "14px 16px",
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <Box
                     sx={{
-                      width: 72,
-                      height: 42,
-                      bgcolor: "#190609",
+                      width: item.sampleWidth,
+                      height: item.sampleHeight,
+                      bgcolor: "var(--color-text-primary)",
                       borderRadius: item.radius,
                       flexShrink: 0,
+                      opacity: item.sampleVariant === "soft" ? 0.7 : 1,
                     }}
                   />
                   <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography sx={{ fontFamily: "var(--font-family-mono)", fontSize: "11px", color: "var(--color-text-link)" }}>
+                    <Typography
+                      sx={{
+                        fontFamily: "var(--font-family-mono)",
+                        fontSize: "12px",
+                        color: "var(--color-text-primary)",
+                        fontWeight: 500,
+                      }}
+                    >
                       {item.token}
                     </Typography>
-                    <Typography sx={{ mt: 0.5, fontFamily: "var(--font-family-mono)", fontSize: "10px", color: "var(--color-text-muted)" }}>
+                    <Typography
+                      sx={{
+                        mt: 0.5,
+                        fontFamily: "var(--font-family-mono)",
+                        fontSize: "10px",
+                        color: "var(--color-text-muted)",
+                      }}
+                    >
                       {item.value}
                     </Typography>
-                    <Typography sx={{ mt: 0.25, fontSize: "11px", color: "var(--color-text-muted)", lineHeight: 1.5 }}>
+                    <Typography
+                      sx={{
+                        mt: 0.5,
+                        fontSize: "12px",
+                        color: "var(--color-text-muted)",
+                        lineHeight: 1.5,
+                      }}
+                    >
                       {item.description}
                     </Typography>
                   </Box>
                 </Box>
-              </Paper>
+              </DesignSystemPanel>
             </Grid>
           ))}
         </Grid>

@@ -12,6 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
+import { PageLoader } from "../components/LoadingState";
 
 const GET_EXCHANGE_POINTS = gql`
   query GetExchangePoints($limit: Int, $offset: Int) {
@@ -89,11 +90,7 @@ const ExchangePointsPage: React.FC = () => {
         {t("navigation.exchangePoints", "Exchange Points")} ({exchangePointsCountData?.exchangePointsCount || 0})
       </Typography>
 
-      {exchangePointsLoading && (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
-        </Box>
-      )}
+      {exchangePointsLoading && <PageLoader />}
 
       {exchangePointsError && (
         <Alert severity="error" sx={{ mb: 2 }}>

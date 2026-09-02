@@ -4,9 +4,11 @@ import {
   Typography,
   ListItem,
   ListItemButton,
-  ListItemIcon,
+  // ListItemIcon,
   ListItemText,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { semanticTokens } from "../styles/semanticTokens";
 
 export interface SimpleNews {
   id: string;
@@ -32,24 +34,24 @@ const NewsSummary: React.FC<NewsSummaryProps> = ({ news, onClick }) => {
           pl: 2,
           cursor: "pointer",
           "&:hover": {
-            bgcolor: "#db036b0f",
+            bgcolor: alpha(semanticTokens.color.brandPrimary, 0.06),
           },
         }}
       >
-        <ListItemIcon sx={{ minWidth: 28 }}>
+        {/* <ListItemIcon sx={{ minWidth: 28 }}>
           <Box
             sx={{
               width: 8,
               height: 8,
               borderRadius: "50%",
-              bgcolor: "var(--color-brand-primary)",
+              bgcolor: semanticTokens.color.brandPrimary,
               display: "flex",
               alignItems: "center",
               gap: 2,
               mb: 1,
             }}
           />
-        </ListItemIcon>
+        </ListItemIcon> */}
         <Typography
           variant="body2"
           color="text.secondary"
@@ -102,8 +104,8 @@ const NewsSummary: React.FC<NewsSummaryProps> = ({ news, onClick }) => {
                 key={index}
                 variant="caption"
                 sx={{
-                  bgcolor: "primary.main",
-                  color: "white",
+                  bgcolor: semanticTokens.color.brandPrimary,
+                  color: semanticTokens.color.textInverse,
                   px: 1,
                   py: 0.5,
                   borderRadius: 1,

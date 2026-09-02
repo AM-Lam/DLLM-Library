@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Box, Button, Dialog, DialogContent, Typography } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import CheckIcon from "@mui/icons-material/Check";
 import { useTranslation } from "react-i18next";
 import { clearPendingSignupOnboarding } from "../utils/signupOnboarding";
@@ -89,7 +90,7 @@ const SignupOnboardingDialog: React.FC<SignupOnboardingDialogProps> = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              bgcolor: "#FCE0ED",
+              bgcolor: alpha(semanticTokens.color.brandPrimary, 0.08),
               color: semanticTokens.color.brandPrimary,
             }}
           >

@@ -20,6 +20,7 @@ import NewsForm from "./NewsForm";
 import NewsSummary from "./NewsSummary";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { PageLoader } from "./LoadingState";
 
 const NEWS_RECENT_QUERY = gql`
   query NewsRecentPosts($limit: Int, $offset: Int, $newsStatus: NewsStatus) {
@@ -109,10 +110,11 @@ const RecentNewsPage: React.FC<RecentNewsPageProps> = ({
       )}
 
       {loading && (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-          <CircularProgress size={24} />
-          <Typography>{t("news.loadNews")}</Typography>
-        </Box>
+        <PageLoader
+          message={t("news.loadNews", "Loading news...")}
+          size={28}
+          minHeight={140}
+        />
       )}
 
       {error && (

@@ -41,20 +41,20 @@ export const designSystemNavSections: NavSection[] = [
     labelKey: "designSystem.nav.foundations",
     items: [
       { id: "governing", labelKey: "designSystem.nav.governing", color: "var(--color-brand-primary)" },
-      { id: "colours", labelKey: "designSystem.nav.colours", color: "#DB036B" },
-      { id: "tokens", labelKey: "designSystem.nav.tokens", color: "#8F7B6E" },
-      { id: "typography", labelKey: "designSystem.nav.typography", color: "#2E2420" },
-      { id: "type-tokens", labelKey: "designSystem.nav.typeTokens", color: "#190609" },
-      { id: "radius-tokens", labelKey: "designSystem.nav.radiusTokens", color: "#190609" },
-      { id: "spacing-tokens", labelKey: "designSystem.nav.spacingTokens", color: "#8A0047" },
+      { id: "colours", labelKey: "designSystem.nav.colours", color: "var(--color-brand-primary)" },
+      { id: "tokens", labelKey: "designSystem.nav.tokens", color: "var(--color-text-muted)" },
+      { id: "typography", labelKey: "designSystem.nav.typography", color: "var(--color-text-primary)" },
+      { id: "type-tokens", labelKey: "designSystem.nav.typeTokens", color: "var(--color-text-primary)" },
+      { id: "radius-tokens", labelKey: "designSystem.nav.radiusTokens", color: "var(--color-text-primary)" },
+      { id: "spacing-tokens", labelKey: "designSystem.nav.spacingTokens", color: "var(--color-brand-accent)" },
     ],
   },
   {
     labelKey: "designSystem.nav.components",
     items: [
-      { id: "status-chip", labelKey: "designSystem.nav.statusChip", color: "#1A5C30" },
-      { id: "category-chip", labelKey: "designSystem.nav.categoryChip", color: "#502B30" },
-      { id: "book-card", labelKey: "designSystem.nav.bookCard", color: "#190609" },
+      { id: "status-chip", labelKey: "designSystem.nav.statusChip", color: "var(--color-special)" },
+      { id: "category-chip", labelKey: "designSystem.nav.categoryChip", color: "var(--color-text-body)" },
+      { id: "book-card", labelKey: "designSystem.nav.bookCard", color: "var(--color-text-primary)" },
     ],
   },
 ];
@@ -158,7 +158,7 @@ export default function DesignSystemPage() {
           <Typography
             sx={{
               fontFamily: "var(--font-family-mono)",
-              fontSize: "9px",
+              fontSize: "12px",
               lineHeight: 1.5,
               color: "var(--color-text-muted)",
               whiteSpace: "pre-line",
@@ -173,10 +173,10 @@ export default function DesignSystemPage() {
               px: 0.875,
               py: 0.25,
               borderRadius: "20px",
-              bgcolor: "#FCD4E8",
+              bgcolor: "var(--color-bg-canvas)",
               color: "var(--color-text-link)",
               fontFamily: "var(--font-family-mono)",
-              fontSize: "8px",
+              fontSize: "12px",
               textTransform: "uppercase",
               letterSpacing: "0.1em",
             }}
@@ -192,7 +192,7 @@ export default function DesignSystemPage() {
                 <Typography
                   sx={{
                     fontFamily: "var(--font-family-mono)",
-                    fontSize: "8.5px",
+                    fontSize: "12px",
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
                     color: "var(--color-text-tertiary)",
@@ -211,7 +211,7 @@ export default function DesignSystemPage() {
                       px: 2.5,
                       borderLeft: 2,
                       borderColor: activeId === item.id ? "var(--color-text-link)" : "transparent",
-                      bgcolor: activeId === item.id ? "#FFF0F6" : "transparent",
+                      bgcolor: activeId === item.id ? "var(--color-bg-subtle)" : "transparent",
                       color: activeId === item.id ? "var(--color-text-link)" : "var(--color-text-body)",
                       "&:hover": {
                         bgcolor: "var(--color-bg-curator)",
@@ -270,7 +270,7 @@ export default function DesignSystemPage() {
               display: "block",
               mb: 1.5,
               fontFamily: "var(--font-family-mono)",
-              fontSize: "9px",
+              fontSize: "12px",
               color: "var(--color-brand-primary-hover)",
               letterSpacing: "0.18em",
             }}
@@ -293,7 +293,7 @@ export default function DesignSystemPage() {
               Sydney
             </Box>
           </Typography>
-          <Typography sx={{ fontFamily: "var(--font-family-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "var(--color-text-muted)" }}>
+          <Typography sx={{ fontFamily: "var(--font-family-mono)", fontSize: "12px", letterSpacing: "0.06em", color: "var(--color-text-muted)" }}>
             {t("designSystem.tagline")}
           </Typography>
         </Box>

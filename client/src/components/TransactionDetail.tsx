@@ -68,6 +68,7 @@ import {
   buildTransactionWorkflowState,
   type TransactionWorkflowState,
 } from "../utils/transactionWorkflow";
+import { getTransactionStatusChipProps } from "../utils/itemStatusChip";
 
 // Create a custom icon using Leaflet's default marker
 const customIcon = new L.Icon({
@@ -454,15 +455,12 @@ const TransactionDetailPage: React.FC = () => {
   };
 
   const getStatusColor = (status: TransactionStatus) => {
-    const statusColorMap: Partial<Record<TransactionStatus, string>> = {
-      [TransactionStatus.Pending]: "warning",
-      [TransactionStatus.Approved]: "success",
-      [TransactionStatus.Transfered]: "primary",
-      [TransactionStatus.Completed]: "success",
-      [TransactionStatus.Cancelled]: "error",
+    const palette = getTransactionStatusChipProps(status);
+    return {
+      backgroundColor: palette.bgColor,
+      color: palette.color,
+      borderColor: palette.borderColor,
     };
-
-    return statusColorMap[status] || "default";
   };
 
   const formatDate = (dateString: string) => {
@@ -670,8 +668,15 @@ const TransactionDetailPage: React.FC = () => {
             `transactions.status.${transaction.status.toLowerCase()}`,
             transaction.status,
           )}
-          color={getStatusColor(transaction.status) as any}
           size="medium"
+          sx={{
+            ...getStatusColor(transaction.status),
+            border: `1px solid ${getTransactionStatusChipProps(transaction.status).borderColor}`,
+            fontWeight: 700,
+            ".MuiChip-icon": {
+              color: getTransactionStatusChipProps(transaction.status).color,
+            },
+          }}
         />
       </Box>
 

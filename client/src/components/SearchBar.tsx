@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
+import { semanticTokens } from "../styles/semanticTokens";
 
 interface SearchBarProps {
   loading?: boolean;
@@ -122,7 +123,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             position: "absolute",
             width: "100%",
             bgcolor: "background.paper",
-            border: "1px solid #ccc",
+            border: `1px solid ${semanticTokens.color.borderDefault}`,
             borderRadius: 1,
             zIndex: 1000,
             mt: 0.5,
@@ -141,7 +142,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             position: "absolute",
             width: "100%",
             bgcolor: "background.paper",
-            border: "1px solid #ccc",
+            border: `1px solid ${semanticTokens.color.borderDefault}`,
             borderRadius: 1,
             zIndex: 1000,
             mt: 0.5,
@@ -159,7 +160,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             position: "absolute",
             width: "100%",
             bgcolor: "background.paper",
-            border: "1px solid #ccc",
+            border: `1px solid ${semanticTokens.color.borderDefault}`,
             borderRadius: 1,
             zIndex: 1000,
             mt: 0.5,

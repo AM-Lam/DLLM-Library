@@ -1,5 +1,7 @@
 import React from "react";
 import { Box, Grid } from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { semanticTokens } from "../styles/semanticTokens";
 
 interface BookshelfGridProps {
   children: React.ReactNode;
@@ -26,7 +28,7 @@ const BookshelfGrid: React.FC<BookshelfGridProps> = ({
           right: 0,
           height: "2px",
           background:
-            "linear-gradient(to right, transparent, rgba(0,0,0,0.1) 20%, rgba(0,0,0,0.1) 80%, transparent)",
+            `linear-gradient(to right, transparent, ${alpha(semanticTokens.color.textPrimary, 0.08)} 20%, ${alpha(semanticTokens.color.textPrimary, 0.08)} 80%, transparent)`,
           pointerEvents: "none",
         },
       }}

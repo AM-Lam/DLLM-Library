@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 import { Box, Typography } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
 
 interface DesignSystemNoteProps {
   children: ReactNode;
   warn?: boolean;
-  sx?: object;
+  sx?: SxProps<Theme>;
 }
 
 export default function DesignSystemNote({ children, warn = false, sx }: DesignSystemNoteProps) {
@@ -21,7 +22,7 @@ export default function DesignSystemNote({ children, warn = false, sx }: DesignS
         ...sx,
       }}
     >
-      <Typography sx={{ fontSize: "11px", lineHeight: 1.7, color: "var(--color-text-muted)" }}>{children}</Typography>
+      <Typography sx={{ fontSize: "12px", lineHeight: 1.7, color: "var(--color-text-muted)" }}>{children}</Typography>
     </Box>
   );
 }

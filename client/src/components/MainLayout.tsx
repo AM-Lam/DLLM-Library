@@ -232,7 +232,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       sx={{
         ...navPillSx,
         backgroundColor: isActive
-          ? "var(--color-nav-selected-bg)"
+          ? "var(--color-bg-subtle)"
           : "transparent",
         color: isActive ? "var(--color-brand-primary)" : "inherit",
       }}

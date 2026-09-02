@@ -1,8 +1,38 @@
-import { Box, Grid, Paper, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import CategoryChip from "../shared/CategoryChip";
+import ItemStatusChip from "../shared/ItemStatusChip";
 import DesignSystemNote from "./DesignSystemNote";
+import DesignSystemPanel from "./DesignSystemPanel";
 import DesignSystemSection from "./DesignSystemSection";
 import DesignSystemSubSection from "./DesignSystemSubSection";
+
+const cardVariants = [
+  {
+    name: "Horizontal",
+    width: 140,
+    coverHeight: 194,
+    status: "AVAILABLE",
+    tags: ["六四", "禁書"],
+    gradient: "linear-gradient(160deg, var(--color-text-muted) 0%, var(--color-bg-subtle) 100%)",
+  },
+  {
+    name: "Grid",
+    width: 112,
+    coverHeight: 180,
+    status: "EXCHANGEABLE",
+    tags: ["雨傘"],
+    gradient: "linear-gradient(150deg, var(--color-text-body) 0%, var(--color-border-subtle) 100%)",
+  },
+  {
+    name: "Compact",
+    width: 88,
+    coverHeight: 150,
+    status: "RESERVED",
+    tags: ["國安法"],
+    gradient: "linear-gradient(150deg, var(--color-brand-accent) 0%, var(--color-bg-subtle) 100%)",
+  },
+] as const;
 
 export default function BookCardSection() {
   const { t } = useTranslation();
@@ -17,71 +47,74 @@ export default function BookCardSection() {
       <DesignSystemSubSection label="Browse card anatomy">
         <Grid container spacing={2} alignItems="stretch">
           <Grid size={{ xs: 12, md: 8 }}>
-            <Paper
-              elevation={0}
+            <DesignSystemPanel
               sx={{
                 p: 2,
                 border: "1px solid var(--color-border-subtle)",
-                borderRadius: 2,
+                borderRadius: "10px",
                 bgcolor: "var(--color-bg-subtle)",
               }}
             >
-              <Box sx={{ position: "relative", width: 180, bgcolor: "#FFFFFF", borderRadius: "12px", overflow: "hidden", boxShadow: "0 1px 4px rgba(25,6,9,0.06)" }}>
-                <Box
-                  sx={{
-                    position: "relative",
-                    height: 196,
-                    background: "linear-gradient(160deg, #2A3B40 0%, #F1E9EA 100%)",
-                  }}
-                >
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "flex-end" }}>
+                {cardVariants.map((variant) => (
                   <Box
-                    component="span"
+                    key={variant.name}
                     sx={{
-                      position: "absolute",
-                      top: 1,
-                      right: 1,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      px: 1,
-                      py: 0.5,
-                      borderRadius: "4px",
-                      bgcolor: "rgba(224,244,240,0.94)",
-                      color: "#1A5C30",
-                      fontSize: "10px",
-                      fontWeight: 600,
+                      position: "relative",
+                      width: variant.width,
+                      bgcolor: "var(--color-bg-surface)",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      boxShadow: "0 1px 4px var(--color-border-default)",
                     }}
                   >
-                    可借用
-                  </Box>
-                </Box>
-                <Box sx={{ px: 1.5, py: 1.25 }}>
-                  <Typography sx={{ fontSize: "12px", fontWeight: 700, lineHeight: 1.35, color: "var(--color-text-primary)" }}>
-                    記憶與抗爭
-                  </Typography>
-                  <Box sx={{ mt: 1, display: "flex", gap: 0.75, flexWrap: "wrap" }}>
-                    <Box component="span" sx={{ display: "inline-flex", px: 0.75, py: 0.2, borderRadius: "4px", bgcolor: "#E4D8DA", color: "#502B30", fontSize: "9px", fontWeight: 600 }}>
-                      六四
+                    <Box sx={{ position: "relative", height: variant.coverHeight, background: variant.gradient }}>
+                      <ItemStatusChip
+                        status={variant.status}
+                        sx={{
+                          position: "absolute",
+                          top: 7,
+                          right: 7,
+                        }}
+                      />
                     </Box>
-                    <Box component="span" sx={{ display: "inline-flex", px: 0.75, py: 0.2, borderRadius: "4px", bgcolor: "#E4D8DA", color: "#502B30", fontSize: "9px", fontWeight: 600 }}>
-                      禁書
+                    <Box sx={{ px: 1.5, py: 1.25 }}>
+                      <Typography
+                        sx={{
+                          fontSize: variant.name === "Compact" ? "10px" : variant.name === "Grid" ? "11px" : "12px",
+                          fontWeight: 700,
+                          lineHeight: 1.35,
+                          color: "var(--color-text-primary)",
+                        }}
+                      >
+                        {variant.name === "Compact" ? "城市記憶" : "記憶與抗爭"}
+                      </Typography>
+                      <Box sx={{ mt: 1, display: "flex", gap: 0.75, flexWrap: "wrap" }}>
+                        {variant.tags.map((tag) => <CategoryChip key={tag} label={tag} tone={tag === "六四" ? "memorial" : "default"} />)}
+                      </Box>
                     </Box>
                   </Box>
-                </Box>
+                ))}
               </Box>
-            </Paper>
+            </DesignSystemPanel>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
-            <Paper
-              elevation={0}
+            <DesignSystemPanel
               sx={{
                 p: 2,
-                border: "1px solid var(--color-border-subtle)",
-                borderRadius: 1.5,
-                bgcolor: "var(--color-bg-surface)",
+                borderRadius: "8px",
                 height: "100%",
               }}
             >
-              <Typography sx={{ fontFamily: "var(--font-family-mono)", fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-muted)" }}>
+              <Typography
+                sx={{
+                  fontFamily: "var(--font-family-mono)",
+                  fontSize: "9px",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "var(--color-text-muted)",
+                }}
+              >
                 Anatomy
               </Typography>
               <Box sx={{ mt: 1.5, display: "grid", gap: 1 }}>
@@ -90,7 +123,7 @@ export default function BookCardSection() {
                 <Typography sx={{ fontSize: "11px", color: "var(--color-text-body)" }}>Title + metadata</Typography>
                 <Typography sx={{ fontSize: "11px", color: "var(--color-text-body)" }}>Category chips</Typography>
               </Box>
-            </Paper>
+            </DesignSystemPanel>
           </Grid>
         </Grid>
       </DesignSystemSubSection>

@@ -169,7 +169,7 @@ export const ShareTransactionDialog: React.FC<ShareTransactionDialogProps> = ({
               justifyContent: "center",
               mb: 3,
               p: 3,
-              bgcolor: "white",
+              bgcolor: semanticTokens.color.bgSurface,
               borderRadius: 2,
               border: 1,
               borderColor: "divider",

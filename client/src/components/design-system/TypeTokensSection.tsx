@@ -5,64 +5,53 @@ import DesignSystemSubSection from "./DesignSystemSubSection";
 import DesignSystemNote from "./DesignSystemNote";
 
 const familyRows = [
-  ["--font-serif", "'Noto Serif TC'", "'Noto Serif TC', serif"],
-  ["--font-sans", "'IBM Plex Sans'", "'IBM Plex Sans', -apple-system, sans-serif"],
-  ["--font-mono", "'IBM Plex Mono'", "'IBM Plex Mono', monospace"],
+  ["--font-family-display", "Noto Serif TC", "Noto Serif TC, Playfair Display, serif"],
+  ["--font-family-body", "IBM Plex Sans", "IBM Plex Sans, Noto Serif TC, PingFang HK, PingFang TC, Microsoft JhengHei, sans-serif"],
+  ["--font-family-mono", "IBM Plex Mono", "IBM Plex Mono, Menlo, Monaco, Consolas, monospace"],
 ] as const;
 
 const sizeRows = [
-  ["--fs-22", "歡迎返嚟 Welcome", "22px", "serif", 700],
-  ["--fs-18", "館長推介 BookGuide", "18px", "serif", 700],
-  ["--fs-16", "新番入庫", "16px", "serif", 700],
-  ["--fs-14", "實體書改唔到，刪唔到。", "14px", "body", 400],
-  ["--fs-13", "本月推薦：記憶與抗爭", "13px", "serif", 400],
-  ["--fs-12", "5月35日－創作・記憶 查看全部 →", "12px", "serif", 700],
-  ["--fs-11", "首頁 可借閱", "11px", "body", 600],
-  ["--fs-10", "禁書 六四", "10px · chips", "body", 500],
-  ["--fs-9", "Hong Kong books. Keep them moving.", "9px · Latin only", "mono", 400],
+  ["--font-size-display", "歡迎返嚟 Welcome", "22px", "serif", 700],
+  ["--font-size-title-lg", "館長推介 BookGuide", "18px", "serif", 700],
+  ["--font-size-title", "新番入庫", "16px", "serif", 700],
+  ["--font-size-body", "實體書改唔到，刪唔到。", "14px", "body", 400],
+  ["--font-size-body-sm", "本月推薦：記憶與抗爭", "13px", "serif", 400],
+  ["--font-size-label", "5月35日－創作・記憶 查看全部 →", "12px", "serif", 700],
+  ["--font-size-caption", "首頁 可借閱", "11px", "body", 600],
+  ["--font-size-micro", "禁書 六四", "10px · chips", "body", 500],
+  ["--font-size-micro-system", "Hong Kong books. Keep them moving.", "9px · Latin only", "mono", 400],
 ] as const;
 
 const weightRows = [
-  ["--fw-regular", "400"],
-  ["--fw-medium", "500"],
-  ["--fw-semibold", "600"],
-  ["--fw-bold", "700"],
+  ["--font-weight-regular", "400"],
+  ["--font-weight-medium", "500"],
+  ["--font-weight-semibold", "600"],
+  ["--font-weight-bold", "700"],
 ] as const;
 
 const lineHeightRows = [
-  ["--lh-none", "1"],
-  ["--lh-tight", "1.2"],
-  ["--lh-snug", "1.3"],
-  ["--lh-normal", "1.5"],
-  ["--lh-relaxed", "1.55"],
+  ["--line-height-none", "1"],
+  ["--line-height-tight", "1.2"],
+  ["--line-height-snug", "1.3"],
+  ["--line-height-normal", "1.5"],
+  ["--line-height-relaxed", "1.55"],
 ] as const;
 
 const spacingRows = [
-  ["--ls-none", "0"],
-  ["--ls-normal", ".04em"],
-  ["--ls-wide", ".06em"],
+  ["--letter-spacing-normal", ".04em"],
+  ["--letter-spacing-wide", ".06em"],
+  ["--letter-spacing-wider", ".12em"],
 ] as const;
 
 const semanticRoleRows = [
-  ["--type-display", "serif", "--fs-22", "bold", "snug", "CJK", "Welcome greeting"],
-  ["--type-title-lg", "serif", "--fs-18", "bold", "tight", "CJK", "Wordmark, 館長推介 title"],
-  ["--type-title", "serif", "--fs-16", "bold", "tight", "CJK", "Section tab headers"],
-  ["--type-body", "sans", "--fs-14", "regular", "relaxed", "Both", "Welcome body, descriptions"],
-  ["--type-body-sm", "serif", "--fs-13", "regular", "normal", "CJK", "Curator note, editorial copy"],
-  ["--type-label", "serif / sans", "--fs-12", "medium-bold", "snug", "Both", "Card titles, links, view-all"],
-  ["--type-caption", "sans", "--fs-11", "medium-semi", "normal", "Both", "Badges, nav labels, buttons"],
-  ["--type-micro", "sans / mono", "--fs-10 / --fs-9", "medium / regular", "normal", "Latin*", "Chips (10px), tagline (9px)"],
-] as const;
-
-const responsiveRows = [
-  ["display", "22px", "22px", "24px", "26px", true],
-  ["title-lg", "18px", "18px", "18px", "20px", true],
-  ["title", "16px", "16px", "16px", "17px", true],
-  ["body", "14px", "14px", "14px", "15px", true],
-  ["body-sm", "13px", "- no change -", "- no change -", "- no change -", false],
-  ["label", "12px", "- no change -", "- no change -", "- no change -", false],
-  ["caption", "11px", "- no change -", "- no change -", "- no change -", false],
-  ["micro", "10 / 9px", "- no change -", "- no change -", "- no change -", false],
+  ["semanticTokens.typography.display", "serif", "22px", "bold", "snug", "CJK", "Welcome greeting"],
+  ["semanticTokens.typography.titleLg", "serif", "18px", "bold", "tight", "CJK", "Wordmark, curator title"],
+  ["semanticTokens.typography.title", "serif", "16px", "bold", "tight", "CJK", "Section tab headers"],
+  ["semanticTokens.typography.body", "sans", "14px", "regular", "relaxed", "Both", "Welcome body, descriptions"],
+  ["semanticTokens.typography.bodySm", "serif", "13px", "regular", "normal", "CJK", "Curator note, editorial copy"],
+  ["semanticTokens.typography.label", "sans", "12px", "medium", "snug", "Both", "Card titles, links, view-all"],
+  ["semanticTokens.typography.caption", "sans", "11px", "medium", "normal", "Both", "Badges, nav labels, buttons"],
+  ["semanticTokens.typography.micro", "sans", "10px", "medium", "normal", "Latin*", "Chips"],
 ] as const;
 
 const scriptRuleRows = [
@@ -205,42 +194,7 @@ export default function TypeTokensSection() {
         </DesignSystemNote>
       </DesignSystemSubSection>
 
-      <DesignSystemSubSection label="3 · Responsive Variance — breakpoint scaling" sx={{ mb: 5 }}>
-        <Typography sx={{ fontSize: "13px", color: "var(--color-text-muted)", lineHeight: 1.75, mb: 2 }}>
-          Only display, title-lg, title, and body scale up at larger breakpoints. Body-sm, label, caption, and micro stay locked for density consistency.
-        </Typography>
-        <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid var(--color-border-subtle)", borderRadius: "10px", overflow: "hidden" }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: "var(--color-bg-canvas)" }}>
-                <TableCell sx={headCellSx}>Role</TableCell>
-                <TableCell sx={headCellSx}>≤ 480px</TableCell>
-                <TableCell sx={headCellSx}>481-599px</TableCell>
-                <TableCell sx={headCellSx}>600-767px</TableCell>
-                <TableCell sx={headCellSx}>≥ 768px</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {responsiveRows.map(([role, p1, p2, p3, p4, scaled]) => (
-                <TableRow key={role} hover sx={{ "&:last-child td": { borderBottom: "none" }, "&:hover td": { bgcolor: "var(--color-bg-canvas)" } }}>
-                  <TableCell sx={nameCellSx}>{role}</TableCell>
-                  <TableCell sx={valCellSx}>{p1}</TableCell>
-                  <TableCell sx={valCellSx}>{p2}</TableCell>
-                  <TableCell sx={valCellSx}>{p3}</TableCell>
-                  <TableCell sx={{ ...valCellSx, color: scaled ? "var(--color-text-link)" : "var(--color-text-tertiary)" }}>{p4}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <DesignSystemNote>
-          <>
-            Values in <Box component="span" sx={{ color: "var(--color-text-link)", fontWeight: 500 }}>magenta</Box> indicate breakpoint overrides. Scaling is intentionally modest to preserve compact information density.
-          </>
-        </DesignSystemNote>
-      </DesignSystemSubSection>
-
-      <DesignSystemSubSection label="4 · CJK / Latin Script Rules" sx={{ mb: 0 }}>
+      <DesignSystemSubSection label="3 · CJK / Latin Script Rules" sx={{ mb: 0 }}>
         <Typography sx={{ fontSize: "13px", color: "var(--color-text-muted)", lineHeight: 1.75, mb: 2 }}>
           Engineers should pick a semantic type token first, then validate script safety using these rules.
         </Typography>

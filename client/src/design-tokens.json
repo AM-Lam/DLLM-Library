@@ -72,12 +72,15 @@
       "mono": "IBM Plex Mono, Menlo, Monaco, Consolas, monospace"
     },
     "fontSize": {
-      "xs": 12,
-      "sm": 14,
-      "md": 16,
-      "lg": 20,
-      "xl": 24,
-      "2xl": 32
+      "display": 22,
+      "titleLg": 18,
+      "title": 16,
+      "body": 14,
+      "bodySm": 13,
+      "label": 12,
+      "caption": 11,
+      "micro": 10,
+      "microSystem": 9
     },
     "fontWeight": {
       "regular": 400,
@@ -87,15 +90,18 @@
       "black": 900
     },
     "lineHeight": {
-      "tight": 1.25,
+      "none": 1,
+      "tight": 1.2,
+      "snug": 1.3,
       "normal": 1.5,
-      "relaxed": 1.7
+      "relaxed": 1.55,
+      "loose": 1.6
     },
     "radius": {
       "xs": 4,
       "sm": 8,
       "md": 12,
-      "lg": 16,
+      "lg": 12,
       "pill": 999
     },
     "space": {
@@ -104,7 +110,9 @@
       "3": 12,
       "4": 16,
       "5": 20,
-      "6": 24
+      "6": 24,
+      "7": 32,
+      "8": 40
     },
     "shadow": {
       "1": "0 1px 3px #1906090F",
@@ -158,26 +166,70 @@
         "info": "{primitives.color.status-act-fg}",
         "infoBg": "{primitives.color.status-act-bg}",
         "special": "{primitives.color.status-spec-fg}",
-        "specialBg": "{primitives.color.status-spec-bg}"
+        "specialBg": "{primitives.color.status-spec-bg}",
+        "gift": "{primitives.color.status-gift-fg}",
+        "giftBg": "{primitives.color.status-gift-bg}"
       }
     },
     "typography": {
       "body": {
         "family": "{primitives.fontFamily.body}",
-        "size": "{primitives.fontSize.md}",
+        "size": "{primitives.fontSize.body}",
         "weight": "{primitives.fontWeight.regular}",
-        "lineHeight": "{primitives.lineHeight.normal}"
+        "lineHeight": "{primitives.lineHeight.relaxed}"
       },
       "display": {
         "family": "{primitives.fontFamily.display}",
-        "size": "{primitives.fontSize.xl}",
-        "weight": "{primitives.fontWeight.black}",
-        "lineHeight": "{primitives.lineHeight.tight}"
+        "size": "{primitives.fontSize.display}",
+        "weight": "{primitives.fontWeight.bold}",
+        "lineHeight": "{primitives.lineHeight.snug}"
       },
       "mono": {
         "family": "{primitives.fontFamily.mono}",
-        "size": "{primitives.fontSize.sm}",
+        "size": "{primitives.fontSize.body}",
         "weight": "{primitives.fontWeight.medium}",
+        "lineHeight": "{primitives.lineHeight.normal}"
+      },
+      "titleLg": {
+        "family": "{primitives.fontFamily.display}",
+        "size": "{primitives.fontSize.titleLg}",
+        "weight": "{primitives.fontWeight.bold}",
+        "lineHeight": "{primitives.lineHeight.tight}"
+      },
+      "title": {
+        "family": "{primitives.fontFamily.display}",
+        "size": "{primitives.fontSize.title}",
+        "weight": "{primitives.fontWeight.bold}",
+        "lineHeight": "{primitives.lineHeight.tight}"
+      },
+      "bodySm": {
+        "family": "{primitives.fontFamily.display}",
+        "size": "{primitives.fontSize.bodySm}",
+        "weight": "{primitives.fontWeight.regular}",
+        "lineHeight": "{primitives.lineHeight.normal}"
+      },
+      "label": {
+        "family": "{primitives.fontFamily.body}",
+        "size": "{primitives.fontSize.label}",
+        "weight": "{primitives.fontWeight.medium}",
+        "lineHeight": "{primitives.lineHeight.snug}"
+      },
+      "caption": {
+        "family": "{primitives.fontFamily.body}",
+        "size": "{primitives.fontSize.caption}",
+        "weight": "{primitives.fontWeight.medium}",
+        "lineHeight": "{primitives.lineHeight.normal}"
+      },
+      "micro": {
+        "family": "{primitives.fontFamily.body}",
+        "size": "{primitives.fontSize.micro}",
+        "weight": "{primitives.fontWeight.medium}",
+        "lineHeight": "{primitives.lineHeight.normal}"
+      },
+      "microSystem": {
+        "family": "{primitives.fontFamily.mono}",
+        "size": "{primitives.fontSize.microSystem}",
+        "weight": "{primitives.fontWeight.regular}",
         "lineHeight": "{primitives.lineHeight.normal}"
       }
     },
@@ -191,7 +243,15 @@
       "xs": "{primitives.space.1}",
       "sm": "{primitives.space.2}",
       "md": "{primitives.space.4}",
-      "lg": "{primitives.space.6}"
+      "lg": "{primitives.space.6}",
+      "xl": "{primitives.space.7}",
+      "2xl": 48,
+      "3xl": 64,
+      "4xl": 80,
+      "sectionGap": 48,
+      "contentGap": 24,
+      "elementGap": 16,
+      "elementGapSm": 8
     },
     "elevation": {
       "surface": "{primitives.shadow.1}",

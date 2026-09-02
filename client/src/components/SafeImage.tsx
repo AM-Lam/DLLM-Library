@@ -9,6 +9,8 @@ import {
   Alert
 } from '@mui/material';
 import { Warning } from '@mui/icons-material';
+import { alpha } from '@mui/material/styles';
+import { semanticTokens } from '../styles/semanticTokens';
 
 interface SafeImageProps {
   src: string;
@@ -165,7 +167,7 @@ const SafeImage: React.FC<SafeImageProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            backgroundColor: alpha(semanticTokens.color.bgSurface, 0.8),
             borderRadius: '8px'
           }}
         >
@@ -186,13 +188,13 @@ const SafeImage: React.FC<SafeImageProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
+            backgroundColor: alpha(semanticTokens.color.textPrimary, 0.7),
+            color: semanticTokens.color.textInverse,
             borderRadius: '8px',
             padding: 2
           }}
         >
-          <Warning sx={{ fontSize: 32, mb: 1, color: 'orange' }} />
+          <Warning sx={{ fontSize: 32, mb: 1, color: semanticTokens.color.warning }} />
           <Typography variant="body2" align="center" sx={{ mb: 2 }}>
             This image may contain adult content
           </Typography>
@@ -202,15 +204,15 @@ const SafeImage: React.FC<SafeImageProps> = ({
                 checked={userConsent}
                 onChange={handleConsentChange}
                 sx={{
-                  color: 'white',
+                  color: semanticTokens.color.textInverse,
                   '&.Mui-checked': {
-                    color: 'orange'
+                    color: semanticTokens.color.warning
                   }
                 }}
               />
             }
             label={
-              <Typography variant="caption" sx={{ color: 'white' }}>
+              <Typography variant="caption" sx={{ color: semanticTokens.color.textInverse }}>
                 I confirm I want to view this content
               </Typography>
             }

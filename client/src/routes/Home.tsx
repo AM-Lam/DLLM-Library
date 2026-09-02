@@ -39,6 +39,7 @@ import ItemForm from "../components/ItemForm";
 import RecentNewsBanner from "../components/RecentNewsBanner";
 import AddressReminderDialog from "../components/AddressReminderDialog";
 import SearchBar from "../components/SearchBar";
+import { PageLoader } from "../components/LoadingState";
 
 const RecentCategoriesQuery = gql`
   query RecentCategories($limit: Int!) {
@@ -153,6 +154,8 @@ const HomePage: React.FC = () => {
     setShowCreateUser(false);
     window.location.reload();
   };
+
+  const homeLoading = userPickedLoading || recentCategoriesLoading || hotCategoriesLoading;
 
   const handleViewAllItems = () => {
     navigate("/item/all");
@@ -270,7 +273,7 @@ const HomePage: React.FC = () => {
                           borderRadius: 2,
                           border: "1px solid",
                           borderColor: "divider",
-                          backgroundColor: "rgba(0, 0, 0, 0.02)",
+                          backgroundColor: "var(--color-bg-canvas)",
                         }}
                       >
                         <Typography
@@ -437,13 +440,15 @@ const HomePage: React.FC = () => {
           newsStatus={NewsStatus.Published}
           isFrontPage={true}
         />
-        {userPickedLoading && (
+
+        {homeLoading && (
           <ListItem>
-            <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-              <CircularProgress size={20} sx={{ mr: 1 }} />
-              <Typography>
-                {t("home.loadingRecommendations", "Loading recommendations...")}
-              </Typography>
+            <Box sx={{ width: "100%" }}>
+              <PageLoader
+                message={t("common.loading", "Loading...")}
+                size={36}
+                minHeight={160}
+              />
             </Box>
           </ListItem>
         )}
@@ -506,12 +511,6 @@ const HomePage: React.FC = () => {
           </Box>
         </ListItem>
 
-        {recentCategoriesLoading && (
-          <ListItem>
-            <Typography>{t("common.loading")}</Typography>
-          </ListItem>
-        )}
-
         {/* Hot Categories Section */}
         {hotCategoriesData?.hotCategories && (
           <ListItem>
@@ -536,12 +535,6 @@ const HomePage: React.FC = () => {
                 />
               </ListItem>
             </Box>
-          </ListItem>
-        )}
-
-        {hotCategoriesLoading && (
-          <ListItem>
-            <Typography>{t("common.loading")}</Typography>
           </ListItem>
         )}
 

@@ -102,13 +102,12 @@ const cardContentSx = {
 };
 
 const categoryTagSx = {
-  backgroundColor: "var(--color-bg-subtle)",
-  color: "var(--color-text-primary)",
+  backgroundColor: semanticTokens.color.bgSubtle,
+  color: semanticTokens.color.textPrimary,
   borderRadius: "4px",
   px: "6px",
   py: "2px",
   fontSize: "11px",
-  bgcolor: "#f9f5f6",
   fontWeight: "var(--font-weight-semibold)",
   fontFamily: "var(--font-family-body)",
 };

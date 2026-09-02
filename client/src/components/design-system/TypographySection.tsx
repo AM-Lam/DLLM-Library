@@ -47,7 +47,7 @@ const typeSpecimens: TypeSpecimen[] = [
     role: "Display",
     spec: "Noto Serif TC\n700 · 22px · memorial colour",
     preview: (
-      <Box sx={{ fontFamily: "var(--font-family-display)", fontSize: "22px", fontWeight: 700, color: "#890604", px: 2, py: 1.25, bgcolor: "var(--color-bg-canvas)", borderRadius: "6px", lineHeight: 1.3 }}>
+      <Box sx={{ fontFamily: "var(--font-family-display)", fontSize: "22px", fontWeight: 700, color: "var(--color-brand-accent)", px: 2, py: 1.25, bgcolor: "var(--color-bg-canvas)", borderRadius: "6px", lineHeight: 1.3 }}>
         歡迎返嚟，米牙珠珠子
       </Box>
     ),
@@ -57,8 +57,8 @@ const typeSpecimens: TypeSpecimen[] = [
     role: "Title LG",
     spec: "Noto Serif TC\n700 · 18px · ink-950",
     preview: (
-      <Box sx={{ fontFamily: "var(--font-family-display)", fontSize: "18px", fontWeight: 700, color: "#190609", px: 2, py: 1.25, bgcolor: "#FFFFFF", borderRadius: "6px", lineHeight: 1, display: "flex", alignItems: "baseline", gap: "7px" }}>
-        BookGuide <Box component="span" sx={{ fontWeight: 600, color: "#DB036B" }}>Sydney</Box>
+      <Box sx={{ fontFamily: "var(--font-family-display)", fontSize: "18px", fontWeight: 700, color: "var(--color-text-primary)", px: 2, py: 1.25, bgcolor: "var(--color-bg-surface)", borderRadius: "6px", lineHeight: 1, display: "flex", alignItems: "baseline", gap: "7px" }}>
+        BookGuide <Box component="span" sx={{ fontWeight: 600, color: "var(--color-brand-primary)" }}>Sydney</Box>
       </Box>
     ),
     right: "18px / 700\ncity: 18px / 600\ncolor: ink-950 / brand-500",
@@ -67,7 +67,7 @@ const typeSpecimens: TypeSpecimen[] = [
     role: "Title",
     spec: "Noto Serif TC\n700 · 16px · ink-950",
     preview: (
-      <Box sx={{ fontFamily: "var(--font-family-display)", fontSize: "16px", fontWeight: 700, color: "#190609", px: 2, py: 1.25, bgcolor: "var(--color-bg-canvas)", borderRadius: "6px" }}>
+      <Box sx={{ fontFamily: "var(--font-family-display)", fontSize: "16px", fontWeight: 700, color: "var(--color-text-primary)", px: 2, py: 1.25, bgcolor: "var(--color-bg-canvas)", borderRadius: "6px" }}>
         新番入庫
       </Box>
     ),
@@ -77,7 +77,7 @@ const typeSpecimens: TypeSpecimen[] = [
     role: "Body",
     spec: "IBM Plex Sans\n400 · 14px · ink-700",
     preview: (
-      <Box sx={{ fontFamily: "var(--font-family-body)", fontSize: "14px", color: "#70484D", px: 2, py: 1.25, bgcolor: "var(--color-bg-canvas)", borderRadius: "6px", maxWidth: 320, lineHeight: 1.55 }}>
+      <Box sx={{ fontFamily: "var(--font-family-body)", fontSize: "14px", color: "var(--color-text-secondary)", px: 2, py: 1.25, bgcolor: "var(--color-bg-canvas)", borderRadius: "6px", maxWidth: 320, lineHeight: 1.55 }}>
         實體書改唔到，刪唔到。記憶值得留低。
       </Box>
     ),
@@ -87,7 +87,7 @@ const typeSpecimens: TypeSpecimen[] = [
     role: "Body SM",
     spec: "Noto Serif TC\n400 · 13px · ink-700",
     preview: (
-      <Box sx={{ fontFamily: "var(--font-family-display)", fontSize: "13px", color: "#70484D", px: 2, py: 1.25, bgcolor: "#F1E9EA", borderRadius: "6px", maxWidth: 360, lineHeight: 1.5 }}>
+      <Box sx={{ fontFamily: "var(--font-family-display)", fontSize: "13px", color: "var(--color-text-secondary)", px: 2, py: 1.25, bgcolor: "var(--color-bg-subtle)", borderRadius: "6px", maxWidth: 360, lineHeight: 1.5 }}>
         本月推薦：記憶與抗爭 — 六月，不能忘記的日子。
       </Box>
     ),
@@ -97,9 +97,9 @@ const typeSpecimens: TypeSpecimen[] = [
     role: "Label",
     spec: "Noto Serif TC / Plex Sans\n500-700 · 12px",
     preview: (
-      <Box sx={{ display: "flex", gap: 2, alignItems: "center", px: 2, py: 1.25, bgcolor: "#FFFFFF", border: "1px solid var(--color-border-subtle)", borderRadius: "6px" }}>
-        <Box component="span" sx={{ fontFamily: "var(--font-family-display)", fontWeight: 700, fontSize: "12px", color: "#190609" }}>5月35日－創作・記憶</Box>
-        <Box component="span" sx={{ fontSize: "12px", color: "#8A0047", fontWeight: 500 }}>查看全部 →</Box>
+      <Box sx={{ display: "flex", gap: 2, alignItems: "center", px: 2, py: 1.25, bgcolor: "var(--color-bg-surface)", border: "1px solid var(--color-border-subtle)", borderRadius: "6px" }}>
+        <Box component="span" sx={{ fontFamily: "var(--font-family-display)", fontWeight: 700, fontSize: "12px", color: "var(--color-text-primary)" }}>5月35日－創作・記憶</Box>
+        <Box component="span" sx={{ fontSize: "12px", color: "var(--color-text-link)", fontWeight: 500 }}>查看全部 →</Box>
       </Box>
     ),
     right: "12px / 500-700\ncard titles, links\nCJK floor for must-read text",
@@ -108,10 +108,10 @@ const typeSpecimens: TypeSpecimen[] = [
     role: "Caption",
     spec: "IBM Plex Sans\n500-600 · 11px",
     preview: (
-      <Box sx={{ display: "flex", gap: 1, alignItems: "center", px: 2, py: 1.25, bgcolor: "#FFFFFF", border: "1px solid var(--color-border-subtle)", borderRadius: "6px" }}>
-        <Box component="span" sx={{ fontSize: "11px", fontWeight: 500, color: "#0F6B56", bgcolor: "rgba(224,244,240,.94)", px: 0.875, py: 0.25, borderRadius: "5px" }}>可借閱</Box>
-        <Box component="span" sx={{ fontSize: "11px", color: "#190609", fontWeight: 600 }}>首頁</Box>
-        <Box component="span" sx={{ fontSize: "11px", color: "#70484D", px: 1.125, py: 0.5, border: "1px solid var(--color-border-subtle)", borderRadius: "14px" }}>正體中文 ▾</Box>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center", px: 2, py: 1.25, bgcolor: "var(--color-bg-surface)", border: "1px solid var(--color-border-subtle)", borderRadius: "6px" }}>
+        <Box component="span" sx={{ fontSize: "11px", fontWeight: 500, color: "var(--color-special)", bgcolor: "var(--color-special-bg)", px: 0.875, py: 0.25, borderRadius: "5px" }}>可借閱</Box>
+        <Box component="span" sx={{ fontSize: "11px", color: "var(--color-text-primary)", fontWeight: 600 }}>首頁</Box>
+        <Box component="span" sx={{ fontSize: "11px", color: "var(--color-text-secondary)", px: 1.125, py: 0.5, border: "1px solid var(--color-border-subtle)", borderRadius: "14px" }}>正體中文 ▾</Box>
       </Box>
     ),
     right: "11px / 500-600\nbadges, nav labels, buttons",
@@ -120,10 +120,10 @@ const typeSpecimens: TypeSpecimen[] = [
     role: "Micro",
     spec: "Plex Sans 10px · chips\nPlex Mono 9px · system",
     preview: (
-      <Box sx={{ display: "flex", gap: 1, alignItems: "center", px: 2, py: 1.25, bgcolor: "#FFFFFF", border: "1px solid var(--color-border-subtle)", borderRadius: "6px" }}>
-        <Box component="span" sx={{ fontSize: "10px", fontWeight: 500, color: "#502B30", bgcolor: "#E4D8DA", px: 0.75, py: 0.125, borderRadius: "4px" }}>禁書</Box>
-        <Box component="span" sx={{ fontSize: "10px", fontWeight: 500, color: "#890604", bgcolor: "rgba(137,6,4,.12)", px: 0.75, py: 0.125, borderRadius: "4px" }}>六四</Box>
-        <Box component="span" sx={{ fontFamily: "var(--font-family-mono)", fontSize: "9px", color: "#956A70", letterSpacing: ".04em" }}>Hong Kong books.</Box>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center", px: 2, py: 1.25, bgcolor: "var(--color-bg-surface)", border: "1px solid var(--color-border-subtle)", borderRadius: "6px" }}>
+        <Box component="span" sx={{ fontSize: "10px", fontWeight: 500, color: "var(--color-text-body)", bgcolor: "var(--color-border-subtle)", px: 0.75, py: 0.125, borderRadius: "4px" }}>禁書</Box>
+        <Box component="span" sx={{ fontSize: "10px", fontWeight: 500, color: "var(--color-brand-accent)", bgcolor: "var(--color-bg-canvas)", px: 0.75, py: 0.125, borderRadius: "4px" }}>六四</Box>
+        <Box component="span" sx={{ fontFamily: "var(--font-family-mono)", fontSize: "9px", color: "var(--color-text-muted)", letterSpacing: ".04em" }}>Hong Kong books.</Box>
       </Box>
     ),
     right: "10px chips, 9px system\nCJK: 1-2 char labels only\n9px: Latin decorative only",

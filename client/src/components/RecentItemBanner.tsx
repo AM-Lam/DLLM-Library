@@ -18,6 +18,7 @@ import {
 import ItemPreview from "./ItemPreview";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
+import { PageLoader } from "./LoadingState";
 
 const RECENT_ITEMS_QUERY = gql`
   query RecentItems($category: [String!], $limit: Int, $random: Boolean) {
@@ -65,6 +66,7 @@ const loadingBoxSx = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  minHeight: 140,
   py: 4,
 };
 
@@ -223,7 +225,7 @@ const RecentItemBanner: React.FC<RecentItemBannerProps> = ({
   if (loading) {
     return (
       <Box sx={loadingBoxSx}>
-        <CircularProgress />
+        <PageLoader size={32} minHeight={0} message={t("common.loading", "Loading...")} />
       </Box>
     );
   }
@@ -261,7 +263,7 @@ const RecentItemBanner: React.FC<RecentItemBannerProps> = ({
             onClick={handleViewAll}
             sx={viewAllButtonSx}
           >
-            全部查看
+            {t("common.viewAll", "View All")}
           </Button>
         )}
       </Box>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { alpha } from "@mui/material/styles";
 import {
   Box,
   Typography,
@@ -224,7 +225,7 @@ const ItemComments: React.FC<ItemCommentsProps> = ({ itemId, currentUser }) => {
                         },
                         "&.Mui-focused": {
                           borderColor: "primary.main",
-                          boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.5)",
+                          boxShadow: `0 0 0 2px ${alpha("#DB036B", 0.32)}`,
                         },
                         "&.Mui-disabled": {
                           backgroundColor: "grey.100",
@@ -237,7 +238,9 @@ const ItemComments: React.FC<ItemCommentsProps> = ({ itemId, currentUser }) => {
                         <span
                           style={{
                             color:
-                              newComment.length > maxChar ? "red" : "inherit",
+                              newComment.length > maxChar
+                                ? "var(--color-error)"
+                                : "inherit",
                           }}
                         >
                           {newComment.length}/{maxChar}{" "}

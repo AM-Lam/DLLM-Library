@@ -12,6 +12,56 @@ const semanticCssPath = path.join(clientRoot, "src", "styles", "semantic-tokens.
 const raw = fs.readFileSync(tokenJsonPath, "utf8");
 const tokenDoc = JSON.parse(raw);
 
+const requiredTokenPaths = [
+  "primitives.fontFamily.body",
+  "primitives.fontFamily.display",
+  "primitives.fontFamily.mono",
+  "primitives.color",
+  "primitives.shadow.1",
+  "primitives.shadow.2",
+  "primitives.shadow.3",
+  "semantic.typography.body",
+  "semantic.typography.caption",
+  "semantic.elevation.card",
+  "semantic.color.brand.primary",
+  "semantic.color.brand.primaryHover",
+  "semantic.color.brand.accent",
+  "semantic.color.text.primary",
+  "semantic.color.text.body",
+  "semantic.color.text.secondary",
+  "semantic.color.text.tertiary",
+  "semantic.color.text.muted",
+  "semantic.color.text.tagline",
+  "semantic.color.text.inverse",
+  "semantic.color.text.link",
+  "semantic.color.text.accent",
+  "semantic.color.bg.canvas",
+  "semantic.color.bg.surface",
+  "semantic.color.bg.subtle",
+  "semantic.color.bg.elevated",
+  "semantic.color.bg.curator",
+  "semantic.color.border.default",
+  "semantic.color.border.subtle",
+  "semantic.color.border.soft",
+  "semantic.color.border.strong",
+  "semantic.color.state.success",
+  "semantic.color.state.successBg",
+  "semantic.color.state.warning",
+  "semantic.color.state.warningBg",
+  "semantic.color.state.error",
+  "semantic.color.state.errorBg",
+  "semantic.color.state.info",
+  "semantic.color.state.infoBg",
+  "semantic.color.state.special",
+  "semantic.color.state.specialBg",
+  "adapters.custom.appBar.shadow",
+  "adapters.custom.badge.surface",
+  "adapters.custom.chip.bg",
+  "adapters.custom.navItem.selectedBg",
+  "adapters.custom.navItem.selectedColor",
+  "adapters.custom.dynamicCardPalette",
+];
+
 function getPathValue(obj, tokenPath) {
   const segments = tokenPath.split(".");
   let current = obj;
@@ -22,6 +72,10 @@ function getPathValue(obj, tokenPath) {
     current = current[segment];
   }
   return current;
+}
+
+for (const tokenPath of requiredTokenPaths) {
+  getPathValue(tokenDoc, tokenPath);
 }
 
 function resolveTokenRefs(value, root, seen = new Set()) {
@@ -77,41 +131,61 @@ function normalizeFontFamily(family) {
 
 const resolved = resolveTokenRefs(tokenDoc, tokenDoc);
 
+function toCssLength(value) {
+  return typeof value === "number" ? `${value}px` : value;
+}
+
 const spacingTokens = {
-  xs: "4px",
-  sm: "8px",
-  md: "16px",
-  lg: "24px",
-  xl: "32px",
-  "2xl": "48px",
-  "3xl": "64px",
-  "4xl": "80px",
+  xs: toCssLength(resolved.semantic.space.xs),
+  sm: toCssLength(resolved.semantic.space.sm),
+  md: toCssLength(resolved.semantic.space.md),
+  lg: toCssLength(resolved.semantic.space.lg),
+  xl: toCssLength(resolved.semantic.space.xl),
+  "2xl": toCssLength(resolved.semantic.space["2xl"]),
+  "3xl": toCssLength(resolved.semantic.space["3xl"]),
+  "4xl": toCssLength(resolved.semantic.space["4xl"]),
+  sectionGap: toCssLength(resolved.semantic.space.sectionGap),
+  contentGap: toCssLength(resolved.semantic.space.contentGap),
+  elementGap: toCssLength(resolved.semantic.space.elementGap),
+  elementGapSm: toCssLength(resolved.semantic.space.elementGapSm),
 };
 
 const typographyTokens = {
-  display: "22px",
-  titleLg: "18px",
-  title: "16px",
-  body: "14px",
-  bodySm: "13px",
-  label: "12px",
-  caption: "11px",
-  micro: "10px",
-  microSystem: "9px",
-  weightRegular: "400",
-  weightMedium: "500",
-  weightSemibold: "600",
-  weightBold: "700",
-  lineHeightNone: "1",
-  lineHeightTight: "1.2",
-  lineHeightSnug: "1.3",
-  lineHeightNormal: "1.5",
-  lineHeightRelaxed: "1.55",
+  display: toCssLength(resolved.semantic.typography.display.size),
+  titleLg: toCssLength(resolved.semantic.typography.titleLg.size),
+  title: toCssLength(resolved.semantic.typography.title.size),
+  body: toCssLength(resolved.semantic.typography.body.size),
+  bodySm: toCssLength(resolved.semantic.typography.bodySm.size),
+  label: toCssLength(resolved.semantic.typography.label.size),
+  caption: toCssLength(resolved.semantic.typography.caption.size),
+  micro: toCssLength(resolved.semantic.typography.micro.size),
+  microSystem: toCssLength(resolved.semantic.typography.microSystem.size),
+  weightRegular: resolved.primitives.fontWeight.regular,
+  weightMedium: resolved.primitives.fontWeight.medium,
+  weightSemibold: resolved.primitives.fontWeight.semibold,
+  weightBold: resolved.primitives.fontWeight.bold,
+  lineHeightNone: resolved.primitives.lineHeight.none,
+  lineHeightTight: resolved.primitives.lineHeight.tight,
+  lineHeightSnug: resolved.primitives.lineHeight.snug,
+  lineHeightNormal: resolved.primitives.lineHeight.normal,
+  lineHeightRelaxed: resolved.primitives.lineHeight.relaxed,
   letterSpacingNormal: "0.04em",
   letterSpacingWide: "0.06em",
   letterSpacingWider: "0.12em",
   letterSpacingWidest: "0.18em",
 };
+
+const typographyRuntime = Object.fromEntries(
+  Object.entries(resolved.semantic.typography).map(([name, role]) => [
+    name,
+    {
+      fontFamily: normalizeFontFamily(role.family),
+      fontSize: toCssLength(role.size),
+      fontWeight: role.weight,
+      lineHeight: role.lineHeight,
+    },
+  ]),
+);
 
 const semanticRuntime = {
   color: {
@@ -149,6 +223,8 @@ const semanticRuntime = {
     infoBg: resolved.semantic.color.state.infoBg,
     special: resolved.semantic.color.state.special,
     specialBg: resolved.semantic.color.state.specialBg,
+    gift: resolved.semantic.color.state.gift,
+    giftBg: resolved.semantic.color.state.giftBg,
     chipBg: resolved.adapters.custom.chip.bg,
   },
   font: {
@@ -156,17 +232,23 @@ const semanticRuntime = {
     display: normalizeFontFamily(resolved.primitives.fontFamily.display),
     mono: normalizeFontFamily(resolved.primitives.fontFamily.mono),
   },
+  primitives: {
+    color: resolved.primitives.color,
+  },
+  typography: typographyRuntime,
+  radius: {
+    control: toCssLength(resolved.semantic.radius.control),
+    card: toCssLength(resolved.semantic.radius.card),
+    badge: toCssLength(resolved.semantic.radius.badge),
+    pill: toCssLength(resolved.semantic.radius.pill),
+  },
   shadow: {
     appBar: resolved.adapters.custom.appBar.shadow,
-    card: resolved.primitives.shadow["1"],
+    card: resolved.semantic.elevation.card,
     cardHover: resolved.primitives.shadow["3"],
     cardSoft: resolved.primitives.shadow["2"],
   },
   dynamicCardPalette: resolved.adapters.custom.dynamicCardPalette,
-  modes: {
-    light: { color: lightColorRuntime },
-    dark: { color: darkColorRuntime },
-  },
 };
 
 const tsOutput = `/* eslint-disable */
@@ -214,10 +296,26 @@ const cssOutput = `/* AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. */
   --color-info-bg: ${semanticRuntime.color.infoBg};
   --color-special: ${semanticRuntime.color.special};
   --color-special-bg: ${semanticRuntime.color.specialBg};
+  --color-gift: ${semanticRuntime.color.gift};
+  --color-gift-bg: ${semanticRuntime.color.giftBg};
 
   --font-family-body: ${semanticRuntime.font.body};
   --font-family-display: ${semanticRuntime.font.display};
   --font-family-mono: ${semanticRuntime.font.mono};
+
+  --radius-control: ${semanticRuntime.radius.control};
+  --radius-card: ${semanticRuntime.radius.card};
+  --radius-badge: ${semanticRuntime.radius.badge};
+  --radius-pill: ${semanticRuntime.radius.pill};
+
+  --space-1: ${toCssLength(resolved.primitives.space["1"])};
+  --space-2: ${toCssLength(resolved.primitives.space["2"])};
+  --space-3: ${toCssLength(resolved.primitives.space["3"])};
+  --space-4: ${toCssLength(resolved.primitives.space["4"])};
+  --space-5: ${toCssLength(resolved.primitives.space["5"])};
+  --space-6: ${toCssLength(resolved.primitives.space["6"])};
+  --space-7: ${toCssLength(resolved.primitives.space["7"])};
+  --space-8: ${toCssLength(resolved.primitives.space["8"])};
 
   --space-xs: ${spacingTokens.xs};
   --space-sm: ${spacingTokens.sm};
@@ -227,10 +325,10 @@ const cssOutput = `/* AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. */
   --space-2xl: ${spacingTokens["2xl"]};
   --space-3xl: ${spacingTokens["3xl"]};
   --space-4xl: ${spacingTokens["4xl"]};
-  --space-section-gap: 48px;
-  --space-content-gap: 24px;
-  --space-element-gap: 16px;
-  --space-element-gap-sm: 8px;
+  --space-section-gap: ${spacingTokens.sectionGap};
+  --space-content-gap: ${spacingTokens.contentGap};
+  --space-element-gap: ${spacingTokens.elementGap};
+  --space-element-gap-sm: ${spacingTokens.elementGapSm};
 
   --font-size-display: ${typographyTokens.display};
   --font-size-title-lg: ${typographyTokens.titleLg};
@@ -260,7 +358,25 @@ const cssOutput = `/* AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. */
 }
 `;
 
-fs.writeFileSync(semanticTsPath, tsOutput, "utf8");
-fs.writeFileSync(semanticCssPath, cssOutput, "utf8");
+const outputs = [
+  [semanticTsPath, tsOutput],
+  [semanticCssPath, cssOutput],
+];
 
-console.log("Generated semanticTokens.ts and semantic-tokens.css from design-tokens.json");
+if (process.argv.includes("--check")) {
+  const outOfDateFiles = outputs
+    .filter(([outputPath, output]) => fs.readFileSync(outputPath, "utf8") !== output)
+    .map(([outputPath]) => path.relative(clientRoot, outputPath));
+
+  if (outOfDateFiles.length > 0) {
+    throw new Error(`Generated token files are out of date: ${outOfDateFiles.join(", ")}`);
+  }
+
+  console.log("Generated token files are up to date");
+} else {
+  for (const [outputPath, output] of outputs) {
+    fs.writeFileSync(outputPath, output, "utf8");
+  }
+
+  console.log("Generated semanticTokens.ts and semantic-tokens.css from design-tokens.json");
+}
